@@ -1,0 +1,253 @@
+export const newsData = {
+  status: "ok",
+  totalResults: 33,
+  articles: [
+    {
+      source: {
+        id: null,
+        name: "CBS Sports"
+      },
+      author: "Garrett Podell",
+      title: "Chiefs vs. Chargers live updates: Game score, analysis, highlights as AFC West rivals meet in Brazil - CBS Sports",
+      description: "Kansas City and Los Angeles face off in the second game of Week 1, a special Friday night game in Brazil",
+      url: "https://www.cbssports.com/nfl/news/chiefs-chargers-live-updates-game-score-brazil-week-1-patrick-mahomes-justin-herbert/live/",
+      urlToImage: "https://sportshub.cbsistatic.com/i/r/2025/09/06/7dc6c391-4fdd-444d-9393-07d8b007765a/thumbnail/1200x675/37d74a2b9f7db896c358ae8209315852/quentin-johnston.jpg",
+      publishedAt: "2025-09-06T02:12:24Z",
+      content: "The 2025 NFL season certainly wasn't a pretty start for the Kansas City Chiefs. Starting wide receiver Xavier Worthy (shoulder) was knocked out of the game when he and tight end Travis Kelce collided… [+1878 chars]"
+    },
+    {
+      source: {
+        id: "associated-press",
+      name: "Associated Press"
+      },
+      author: "Matt O'Brien",
+      title: "Anthropic to pay authors $1.5 billion to settle lawsuit over pirated books used to train AI chatbots - AP News",
+      description: "Artificial intelligence company Anthropic has agreed to pay $1.5 billion to settle a class-action lawsuit by book authors who say the company took pirated copies of their works to train its chatbot. The landmark settlement, if approved by a judge as soon as M…",
+      url: "https://apnews.com/article/anthropic-copyright-authors-settlement-training-f294266bc79a16ec90d2ddccdf435164",
+      urlToImage: "https://dims.apnews.com/dims4/default/7507e71/2147483647/strip/true/crop/7105x3997+0+539/resize/1440x810!/quality/90/?url=https%3A%2F%2Fassets.apnews.com%2Fd3%2F3b%2F536cdb89ec724b42e29d9ba4405a%2F6ca20751c12c4dcdb6eb45e47ecbe8bf",
+      publishedAt: "2025-09-06T00:50:00Z",
+      content: "NEW YORK (AP) Artificial intelligence company Anthropic has agreed to pay $1.5 billion to settle a class-action lawsuit by book authors who say the company took pirated copies of their works to train… [+6674 chars]"
+    },
+    {
+      source: {
+        id: "associated-press",
+        name: "Associated Press"
+      },
+      author: "Howard Fendrich",
+      title: "Carlos Alcaraz beats Novak Djokovic at the US Open to reach his 3rd Grand Slam final in a row - AP News",
+      description: "Carlos Alcaraz has defeated Novak Djokovic 6-4, 7-6 (4), 6-2 at the U.S. Open to reach his third consecutive Grand Slam final. The No. 2-seeded Alcaraz's victory Friday means he will face either No. 1 Jannik Sinner or No. 25 Felix Auger-Aliassime for the cham…",
+      url: "https://apnews.com/article/us-open-djokovic-alcaraz-sinner-auger-aliassime-semifinals-men-e2476ffd6a5623479b080cc0f6a61866",
+      urlToImage: "https://dims.apnews.com/dims4/default/7b9b02e/2147483647/strip/true/crop/5972x3359+0+310/resize/1440x810!/quality/90/?url=https%3A%2F%2Fassets.apnews.com%2F74%2F23%2F377b04052ff23ac006a837c93871%2F4689b715b14b45ff9757351147099e27",
+      publishedAt: "2025-09-06T00:31:00Z",
+      content: "NEW YORK (AP) Carlos Alcaraz used his youth, athleticism and creativity to assert himself against the much more accomplished, but also much older, Novak Djokovic and beat the 24-time major champion 6… [+4406 chars]"
+    },
+    {
+      source: {
+        id: "nbc-news",
+        name: "NBC News"
+      },
+      author: "Babak Dehghanpisheh, Colin Sheeley",
+      title: "College of Charleston instructor among victims killed in Lisbon funicular crash - NBC News",
+      description: "The College of Charleston confirmed on Friday that one of its instructors was among the 16 people killed in the crash of the popular funicular railway in Lisbon on Wednesday.",
+      url: "https://www.nbcnews.com/world/europe/college-charleston-instructor-victims-killed-lisbon-funicular-crash-rcna229465",
+      urlToImage: "https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1200-630,f_auto,q_auto:best/rockcms/2025-09/250905-lisbon-streetcar-crash-aftermath-ac-731p-f89fce.jpg",
+      publishedAt: "2025-09-05T23:57:49Z",
+      content: "The College of Charleston confirmed on Friday that one of its instructors was among the 16 people killed in the crash of the popular funicular railway in Lisbon on Wednesday, which shocked Portugal a… [+2835 chars]"
+    },
+    {
+      source: {
+        id: null,
+        name: "BBC News"
+      },
+      author: null,
+      title: "Judge rules ending protections for Venezuelan and Haitian migrants is unlawful - BBC",
+      description: "The decision is in response to the Trump administration's efforts to end temporary protected status (TPS).",
+      url: "https://www.bbc.com/news/articles/c3vzknpywp4o",
+      urlToImage: "https://ichef.bbci.co.uk/news/1024/branded_news/a928/live/0da0d120-8aa7-11f0-8d32-095c155d0044.jpg",
+      publishedAt: "2025-09-05T23:36:04Z",
+      content: "Nardine SaadBBC News, Los Angeles\r\nThe Trump administration's effort to strip hundreds of thousands of Venezuelan and Haitian migrants of legal protections is unlawful, a US judge says.\r\nThe ruling b… [+2954 chars]"
+    },
+    {
+      source: {
+        id: "techcrunch",
+        name: "TechCrunch"
+      },
+      author: "Maxwell Zeff",
+      title: "OpenAI reorganizes research team behind ChatGPT’s personality - TechCrunch",
+      description: "OpenAI is shuffling the team that shapes its AI models' behavior, and its leader is moving on to another project within the company.",
+      url: "https://techcrunch.com/2025/09/05/openai-reorganizes-research-team-behind-chatgpts-personality/",
+      urlToImage: "https://techcrunch.com/wp-content/uploads/2024/12/GettyImages-2021258442.jpg?resize=1200,800",
+      publishedAt: "2025-09-05T23:19:12Z",
+      content: "OpenAI is reorganizing its Model Behavior team, a small but influential group of researchers who shape how the company’s AI models interact with people, TechCrunch has learned.\r\nIn an August memo to … [+4189 chars]"
+    },
+    {
+      source: {
+        id: "cbs-news",
+        name: "CBS News"
+      },
+      author: "Melissa  Gaffney",
+      title: "Powerball winners can opt for potentially \"dangerous\" lump sum or \"safe bet\" annual payments. An accountant gives advice. - CBS News",
+      description: "Saturday's Powerball jackpot would be the second-biggest in U.S. lottery history, only trailing the world-record $2.04 billion grand prize won in 2022.",
+      url: "https://www.cbsnews.com/news/powerball-jackpot-winners-lump-sum-annual-payments-accountant-advice/",
+      urlToImage: "https://assets1.cbsnewsstatic.com/hub/i/r/2025/09/05/98a01478-a85d-42bd-bb43-b6225557a146/thumbnail/1200x630/4aa4596d487331d8c4252dc82e1c90f1/gettyimages-2231845592.jpg",
+      publishedAt: "2025-09-05T23:13:05Z",
+      content: "With the Powerball jackpot now an estimated $1.8 billion for Saturday night's drawing, there's lottery fever in the air. If you're the lucky one whose $2 ticket ends up worth millions, what do you do… [+2599 chars]"
+    },
+    {
+      source: {
+        id: "cbs-news",
+        name: "CBS News"
+      },
+      author: "Camilo  Montoya-Galvez",
+      title: "Trump administration tells Abrego Garcia he now faces deportation to African country of Eswatini - CBS News",
+      description: "The Trump administration told Kilmar Abrego Garcia on Friday it is now seeking to deport him to the tiny African kingdom of Eswatini, according to an email obtained by CBS News.",
+      url: "https://www.cbsnews.com/news/kilmar-abrego-garcia-trump-eswatini-deportation/",
+      urlToImage: "https://assets3.cbsnewsstatic.com/hub/i/r/2025/08/26/85b95d25-c652-4055-894c-5f4fa66c686b/thumbnail/1200x630/ea7c75906231f245785d8803d60fb153/gettyimages-2231358090.jpg",
+      publishedAt: "2025-09-05T23:05:00Z",
+      content: "The Trump administration told Kilmar Abrego Garcia on Friday it is now seeking to deport him to the tiny African kingdom of Eswatini, formerly known as Swaziland, according to an Immigration and Cust… [+4776 chars]"
+    },
+    {
+      source: {
+        id: null,
+        name: "InStyle"
+      },
+      author: "https://www.facebook.com/InStyle",
+      title: "Blake Lively Makes Her First Public Appearance in Months Wearing a Completely Sheer Mesh Tank Top - instyle.com",
+      description: "Blake Lively stepped out in NYC for the first time in months, where she favored fall hues in a sheer sequined tank top and brown suede boots. See her latest look here.",
+      url: "https://www.instyle.com/blake-lively-first-public-appearance-in-months-sheer-tank-11804761",
+      urlToImage: "https://www.instyle.com/thmb/wUkL4SAaYvnNw2fOhmflcM_a-Xs=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Blake-Lively-Leadjpg-b135b046e5a741dcaeba76ae228c90c6.jpg",
+      publishedAt: "2025-09-05T22:30:49Z",
+      content: "Blake Lively stepped out for the first time in nearly two months on Friday as she attended Glossy's Pop event in New York City. The actress favored fall hues, selecting a maroon sequined tank top and… [+2064 chars]"
+    },
+    {
+      source: {
+        id: "axios",
+        name: "Axios"
+      },
+      author: "Herb Scribner",
+      title: "Eric Adams refuses to exit NYC mayor race after reports of Trump job offer - Axios",
+      description: "Adams denied the media reports that he's leaving the race to join the Trump administration.",
+      url: "https://www.axios.com/2025/09/05/eric-adams-nyc-mayor-race-trump-job",
+      urlToImage: "https://images.axios.com/o-hfXsqZIpGEJp-sifjJs50rgh8=/0x81:4000x2331/1366x768/2025/09/05/1757104166663.jpeg",
+      publishedAt: "2025-09-05T22:09:46Z",
+      content: "<ul><li>Adams had previously denied the claims and said during a Friday afternoon press conference that some reports said, \"I'm in Washington on Monday. Those reports are wrong. I'm not.\"</li><li>The… [+1852 chars]"
+    },
+    {
+      source: {
+        id: null,
+        name: "Financial Times"
+      },
+      author: "Abigail Hauslohner",
+      title: "Donald Trump issues order to penalise countries that detain American citizens - Financial Times",
+      description: "Move raises possibility the administration could bar some foreign leaders from attending upcoming UN General Assembly",
+      url: "https://www.ft.com/content/11fca04e-cada-41aa-a9f3-ab448efbb3d8",
+      urlToImage: "https://www.ft.com/__origami/service/image/v2/images/raw/https%3A%2F%2Fd1e00ek4ebabms.cloudfront.net%2Fproduction%2Fa136e9ff-fe1e-4b5b-93b7-840465867727.jpg?source=next-barrier-page",
+      publishedAt: "2025-09-05T22:09:09Z",
+      content: "Complete digital access to quality analysis and expert insights, complemented with our award-winning Weekend Print edition.\r\n<ul><li></li>Everything in Print<li></li>Weekday Print Edition<li></li>FT … [+231 chars]"
+    },
+    {
+      source: {
+        id: null,
+        name: "Rolling Stone"
+      },
+      author: "Jon Blistein",
+      title: "Mark Volman, Co-Founder of the Turtles and Vocalist on Flower Power Classic 'Happy Together,' Dead at 78 - Rolling Stone",
+      description: "Mark Volman, co-founder of the Turtles and Flo and Eddie with his longtime friend Howard Kaylan, has died at the age of 78.",
+      url: "http://www.rollingstone.com/music/music-news/mark-volman-the-turtles-happy-together-dead-obtiuary-1235422564/",
+      urlToImage: "https://www.rollingstone.com/wp-content/uploads/2025/09/GettyImages-1162981962.jpg?w=1600&h=900&crop=1",
+      publishedAt: "2025-09-05T21:39:13Z",
+      content: "Mark Volman, the singer and co-founder of the Sixties pop-rock group the Turtles, best known for their 1967 hit “Happy Together,” died Friday, Sept. 5. He was 78.\r\nReps for Volman confirmed his death… [+6329 chars]"
+    },
+    {
+      source: {
+        id: null,
+        name: "MacRumors"
+      },
+      author: "Juli Clover",
+      title: "Awe Dropping: Everything Coming at the September 9 Apple Event - MacRumors",
+      description: "Apple is holding its annual iPhone-centric event on Tuesday, September 9 at 10:00 a.m. Pacific Time. This is the biggest Apple event of the year, and...",
+      url: "https://www.macrumors.com/guide/september-2025-apple-event-what-to-expect/",
+      urlToImage: "https://images.macrumors.com/t/dDR6-1VT5NiD327bFB4rFMa9f2Y=/2500x/article-new/2025/09/Awe-Dropping-What-to-Expect.jpg",
+      publishedAt: "2025-09-05T21:02:00Z",
+      content: "Apple is holding its annual iPhone-centric event on Tuesday, September 9 at 10:00 a.m. Pacific Time. This is the biggest Apple event of the year, and we'll see Apple unveiling new iPhones, new Apple … [+16882 chars]"
+    },
+    {
+      source: {
+        id: null,
+        name: "The Texas Tribune"
+      },
+      author: "By Kayla Guo and Eleanor Klibanoff",
+      title: "Texas Rep. James Talarico launches Democratic primary bid for U.S. Senate - The Texas Tribune",
+      description: "The Austin Democrat has made a name for himself with his viral social media presence. His entry to the race pits him against former U.S. Rep. Colin Allred in the increasingly crowded primary.",
+      url: "https://www.texastribune.org/2025/09/05/james-talarico-texas-senate-democrat-2026/",
+      urlToImage: "https://thumbnails.texastribune.org/qEfyb4uoDJhvVcR_xqEc2CvGjtk=/1200x630/filters:quality(95):focal(0x0:3200x2129)/static.texastribune.org/media/files/62b1e0df5e356726aa1c6e9f12b92537/0725%20Beto%20Talarico%20RB%2011.jpg",
+      publishedAt: "2025-09-05T20:30:33Z",
+      content: "Audio recording is automated for accessibility. Humans wrote and edited the story. See our AI policy, and give us feedback.\r\nSign up for The Brief, The Texas Tribunes daily newsletter that keeps read… [+4006 chars]"
+    },
+    {
+      source: {
+        id: "the-washington-post",
+        name: "The Washington Post"
+      },
+      author: "Tobi Raji",
+      title: "15 dead after new Ebola outbreak in the Democratic Republic of Congo - The Washington Post",
+      description: "Health officials have recorded at least 28 suspected cases amid the central African nation’s 16th outbreak of the deadly disease.",
+      url: "https://www.washingtonpost.com/world/2025/09/05/ebola-congo-drc/",
+      urlToImage: "https://www.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/YZ7IEIT2EO3ZC6PTJXYQKYV3NM.JPG&w=1440",
+      publishedAt: "2025-09-05T19:59:22Z",
+      content: "At least 15 people from the Democratic Republic of Congo, including four health care workers, died following a new outbreak of the Ebola virus, the central African nations 16th major brush with the d… [+57 chars]"
+    },
+    {
+      source: {
+        id: "nbc-news",
+        name: "NBC News"
+      },
+      author: "Berkeley Lovelace Jr.",
+      title: "For some, Medicare isn't covering the updated Covid vaccine yet - NBC News",
+      description: "Some older Americans on Medicare are facing an unexpected problem: The updated Covid shots — approved last month by the Food and Drug Administration for all adults 65 and up — aren’t being covered, forcing them to decide whether to pay out of pocket",
+      url: "https://www.nbcnews.com/health/health-news/-medicare-isnt-covering-updated-covid-shots-yet-rcna229338",
+      urlToImage: "https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1200-630,f_auto,q_auto:best/rockcms/2025-09/250905-covid-vaccine-ch-1224-0debd3.jpg",
+      publishedAt: "2025-09-05T19:56:20Z",
+      content: "Some older Americans on Medicare are facing an unexpected problem: The updated Covid shots approved last month by the Food and Drug Administration for all adults 65 and up arent being covered, forcin… [+3971 chars]"
+    },
+    {
+      source: {
+        id: "the-wall-street-journal",
+        name: "The Wall Street Journal"
+      },
+      author: "The Wall Street Journal",
+      title: "Tesla Board Proposes Musk Pay Package Worth as Much as $1 Trillion Over Decade - The Wall Street Journal",
+      description: null,
+      url: "https://www.wsj.com/tech/tesla-board-proposes-musk-pay-package-worth-as-much-as-1-trillion-over-decade-6bc5e449",
+      urlToImage: null,
+      publishedAt: "2025-09-05T19:54:00Z",
+      content: null
+    },
+    {
+      source: {
+        id: null,
+        name: "Notebookcheck.net"
+      },
+      author: "Benjamin Herzig",
+      title: "GaN chargers accross the board and modular, repairable USB-C: Hands on with the new Lenovo ThinkPad P1 Gen 8 and P16 Gen 3 - Notebookcheck",
+      description: "We had the opportunity to get a hands on with the newest 2025 ThinkPad P series, including the Lenovo ThinkPad P1 Gen 8 and P16 Gen 3. One of the key changes for the new workstations: The move to all USB-C charging and Gallium Nitride (GaN chargers).",
+      url: "https://www.notebookcheck.net/GaN-chargers-accross-the-board-and-modular-repairable-USB-C-Hands-on-with-the-new-Lenovo-ThinkPad-P1-Gen-8-and-P16-Gen-3.1106756.0.html",
+      urlToImage: "https://www.notebookcheck.net/fileadmin/Notebooks/News/_nc5/Lenovo_P16_G3_5.jpg",
+      publishedAt: "2025-09-05T19:37:00Z",
+      content: "Due to the system being thinner, Lenovo had to lower the TGP of the GPU slightly. However, according to Lenovo, the chosen TGP is close to the optimum, as a higher power consumption would result in h… [+749 chars]"
+    },
+    {
+      source: {
+        id: "techcrunch",
+        name: "TechCrunch"
+      },
+      author: "Sarah Perez, Maxwell Zeff",
+      title: "Personalized AI companion app Dot is shutting down - TechCrunch",
+      description: "Dot, a personalized AI companion, is shutting down.",
+      url: "https://techcrunch.com/2025/09/05/personalized-ai-companion-app-dot-is-shutting-down/",
+      urlToImage: "https://techcrunch.com/wp-content/uploads/2024/06/hero.png?resize=1200,675",
+      publishedAt: "2025-09-05T19:27:47Z",
+      content: "Dot, an AI companion app that aimed to be a friend and confidante, is shutting down, the company announced on Friday. On a message published on its website, the startup behind Dot, New Computer, said… [+2389 chars]"
+    }
+  ]
+}

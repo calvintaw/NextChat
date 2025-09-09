@@ -1,0 +1,532 @@
+"use client"
+import { requestFriendship, getContacts, getFriendRequests, acceptFriendshipRequest, removeFriendshipRequest } from "@/app/lib/actions";
+import { ContactType } from "@/app/lib/definitions";
+import { socket } from "@/app/lib/socket";
+import * as Tabs from "@radix-ui/react-tabs";
+import { useActionState, useState, useRef, useEffect } from "react";
+import { FaUserFriends } from "react-icons/fa";
+import { GoDotFill } from "react-icons/go";
+import { MdCheck } from "react-icons/md";
+import { RxCross2 } from "react-icons/rx";
+import { Tooltip } from "react-tooltip";
+import InputField from "../form/InputField";
+import { Avatar } from "../general/Avatar";
+import { Button, IconWithSVG } from "../general/Buttons";
+import Search from "../general/Search";
+import { ContactPreviewContainer } from "./ContactCard";
+import { User } from "@/app/lib/definitions";
+import { ImSpinner9 } from "react-icons/im";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+
+type friendRequestsType = { sent: User[]; incoming: User[] };
+
+type ContactTabsProps = {
+  user: User;
+  initialContacts: ContactType[];
+  initialFriendRequests: friendRequestsType;
+};
+
+type AddContactTabProps = {
+	formAction: (formData: FormData) => void;
+	addFriendInputRef: React.RefObject<HTMLInputElement | null>;
+	request: { success: boolean; message: string };
+	isPending: boolean;
+};
+
+type RequestTabProps = {
+	user: User;
+  friendRequests: friendRequestsType;
+  setFriendRequests: React.Dispatch<React.SetStateAction<friendRequestsType>>;
+};
+  
+type AllContactsTabProps = {
+  friendsCount: number;
+  contacts: ContactType[];
+  user: User;
+};
+
+// const test_data: friendRequestsType = {
+// 	sent: [
+// 		{
+// 			id: "1",
+// 			image: "https://randomuser.me/api/portraits/men/1.jpg",
+// 			username: "john_doe",
+// 			displayName: "John Doe",
+// 			email: "john@example.com",
+// 			createdAt: "2025-01-01T12:00:00Z",
+// 			password: "hashed_password_1",
+// 		},
+// 		{
+// 			id: "2",
+// 			image: "https://randomuser.me/api/portraits/women/2.jpg",
+// 			username: "jane_smith",
+// 			displayName: "Jane Smith",
+// 			email: "jane@example.com",
+// 			createdAt: "2025-02-15T09:30:00Z",
+// 			password: "hashed_password_2",
+// 		},
+// 	],
+// 	incoming: [
+// 		{
+// 			id: "3",
+// 			image: "https://randomuser.me/api/portraits/men/3.jpg",
+// 			username: "bob_brown",
+// 			displayName: "Bob Brown",
+// 			email: "bob@example.com",
+// 			createdAt: "2025-03-10T15:45:00Z",
+// 			password: "hashed_password_3",
+// 		},
+// 		{
+// 			id: "4",
+// 			image: "https://randomuser.me/api/portraits/women/4.jpg",
+// 			username: "alice_white",
+// 			displayName: "Alice White",
+// 			email: "alice@example.com",
+// 			createdAt: "2025-04-22T11:20:00Z",
+// 			password: "hashed_password_4",
+// 		},
+// 		{
+// 			id: "8",
+// 			image: "https://randomuser.me/api/portraits/men/3.jpg",
+// 			username: "bob_brown",
+// 			displayName: "Bob Brown",
+// 			email: "bob@example.com",
+// 			createdAt: "2025-03-10T15:45:00Z",
+// 			password: "hashed_password_3",
+// 		},
+// 		{
+// 			id: "9",
+// 			image: "https://randomuser.me/api/portraits/women/4.jpg",
+// 			username: "alice_white",
+// 			displayName: "Alice White",
+// 			email: "alice@example.com",
+// 			createdAt: "2025-04-22T11:20:00Z",
+// 			password: "hashed_password_4",
+// 		},
+// 		{
+// 			id: "10",
+// 			image: "https://randomuser.me/api/portraits/men/3.jpg",
+// 			username: "bob_brown",
+// 			displayName: "Bob Brown",
+// 			email: "bob@example.com",
+// 			createdAt: "2025-03-10T15:45:00Z",
+// 			password: "hashed_password_3",
+// 		},
+// 		{
+// 			id: "11",
+// 			image: "https://randomuser.me/api/portraits/women/4.jpg",
+// 			username: "alice_white",
+// 			displayName: "Alice White",
+// 			email: "alice@example.com",
+// 			createdAt: "2025-04-22T11:20:00Z",
+// 			password: "hashed_password_4",
+// 		},
+// 	],
+// };
+
+const ContactTabs = ({
+	user,
+	initialContacts,
+	initialFriendRequests,
+}: ContactTabsProps) => {
+	const [request, formAction, isPending] = useActionState(
+		async (prevState: { success: boolean; message: string }, formData: FormData) => {
+			const request = await requestFriendship(prevState, formData);
+			if (request.success) {
+				socket.emit("refresh-contacts-page", user.id, request.target_id!);
+			}
+			return {success: request.success, message: request.message}
+
+		},
+		{ success: false, message: "" }
+	);
+		
+		const [friendRequests, setFriendRequests] = useState<friendRequestsType>(initialFriendRequests);
+		const [contacts, setContacts] = useState(initialContacts);
+		const addFriendInputRef = useRef<HTMLInputElement | null>(null);
+		const friendsCount = contacts.length;
+
+
+	useEffect(() => {
+		async function refrechContactsPage() {
+			console.log("refetching contacts")
+			const [newContacts, newRequests] = await Promise.all([getContacts(user.id), getFriendRequests(user.id)])
+			console.log("newCOntacts: ", newContacts)
+			setContacts(newContacts);
+			setFriendRequests(newRequests)
+		}
+
+		socket.on(`refresh-contacts-page`, refrechContactsPage);
+		return () => {
+			socket.off(`refresh-contacts-page`, refrechContactsPage);
+		}
+	
+	}, [])
+
+
+	return (
+		<>
+			<section className="border-r-2 border-border/10 h-full flex flex-col px-4 py-2">
+				<Tabs.Root defaultValue="all" className="flex flex-col h-full">
+					<Tabs.List className="my-3 flex gap-2 items-center">
+						<div className="flex items-center gap-2 mr-2">
+							<FaUserFriends className="text-2xl text-muted" />
+							<p className="text-muted font-medium">Friends</p>
+							<GoDotFill className="text-xs text-muted mt-0.5" />
+						</div>
+
+						<Tabs.Trigger value="all" asChild>
+							<Button className="bg-transparent border-transparent text-text hover:bg-accent/50 data-[state=active]:bg-accent/50 data-[state=active]:cursor-default">
+								All
+							</Button>
+						</Tabs.Trigger>
+
+						{(friendRequests.sent.length > 0 || friendRequests.incoming.length > 0) && (
+							<Tabs.Trigger value="request" asChild>
+								<Button className="bg-transparent border-transparent text-text hover:bg-accent/50 data-[state=active]:bg-accent/50 data-[state=active]:cursor-default">
+									Pending
+								</Button>
+							</Tabs.Trigger>
+						)}
+
+						<Tabs.Trigger
+							value="add"
+							asChild
+							onClick={() => {
+								addFriendInputRef.current?.focus();
+							}}
+						>
+							<Button className="bg-primary hover:bg-primary/80 data-[state=active]:bg-primary/25 data-[state=active]:text-primary data-[state=active]:cursor-default ">
+								Add Friend
+							</Button>
+						</Tabs.Trigger>
+					</Tabs.List>
+
+					<Tabs.Content value="all" asChild>
+						<AllContactsTab friendsCount={friendsCount} contacts={contacts} user={user} />
+					</Tabs.Content>
+
+					<Tabs.Content value="request" asChild>
+						<RequestTab user={user} setFriendRequests={setFriendRequests} friendRequests={friendRequests} />
+					</Tabs.Content>
+
+					<Tabs.Content value="add" asChild>
+						<AddContactTab
+							isPending={isPending}
+							formAction={formAction}
+							addFriendInputRef={addFriendInputRef}
+							request={request}
+						/>
+					</Tabs.Content>
+				</Tabs.Root>
+			</section>
+
+			<Tooltip id={`tooltip-friendship`} place="top" className="my-tooltip" border="var(--tooltip-border)" />
+		</>
+	);
+};
+
+
+
+
+const AddContactTab = ({ formAction, addFriendInputRef, request, isPending }: AddContactTabProps) => {
+	return (
+		<div className="p-4">
+			<div className="flex flex-col gap-2 my-3 mb-5">
+				<h1 className="text-2xl font-semibold ">Add Friends</h1>
+				<p className="text-base">You can add friends with their username.</p>
+			</div>
+			<form action={formAction}>
+				<InputField
+					disabled={isPending}
+					ref={addFriendInputRef}
+					parentClassName="h-fit py-2 group"
+					name="username"
+					placeholder="You can add friends with their username."
+					place="right"
+					errors={[request.message]}
+					success={request.success ? request.message : ""}
+					icon={
+						<>
+							<button
+								disabled={isPending}
+								type="submit"
+								className="bg-primary btn-with-icon opacity-65 group-focus-within:opacity-100 hover:bg-primary/75 active:bg-primary/50 py-1.5 px-3 text-[15px] text-white rounded-lg"
+							>
+								{isPending ? "Sending Friend Request" : "Send Friend Request"}
+								{isPending && <ImSpinner9 className="animate-spin"></ImSpinner9>}
+							</button>
+						</>
+					}
+				></InputField>
+			</form>
+
+			<hr className="hr-separator" />
+			<span className="text-muted text-sm">Recommended ~</span>
+
+			<hr className="hr-separator my-2 bg-transparent" />
+
+			<p className="text-muted">- Recommended Friends functionality coming soon...</p>
+
+		</div>
+	);
+};
+
+import { BsFilterLeft } from "react-icons/bs";
+import clsx from "clsx";
+import router from "next/router";
+
+const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps) => {
+
+	const [error, setError] = useState("")
+	const [isPending, setIsPendingIds] = useState(new Set<string>())
+
+	function handlePending(id: string, pending: boolean) {
+		if (pending) {
+			setIsPendingIds((prev) => new Set(prev).add(id));
+		}
+		else {
+				setIsPendingIds((prev) => {
+					const newSet = new Set(prev);
+					newSet.delete(id);
+					return newSet;
+				});
+		}
+
+	}
+
+	const handleAccept = async (friend: User) => {
+		handlePending(friend.id, true)
+		try {
+			const result = await acceptFriendshipRequest(friend);
+			
+			if (!result.success) {
+				setError(result.message);
+			} else {
+				socket.emit("refresh-contacts-page", user.id, friend.id);
+				setFriendRequests((prev) => ({
+					...prev,
+					incoming: prev.incoming.filter((req) => req.id !== friend.id),
+				}));
+			}
+		} catch (err) {
+			setError("Failed to accept friend request.");
+		} finally {
+			handlePending(friend.id, false);
+		}
+	};
+
+	const handleRemove = async (friend: User, type: "incoming" | "sent") => {
+		handlePending(friend.id, true);
+		try {
+			const result = await removeFriendshipRequest(friend);
+			if (!result.success) {
+				setError(result.message);
+			} else {
+				setFriendRequests((prev) => {
+					if (type === "sent") {
+						return {
+							...prev,
+							sent: prev.sent.filter((req) => req.id !== friend.id),
+						};
+					}
+
+					return {
+						...prev,
+						incoming: prev.incoming.filter((req) => req.id !== friend.id),
+					};
+				});
+				socket.emit("refresh-contacts-page", user.id, friend.id);
+			}
+		} catch (err) {
+			setError("Failed to remove friend request");
+		} finally {
+			handlePending(friend.id, false);
+		}
+	};
+
+	const [filter, setFiltered] = useState<"all" | "incoming" | "sent">("all");
+	let total = 0
+	if (filter === "all") {
+		total = friendRequests.incoming.length + friendRequests.sent.length;
+	}
+	else if (filter === "incoming") {
+		total = friendRequests.incoming.length;
+	}			
+	else if (filter === "sent") {
+		total = friendRequests.sent.length;
+	}
+
+
+	return (
+		<>
+			<div className="p-2 pb-0">
+				<div className="flex flex-row justify-between items-center sm:items-end gap-2 my-3">
+					<div className="flex flex-col gap-2">
+						<h1 className="text-2xl font-semibold ">Friendship Requests</h1>
+						<p className="text-base sm:block hidden">You can accept friendship requests here.</p>
+					</div>
+					<div className="flex gap-2">
+						<button className="bg-amber-500 cursor-default text-white">Total: {total}</button>
+						<DropdownMenu.Root>
+							<DropdownMenu.Trigger asChild>
+								<button className=" btn-wtih-icon flex items-center gap-1 !pl-2">
+									<BsFilterLeft className="text-2xl"></BsFilterLeft>
+									Filter: {filter.charAt(0).toUpperCase() + filter.slice(1)}
+								</button>
+							</DropdownMenu.Trigger>
+
+							<DropdownMenu.Content loop sideOffset={5} align="start" className="DropdownMenu__Content">
+								<DropdownMenu.Item onClick={() => setFiltered("all")} className="DropdownMenuItem">
+									All
+								</DropdownMenu.Item>
+								<DropdownMenu.Item onClick={() => setFiltered("incoming")} className="DropdownMenuItem">
+									Incoming
+								</DropdownMenu.Item>
+
+								<DropdownMenu.Item onClick={() => setFiltered("sent")} className="DropdownMenuItem">
+									Sent
+								</DropdownMenu.Item>
+							</DropdownMenu.Content>
+						</DropdownMenu.Root>
+					</div>
+				</div>
+
+				<hr className="hr-separator my-2 bg-transparent" />
+
+
+				{error && <p className="text-error text-sm my-2">{error}</p>}
+			</div>
+
+			<div className="flex flex-col p-2 max-h-[75%] overflow-y-scroll fade-bg-bottom pb-[100px]">
+				{friendRequests.incoming.length !== 0 && filter !== "sent" && (
+					<>
+						<div className="flex flex-col gap-4">
+							{friendRequests.incoming.map((friend) => (
+								<div
+									key={friend.id}
+									className="rounded-lg h-[60px] px-2.5 hover:bg-secondary/75 flex items-center gap-2.5
+          group/contact"
+								>
+									{/* Avatar */}
+									<div className="h-full mr-1 flex flex-row py-3">
+										<Avatar id={friend.id} src={friend.image} size="size-8" displayName={friend.displayName} />
+									</div>
+
+									<div className="text-sm h-full flex flex-col justify-center flex-1 font-medium text-text truncate leading-tight">
+										<p className="text-base m-0">{friend.displayName}</p>
+										<p className="text-muted text-[13.5px] -mt-0.5">{friend.username}</p>
+									</div>
+
+									<div className={clsx("flex-1 text-center", filter !== "all" && "hidden")}>
+										<p className="text-muted text-sm">incoming</p>
+									</div>
+
+									<div className="flex gap-2 min-w-[72px] justify-end">
+										<IconWithSVG
+											disabled={isPending.has(friend.id)}
+											onClick={() => {
+												handleAccept(friend);
+											}}
+											data-tooltip-id={`tooltip-friendship`}
+											data-tooltip-content="Accept"
+											className="icon-contact-panel group/icon"
+										>
+											<MdCheck className="group-hover/icon:text-success" />
+										</IconWithSVG>
+
+										<IconWithSVG
+											disabled={isPending.has(friend.id)}
+											onClick={() => {
+												// TODO: use toast noti to show users the result of their actions
+												handleRemove(friend, "incoming");
+											}}
+											data-tooltip-id={`tooltip-friendship`}
+											data-tooltip-content="Ignore"
+											className="icon-contact-panel group/icon"
+										>
+											<RxCross2 className="group-hover/icon:text-error" />
+										</IconWithSVG>
+									</div>
+
+									
+								</div>
+							))}
+						</div>
+					</>
+				)}
+
+				{friendRequests.sent.length !== 0 && filter !== "incoming" && (
+					<>
+						<div className="flex flex-col gap-4">
+							{friendRequests.sent.map((friend) => (
+								<div
+									key={friend.id}
+									className="rounded-lg h-[60px] px-2.5 hover:bg-secondary/75 flex items-center gap-2.5
+										group/contact
+										"
+								>
+									{/* Avatar */}
+									<div className="h-full mr-1 flex flex-row py-3">
+										<Avatar id={friend.id} src={friend.image} size="size-8" displayName={friend.displayName} />
+									</div>
+
+									<div className="text-sm h-full flex flex-col justify-center flex-1 font-medium text-text truncate leading-tight">
+										<p className="text-base m-0">{friend.displayName}</p>
+										<p className="text-muted text-[13.5px] -mt-0.5">{friend.username}</p>
+									</div>
+
+									<div className={clsx("flex-1 text-center", filter !== "all" && "hidden")}>
+										<p className="text-muted text-sm">sent</p>
+									</div>
+
+									<div className="flex gap-2 min-w-[72px] justify-end">
+										<IconWithSVG
+											disabled={isPending.has(friend.id)}
+											onClick={() => {
+												// TODO: use toast noti to show users the result of their actions
+												handleRemove(friend, "sent");
+											}}
+											data-tooltip-id={`tooltip-friendship`}
+											data-tooltip-content="Cancel"
+											className="icon-contact-panel group/icon"
+										>
+											<RxCross2 className="group-hover/icon:text-error" />
+										</IconWithSVG>
+									</div>
+
+									<Tooltip
+										id={`tooltip-friendship`}
+										place="top"
+										className="my-tooltip"
+										border="var(--tooltip-border)"
+									/>
+								</div>
+							))}
+						</div>
+					</>
+				)}
+			</div>
+		</>
+	);
+} 
+
+const AllContactsTab = ({ friendsCount, contacts, user }: AllContactsTabProps) => {
+	
+
+	return (
+			<div className="flex flex-col flex-1">
+				<Search />
+
+				<div className="mt-5 flex flex-col gap-4">
+					<p className="text-sm">All Friends - {friendsCount}</p>
+					<hr className="hr-separator !m-0" />
+				</div>
+
+				<ContactPreviewContainer user={user} contacts={contacts} />
+			</div>
+	);
+}
+
+
+export default ContactTabs;
