@@ -512,19 +512,23 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 } 
 
 const AllContactsTab = ({ friendsCount, contacts, user }: AllContactsTabProps) => {
-	
-
+	const [input, setInput] = useState("")
+const filteredContacts = contacts.filter(
+	(s) =>
+		s.displayName.toLowerCase().includes(input.toLowerCase()) ||
+		s.username.toLowerCase().includes(input.toLowerCase())
+);
 	return (
-			<div className="flex flex-col flex-1">
-				<Search />
+		<div className="flex flex-col flex-1">
+			<Search setInput={setInput} />
 
-				<div className="mt-5 flex flex-col gap-4">
-					<p className="text-sm">All Friends - {friendsCount}</p>
-					<hr className="hr-separator !m-0" />
-				</div>
-
-				<ContactPreviewContainer user={user} contacts={contacts} />
+			<div className="mt-5 flex flex-col gap-4">
+				<p className="text-sm">All Friends - {friendsCount}</p>
+				<hr className="hr-separator !m-0" />
 			</div>
+
+			<ContactPreviewContainer user={user} contacts={filteredContacts} />
+		</div>
 	);
 }
 
