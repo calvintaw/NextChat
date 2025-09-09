@@ -129,12 +129,11 @@ const ContactTabs = ({
 	initialContacts,
 	initialFriendRequests,
 }: ContactTabsProps) => {
+	const router = useRouter()
 	const [request, formAction, isPending] = useActionState(
 		async (prevState: { success: boolean; message: string }, formData: FormData) => {
 			const request = await requestFriendship(prevState, formData);
-			if (request.success) {
-				socket.emit("refresh-contacts-page", user.id, request.target_id!);
-			}
+			router.refresh()
 			return {success: request.success, message: request.message}
 
 		},
@@ -274,7 +273,7 @@ const AddContactTab = ({ formAction, addFriendInputRef, request, isPending }: Ad
 
 import { BsFilterLeft } from "react-icons/bs";
 import clsx from "clsx";
-import router from "next/router";
+import { useRouter } from "next/navigation";
 
 const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps) => {
 

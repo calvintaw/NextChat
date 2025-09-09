@@ -24,7 +24,6 @@ import { getDMRoom } from "./utilities";
 import { newsData } from "./news";
 import { socket } from "./socket";
 import console from "console";
-import { id } from "zod/v4/locales";
 
 async function withCurrentUser(callback: Function) {
 	const session = await auth()
@@ -689,6 +688,7 @@ export async function requestFriendship(
 
 
 			console.log(`Success! Your friend requests to ${username} was sent.`);
+			socket.emit("refresh-contacts-page", currentUser.id, id);
 
 			return {
 				success: true,
