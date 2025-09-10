@@ -1,5 +1,5 @@
 "use client"
-import { removeFriendshipRequest } from "@/app/lib/actions";
+import { createDM, removeFriendshipRequest } from "@/app/lib/actions";
 import {  ContactType, User } from "@/app/lib/definitions";
 import { socket } from "@/app/lib/socket";
 import Link from "next/link";
@@ -10,6 +10,7 @@ import { Tooltip } from "react-tooltip";
 import { Avatar } from "../general/Avatar";
 import { IconWithSVG } from "../general/Buttons";
 import { getDMRoom } from "@/app/lib/utilities";
+import { useFriendsProvider } from "@/app/lib/friendsContext";
 
 type MinimalUserType = { id: string; username: string };
 
@@ -88,9 +89,43 @@ export const ContactPreview = ({
 	handleRemove: (friend: MinimalUserType) => void;
 	user: User;
 	contact: ContactType;
-}) => {
+	}) => {
+	
+	const {friends: contacts, setFriends: setContacts} = useFriendsProvider()
+	const handleClick = async () => {
+	
+	const room_id = getDMRoom(user.id, contact.id);
+
+	// Check if DM already exists in state
+	const dmExists = contacts.some((item) => item.room_id === room_id);
+	if (dmExists) {
+		console.log("DM already exists. No need to create.");
+		return;
+	}
+
+	// Create DM if it doesn't exist
+	const result = await createDM({ id: contact.id, username: contact.username });
+
+	if (result.success) {
+		setContacts((prev) => [
+			...prev,
+			{
+				id: contact.id,
+				image: contact.image,
+				username: contact.username,
+				displayName: contact.displayName,
+				email: contact.email,
+				online: false,
+				room_id,
+			},
+		]);
+	} else {
+		console.error(result.message);
+	}
+};
+
 	return (
-		<Link className="cursor-pointer group/contact no-underline" href={`/chat/${getDMRoom(user.id, contact.id)}`}>
+		<Link className="cursor-pointer group/contact no-underline" href={`/chat/${getDMRoom(user.id, contact.id)}`} onClick={handleClick}>
 			<div className="rounded-lg h-[60px] px-2.5 hover:bg-accent/25 flex items-start gap-2.5">
 				{/* Avatar */}
 				<div className="h-full flex flex-row py-2.5">

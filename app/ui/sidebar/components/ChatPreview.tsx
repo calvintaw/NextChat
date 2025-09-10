@@ -19,17 +19,18 @@ import clsx from "clsx";
 import { blockFriendship, deleteDM, getChats, removeFriendshipRequest } from "@/app/lib/actions";
 import { usePathname, useRouter } from "next/navigation";
 import { Route } from "next";
+import { useFriendsProvider } from "@/app/lib/friendsContext";
 
 dayjs.extend(isToday);
 dayjs.extend(isYesterday);
 dayjs.extend(weekday);
 
 export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatType[] }) => {
-	const [localChats, setLocalChats] = useState<ChatType[]>(chats);
+	const {friends: localChats, setFriends: setLocalChats} = useFriendsProvider()
 	const [selectedChat, setSelectedChat] = useState<ChatType | null>(null); // store clicked chat
 
 	useEffect(() => {
-		setLocalChats(chats);
+		setLocalChats(chats)
 	}, [chats]);
 
 	useEffect(() => {
@@ -230,7 +231,7 @@ export const ChatPanelHeader = () => {
 				</span>
 				<FaPlus
 					data-tooltip-id="dm-icon-tooltip"
-					data-tooltip-content="Create DM"
+					data-tooltip-content="Create DM (aesthic only)"
 					className="hover:text-text text-muted ml-auto text-sm"
 				/>
 				<Tooltip id="dm-icon-tooltip" className="my-tooltip" border="var(--tooltip-border)" place="bottom-start" />

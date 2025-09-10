@@ -6,6 +6,7 @@ import { PathBanner } from "../ui/general/PathBanner";
 import { cookies } from "next/headers";
 import { Suspense } from "react";
 import Loading from "./chat/[room_id]/loading";
+import FriendsProvider from "../lib/friendsContext";
 
 
 const roboto = localFont({
@@ -41,12 +42,14 @@ export default async function RootLayout({
 		<html lang="en" className={theme}>
 			<body className={`font-sans ${roboto.className} antialiased flex h-screen w-screen scroll-smooth`}>
 				{/* Sidebar column */}
-				<section className="flex flex-col h-full">
-					<PathBanner />
-					<Sidebar />
-				</section>
+				<FriendsProvider>
 
-				<Suspense fallback={<Loading />}>{children}</Suspense>
+					<section className="flex flex-col h-full">
+						<PathBanner />
+						<Sidebar />
+					</section>
+					<Suspense fallback={<Loading />}>{children}</Suspense>
+				</FriendsProvider>
 			</body>
 		</html>
 	);

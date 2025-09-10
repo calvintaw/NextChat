@@ -16,7 +16,6 @@ const ChatPanel = async ({user}:{user:User}) => {
 		max-lg:border-border
 		-translate-x-[calc(100%+64px)] z-30 bg-background 
 		[#sidebar.active_&]:!border-2
-		[#sidebar.active_&]:!border-red-500
 
     lg:static lg:translate-x-0 lg:flex lg:z-auto lg:bg-transparent 
     

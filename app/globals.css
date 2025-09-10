@@ -330,6 +330,7 @@ html {
 		@apply !size-[30px] bg-transparent hover:animate-wiggle;
 	}
 
+
 	.icon-small {
 		@apply !size-[30px] p-0 m-0;
 	}

@@ -11,6 +11,7 @@ import {
 } from "react-icons/bs";
 import { useState, useRef, ButtonHTMLAttributes } from "react";
 import { IconWithSVG } from "../../general/Buttons";
+import clsx from "clsx";
 
 const emojiIcons = [
 	FaSmileBeam,
@@ -18,19 +19,16 @@ const emojiIcons = [
 	FaStar,
 	FaThumbsUp,
 	FaBell,
-
 	GoSmiley,
 	GoHeartFill,
 	GoStarFill,
 	GoThumbsup,
 	GoBellFill,
-
 	HiEmojiHappy,
 	HiHeart,
 	HiStar,
 	HiThumbUp,
 	HiBell,
-
 	BsFillEmojiSmileFill,
 	BsFillHeartFill,
 	BsFillStarFill,
@@ -38,19 +36,21 @@ const emojiIcons = [
 	BsFillBellFill,
 ];
 
-type BtnProps = ButtonHTMLAttributes<HTMLButtonElement>;
+type BtnProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+	open?: boolean;
+};
 
-export const AddReactionBtn = ({ className = "", ...rest }: BtnProps) => {
+export const AddReactionBtn = ({ className = "", open = false, ...rest }: BtnProps) => {
 	const [selected, setSelected] = useState(0);
 	const hasHovered = useRef(false);
 
 	const handleHover = () => {
-		if (hasHovered.current) return; // prevent rapid re-entry
+		if (open) return;
+		if (hasHovered.current) return;
 		hasHovered.current = true;
 
 		setSelected((prev) => (prev + 1) % emojiIcons.length);
 
-		// Reset hover lock after short delay
 		setTimeout(() => {
 			hasHovered.current = false;
 		}, 200);
@@ -60,7 +60,13 @@ export const AddReactionBtn = ({ className = "", ...rest }: BtnProps) => {
 
 	return (
 		<IconWithSVG onMouseEnter={handleHover} {...rest} className={`icon-chatbox group bg-transparent ${className}`}>
-			<Icon className="text-xl scale-100 animate-pop text-yellow-400 group-hover:scale-[1.2] group-hover:rotate-[1deg] transition-all duration-150 ease-in-out" />
+			<Icon
+				className={clsx(
+					"text-xl text-yellow-400",
+					!open &&
+						"text-xl scale-100 group-hover:scale-[1.2] group-hover:rotate-[1deg] animate-pop transition-all duration-150 ease-in-out"
+				)}
+			/>
 		</IconWithSVG>
 	);
 };

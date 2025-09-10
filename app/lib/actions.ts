@@ -657,6 +657,41 @@ export async function deleteDM(
 
 }
 
+export async function createDM(
+	targetUser: MinimalUserType
+): Promise<{ success: boolean; message: string; roomId?: string }> {
+	return withCurrentUser(async (currentUser: User) => {
+		try {
+			console.log(`Creating DM between ${currentUser.username} and ${targetUser.username}...`);
+
+			// Generate a new room ID
+			const room_id = getDMRoom(currentUser.id, targetUser.id);
+
+			await sql.begin(async (sql) => {
+				// Insert into rooms
+				await sql`
+					INSERT INTO rooms (id, type)
+					VALUES (${room_id}, 'dm')
+				`;
+
+				// Insert members
+				await sql`
+					INSERT INTO room_members (room_id, user_id)
+					VALUES 
+						(${room_id}, ${currentUser.id}),
+						(${room_id}, ${targetUser.id})
+				`;
+			});
+
+			console.log(`Success! Created DM with ${targetUser.username}.`);
+			return { success: true, message: `Created DM with ${targetUser.username}.`, roomId: room_id };
+		} catch (error) {
+			console.error("Error creating DM:", error);
+			return { success: false, message: "Failed to create DM. Please try again later." };
+		}
+	});
+}
+
 
 
 export async function requestFriendship(

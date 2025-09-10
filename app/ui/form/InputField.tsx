@@ -92,9 +92,7 @@ export function PasswordField({
 						type={showPass ? "text" : "password"}
 						placeholder={placeholder}
 						className={className}
-						onKeyDown={(e) => {
-							if (e.key === "Enter") e.preventDefault();
-						}}
+						
 					/>
 
 					<button

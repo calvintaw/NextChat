@@ -32,19 +32,6 @@ const ChatInputBox = ({ activePersons, roomId, user, handleFileUpload, setMessag
 		setStyle("min-h-10");
 	}, []);
 
-	useEffect(() => {
-		if (!textRef.current) return
-		textRef.current.value = input;
-	}, [input])
-
-	const debouncedSetInput = useRef(debounce((val: string) => setInput(val), 250)).current;
-
-	const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		const val = e.target.value;
-		if (textRef.current) textRef.current.value = val; // update DOM instantly
-		debouncedSetInput(val); // update React state after debounce
-	};
-
 	const { cancel } = useDebounce({
 		state: input,
 		startCallback: () => {
@@ -53,14 +40,12 @@ const ChatInputBox = ({ activePersons, roomId, user, handleFileUpload, setMessag
 			}
 		},
 		endCallback: () => socket.emit("typing stopped", roomId),
-		delay: 1750,
+		delay: 2000,
 	});
 
 	const sendMessage = (input: string) => {
 		if (!input.trim()) return;
-		
-
-		const temp_msg = {
+				const temp_msg = {
 			room_id: roomId,
 			sender_id: user.id,
 			sender_image: user.image ?? null,
@@ -96,18 +81,16 @@ const ChatInputBox = ({ activePersons, roomId, user, handleFileUpload, setMessag
 				},
 			];
 		});
-		setInput("");
-		setReplyToMsg(null)
 	};
 	
-
+	
 	const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-		if (e.key === "Enter" && !e.shiftKey) {
+		if (e.key === "Enter" && !e.shiftKey && textRef.current) {
 			e.preventDefault(); // prevents new line from being written
-			setInput(""); 
-			const value = textRef.current?.value ?? "";
-			sendMessage(value);
-			if (textRef.current) textRef.current.value = "";
+			sendMessage(textRef.current?.value);
+			textRef.current.value = "";	
+			setInput("");
+			setReplyToMsg(null);
 		}
 	};
 
@@ -125,26 +108,40 @@ const ChatInputBox = ({ activePersons, roomId, user, handleFileUpload, setMessag
 			<div
 				id="ChatInputBox"
 				className={clsx(
-					"flex items-start gap-2 rounded-lg px-3 py-1.5 bg-background dark:bg-accent/50 border border-foreground/15 not-dark:!border-foreground/30  focus-within:border-muted/25 relative shadow-lg"
-					 ,replyToMsg && "rounded-t-none !border-muted/25"
+					"flex items-start gap-2 rounded-lg px-3 py-1.5 bg-background dark:bg-accent/50 border border-foreground/15 not-dark:!border-foreground/30  focus-within:border-muted/25 relative shadow-lg",
+					replyToMsg && "rounded-t-none !border-muted/25"
 				)}
 			>
 				<AttachmentDropdown handleFileUpload={handleFileUpload} />
-					<TextareaAutosize
-						ref={textRef}
-						name="query"
-						id="chatbox-TextareaAutosize"
-						onChange={handleChange}
-						maxRows={8}
-						placeholder="Write a message"
-						onKeyDown={handleKeyPress}
-						className={clsx(
-							"w-full resize-none bg-transparent text-text placeholder-muted border-none outline-none focus:outline-none focus:ring-0",
-							style
-						)}
-					/>
+				<TextareaAutosize
+					ref={textRef}
+					name="query"
+					id="chatbox-TextareaAutosize"
+					maxRows={8}
+					placeholder="Write a message"
+					onKeyDown={handleKeyPress}
+					className={clsx(
+						"w-full resize-none bg-transparent text-text placeholder-muted border-none outline-none focus:outline-none focus:ring-0",
+						style
+					)}
+				/>
 
-				<ChatToolbar setEmoji={(emoji: EmojiIcon) => setInput((prev) => prev.concat(emoji))} />
+				<ChatToolbar
+					setEmoji={(emoji: EmojiIcon) => {
+						if (!textRef.current) return;
+
+						const textarea = textRef.current;
+						const start = textarea.selectionStart;
+						const end = textarea.selectionEnd;
+
+						const currentValue = textarea.value;
+						const newValue = currentValue.slice(0, start) + emoji + currentValue.slice(end);
+						textarea.value = newValue;
+						setInput(newValue)
+						const cursorPos = start + emoji.length;
+						textarea.selectionStart = textarea.selectionEnd = cursorPos;
+				}}
+				/>
 			</div>
 		</div>
 	);
