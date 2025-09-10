@@ -149,14 +149,14 @@ const NewsGrid = () => {
                 placeholder="Search news..."
                 defaultValue={filter === "home" ? "" : filter}
                 className="w-full flex-1"
-                parentClassName="w-full min-h-0 h-[42px] px-1.5 "
+                parentClassName="w-full min-h-0 h-10 px-1.5 "
               />
             </form>
             <IconWithSVG
               type="button"
               data-tooltip-id="category-id"
               data-tooltip-content={showCategories ? "Hide Categories" : "Show Categories"}
-              className="icon-square !px-0 w-[42px] h-[42px]"
+              className="icon-square !px-0 w-10 h-10"
               onClick={toggleCategories}
             >
               <BiSolidCategory className="text-2xl" />
@@ -173,7 +173,7 @@ const NewsGrid = () => {
                 router.push("/news");
                 setFilter("home");
               }}
-              className={`btn px-3 py-1.5 text-base flex-1 min-w-[calc(50%-0.5rem)] sm:min-w-[120px] ${
+              className={`btn px-3 py-1.5 text-base flex-1 min-w-[calc(50%-0.5rem)] sm:min-w-30 ${
                 filter === "home" ? "bg-foreground text-background" : ""
               }`}
             >
@@ -183,7 +183,7 @@ const NewsGrid = () => {
               <button
                 key={cat}
                 onClick={() => handleClick(cat)}
-                className={`btn px-3 py-1.5 text-base flex-1 min-w-[calc(50%-0.5rem)] sm:min-w-[120px] ${
+                className={`btn px-3 py-1.5 text-base flex-1 min-w-[calc(50%-0.5rem)] sm:min-w-30 ${
                   filter === cat ? "bg-foreground text-background" : ""
                 }`}
               >
@@ -198,7 +198,7 @@ const NewsGrid = () => {
 
       {error && <p className="text-error mb-4">{(error as any)?.message}</p>}
 
-      {isLoading && <Loading className="!max-h-[300px] !max-w-[950px]" />}
+      {isLoading && <Loading className="!max-h-75 !max-w-238" />}
 
       {!isLoading && !error && data && (
         <>

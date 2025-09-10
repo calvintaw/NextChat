@@ -22,10 +22,9 @@ type ChatInputBoxProps = {
 	setMessages: React.Dispatch<React.SetStateAction<MessageType[]>>;
 	tempIdsRef: React.MutableRefObject<Set<string>>;
 };
-import debounce from "lodash.debounce"
 
-const ChatInputBox = ({ activePersons, roomId, user, handleFileUpload, setMessages, tempIdsRef }: ChatInputBoxProps) => {
-	const {input, setInput, replyToMsg, setReplyToMsg} = useChatProvider()
+const ChatInputBox = ({ activePersons, roomId, user, handleFileUpload, setMessages, tempIdsRef, isBlocked }: ChatInputBoxProps) => {
+	const {input, setInput, replyToMsg, setReplyToMsg, textRef} = useChatProvider()
 	const [style, setStyle] = useState("!max-h-10");
 
 	useEffect(() => {
@@ -95,53 +94,57 @@ const ChatInputBox = ({ activePersons, roomId, user, handleFileUpload, setMessag
 	};
 
 
-	const textRef = useRef<HTMLTextAreaElement |null>(null)
 	useEffect(() => {
 		if (replyToMsg) textRef.current?.focus()
 	}, [replyToMsg])
 
 	return (
-		<div className="p-4 relative mb-3" data-tooltip-id={"typing-indicator"}>
-			<TypingIndicator displayName={activePersons} />
-			<ReplyToBox></ReplyToBox>
-
+		<div className={clsx(isBlocked && "cursor-not-allowed")}>
 			<div
-				id="ChatInputBox"
-				className={clsx(
-					"flex items-start gap-2 rounded-lg px-3 py-1.5 bg-background dark:bg-accent/50 border border-foreground/15 not-dark:!border-foreground/30  focus-within:border-muted/25 relative shadow-lg",
-					replyToMsg && "rounded-t-none !border-muted/25"
-				)}
+				className={clsx("p-4 relative mb-3 ", isBlocked && "opacity-75 pointer-events-none")}
+				data-tooltip-id={"typing-indicator"}
 			>
-				<AttachmentDropdown handleFileUpload={handleFileUpload} />
-				<TextareaAutosize
-					ref={textRef}
-					name="query"
-					id="chatbox-TextareaAutosize"
-					maxRows={8}
-					placeholder="Write a message"
-					onKeyDown={handleKeyPress}
+				<TypingIndicator displayName={activePersons} />
+				<ReplyToBox></ReplyToBox>
+
+				<div
+					id="ChatInputBox"
 					className={clsx(
-						"w-full resize-none bg-transparent text-text placeholder-muted border-none outline-none focus:outline-none focus:ring-0",
-						style
+						"flex items-start gap-2 rounded-lg px-3 py-1.5 bg-background dark:bg-accent/50 border border-foreground/15 not-dark:!border-foreground/30  focus-within:border-muted/25 relative shadow-lg",
+						replyToMsg && "rounded-t-none !border-muted/25"
 					)}
-				/>
+				>
+					<AttachmentDropdown handleFileUpload={handleFileUpload} />
+					<TextareaAutosize
+						ref={textRef}
+						name="query"
+						id="chatbox-TextareaAutosize"
+						maxRows={8}
+						placeholder="Write a message"
+						onKeyDown={handleKeyPress}
+						className={clsx(
+							"w-full resize-none bg-transparent text-text placeholder-muted border-none outline-none focus:outline-none focus:ring-0",
+							style
+						)}
+					/>
 
-				<ChatToolbar
-					setEmoji={(emoji: EmojiIcon) => {
-						if (!textRef.current) return;
+					<ChatToolbar
+						setEmoji={(emoji: EmojiIcon) => {
+							if (!textRef.current) return;
 
-						const textarea = textRef.current;
-						const start = textarea.selectionStart;
-						const end = textarea.selectionEnd;
+							const textarea = textRef.current;
+							const start = textarea.selectionStart;
+							const end = textarea.selectionEnd;
 
-						const currentValue = textarea.value;
-						const newValue = currentValue.slice(0, start) + emoji + currentValue.slice(end);
-						textarea.value = newValue;
-						setInput(newValue)
-						const cursorPos = start + emoji.length;
-						textarea.selectionStart = textarea.selectionEnd = cursorPos;
-				}}
-				/>
+							const currentValue = textarea.value;
+							const newValue = currentValue.slice(0, start) + emoji + currentValue.slice(end);
+							textarea.value = newValue;
+							setInput(newValue);
+							const cursorPos = start + emoji.length;
+							textarea.selectionStart = textarea.selectionEnd = cursorPos;
+						}}
+					/>
+				</div>
 			</div>
 		</div>
 	);
@@ -168,7 +171,7 @@ const ReplyToBox = () => {
 
 			<IconWithSVG
 				onClick={() => setReplyToMsg(null)}
-				className="!w-[16px] !h-[16px] !p-0 !rounded-full bg-white/75 hover:bg-white flex items-center justify-center text-center"
+				className="!w-4 !h-4 !p-0 !rounded-full bg-white/75 hover:bg-white flex items-center justify-center text-center"
 			>
 				<RxCross2 className="text-xs font-semibold dark:text-black text-white" />
 			</IconWithSVG>

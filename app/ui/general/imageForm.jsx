@@ -27,7 +27,7 @@ export default function Home() {
 
 	return (
 		<>
-			<div className="container mx-auto mt-8 max-w-[560px]">
+			<div className="container mx-auto mt-8 max-w-140">
 				<div className="flex justify-between items-center pb-4 border-b border-dashed border-gray-900 mb-4">
 					<h1 className="text-3xl font-semibold">Upload File</h1>
 				</div>
@@ -44,7 +44,7 @@ export default function Home() {
 				>
 					Upload File
 				</button>
-				{uploaded && <img src={uploaded} className="my-5 max-w-[400px]" />}
+				{uploaded && <img src={uploaded} className="my-5 max-w-140" />}
 			</div>
 		</>
 	);

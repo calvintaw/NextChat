@@ -98,7 +98,7 @@ export const AttachmentDropdown = ({ handleFileUpload }: Props) => {
 				<DropdownMenu.Trigger asChild>
 					<IconWithSVG
 						className="
-                     !size-[30px]
+                     !size-7.5
                      group
                      !rounded-full
                      p-0

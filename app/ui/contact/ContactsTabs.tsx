@@ -404,7 +404,7 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 							{friendRequests.incoming.map((friend) => (
 								<div
 									key={friend.id}
-									className="rounded-lg h-[60px] px-2.5 hover:bg-secondary/75 flex items-center gap-2.5
+									className="rounded-lg h-15 px-2.5 hover:bg-secondary/75 flex items-center gap-2.5
           group/contact"
 								>
 									{/* Avatar */}
@@ -421,7 +421,7 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 										<p className="text-muted text-sm">incoming</p>
 									</div>
 
-									<div className="flex gap-2 min-w-[72px] justify-end">
+									<div className="flex gap-2 min-w-18 justify-end">
 										<IconWithSVG
 											disabled={isPending.has(friend.id)}
 											onClick={() => {
@@ -461,7 +461,7 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 							{friendRequests.sent.map((friend) => (
 								<div
 									key={friend.id}
-									className="rounded-lg h-[60px] px-2.5 hover:bg-secondary/75 flex items-center gap-2.5
+									className="rounded-lg h-15 px-2.5 hover:bg-secondary/75 flex items-center gap-2.5
 										group/contact
 										"
 								>
@@ -479,7 +479,7 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 										<p className="text-muted text-sm">sent</p>
 									</div>
 
-									<div className="flex gap-2 min-w-[72px] justify-end">
+									<div className="flex gap-2 min-w-18 justify-end">
 										<IconWithSVG
 											disabled={isPending.has(friend.id)}
 											onClick={() => {

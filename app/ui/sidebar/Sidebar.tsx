@@ -18,7 +18,7 @@ const Sidebar = async ({ className }: { className?: string }) => {
 		<>
 			<nav
 				id="sidebar"
-				className={`relative flex-1 max-w-[345px] h-full flex flex-row items-start w-fit ${className} border-contrast border-r-2`}			
+				className={`relative flex-1 max-w-86 h-full flex flex-row items-start w-fit ${className} border-contrast border-r-2`}			
 			>
 				<OnlineIndicator name={user.displayName} userId={user.id}></OnlineIndicator>
 

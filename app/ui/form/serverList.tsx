@@ -27,7 +27,7 @@ export const ServerList = ({ user, servers }: { user: User, servers: Room[] }) =
 				<h1 className="text-2xl font-sans font-semibold">Featured Servers</h1>
 				<form
 					ref={formRef}
-					className="w-full md:w-fit relative flex gap-2"
+					className="md:w-fit relative flex gap-2"
 					onSubmit={(e) => e.preventDefault()}
 				>
 					<InputField
@@ -42,7 +42,7 @@ export const ServerList = ({ user, servers }: { user: User, servers: Room[] }) =
 						value={search}
 						onChange={(e) => setSearch(e.target.value)}
 						className="w-full"
-						parentClassName="w-full px-2"
+						parentClassName="w-full flex-1 px-2"
 					/>
 
 					<select
@@ -59,7 +59,7 @@ export const ServerList = ({ user, servers }: { user: User, servers: Room[] }) =
 							!text-base
 							!focus:!border-primary
 							!outline-none
-							!w-full md:!w-auto
+							!w-fit md:!w-auto
 						"
 						onChange={(e) => setFilterType(e.target.value as FilterType)}
 					>
@@ -120,11 +120,11 @@ const Card = ({ server, user}: any) => {
 	return (
 		<div
 			key={server.id}
-			className="bg-background p-0 rounded-xl overflow-hidden min-w-[250px] shadow-md flex flex-col border-2 border-border group hover:border-foreground/40 not-dark:hover:border-foreground/80 cursor-pointer 
+			className="bg-background p-0 rounded-xl overflow-hidden min-w-63 shadow-md flex flex-col border-2 border-border group hover:border-foreground/40 not-dark:hover:border-foreground/80 cursor-pointer 
 							"
 		>
 			{/* Server Banner */}
-			<div className="relative h-[100px] w-full mb-2.5">
+			<div className="relative h-25 w-full mb-2.5">
 				{server.banner ? (
 					<>
 						{!loaded && <div className="absolute bg-accent top-0 left-0 w-full h-full animate-pulse" />}

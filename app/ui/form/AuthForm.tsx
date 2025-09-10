@@ -16,7 +16,7 @@ export const AuthFormWrapper = ({ className, children }: { className?: string; c
 	return (
 		<div
 			className={clsx(
-				"my-auto max-sm:w-[95%] min-w-[320px] w-fit h-fit m-auto rounded-2xl ring-1 ring-foreground/25 p-6 flex flex-col gap-2 bg-background",
+				"my-auto max-sm:w-[95%] min-w-80 w-fit h-fit m-auto rounded-2xl ring-1 ring-foreground/25 p-6 flex flex-col gap-2 bg-background",
 				className
 			)}
 		>

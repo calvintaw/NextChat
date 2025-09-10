@@ -51,7 +51,7 @@ export const PathBanner = () => {
 	return (
 		<div
 			id="path-banner"
-				className="hidden lg:block p-1 w-full max-w-[345px] text-center border-contrast border-b-1 border-r-2
+				className="hidden lg:block p-1 w-full max-w-86 text-center border-contrast border-b-1 border-r-2
 			text-xl font-sans font-semibold
 			"
 			>

@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { socket } from "../../lib/socket";
 import { ChatType, MessageType, Room, User } from "../../lib/definitions";
-import { blockFriendship, deleteMsg, deleteServer, editProfile, editServer, getRecentMessages, getServersInCommon, removeFriendshipRequest } from "../../lib/actions";
+import { blockFriendship, checkIfBlocked, deleteMsg, deleteServer, editProfile, editServer, getRecentMessages, getServersInCommon, removeFriendshipRequest } from "../../lib/actions";
 import dayjs from "dayjs";
 import isToday from "dayjs/plugin/isToday";
 import isYesterday from "dayjs/plugin/isYesterday";
@@ -22,12 +22,27 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	const [activePersons, setActivePersons] = useState<string[]>([]);
 	const tempIdsRef = useRef<Set<string>>(new Set());
 	const [initialLoading, setInitialLoading] = useState(true)
+	const [isBlocked, setIsBlocked] = useState(false);
+
+	useEffect(() => {
+		// check if it's a DM and recipient exists
+		if (type === "dm" && recipient) {
+			const check = async () => {
+				const blocked = await checkIfBlocked(user, recipient as User);
+				setIsBlocked(blocked);
+			};
+
+			check();
+		} else {
+			setIsBlocked(false);
+		}
+	}, [type, recipient, user.id]);
 	
 	const firstRunRef = useRef(true);
 
 	// fetching msgs at startup and add listeners for typing event
 	useEffect(() => {
-		if (!firstRunRef.current) return; // firstRunRef purpose: to solve some msgs appearing twice sometimes on first render i guess
+		if (!firstRunRef.current || isBlocked) return; // firstRunRef purpose: to solve some msgs appearing twice sometimes on first render i guess
 
 		const fetchMessages = async () => {
 			const recent = await getRecentMessages(roomId);
@@ -58,6 +73,8 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 	// handle incoming msg sockets from server / handle msg delete sockets
 	useEffect(() => {
+		if (isBlocked) return;
+
 		const handleIncomingMsg = (msg: MessageType) => {
 			setMessages((prev) => {
 				if (msg.sender_id !== user.id) return [...prev, msg];
@@ -136,6 +153,8 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 	
 	const handleFileUpload = (url: string[], type: "image" | "video") => {
+		if (isBlocked) return;
+		
 		socket.emit("message", {
 			room_id: roomId,
 			sender_id: user.id,
@@ -147,6 +166,8 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	};
 
 	const deleteMessage = async (id: string) => {
+		if (isBlocked) return;
+
 		const originalMsg = [...messages]
 		setMessages((prev) => prev.filter((tx) => tx.id != id));
 		const result = await deleteMsg(id, roomId)
@@ -161,14 +182,18 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	return (
 		<>
 			<div
-				className="flex flex-1 flex-col shadow-md bg-chatbox		
+				className="flex flex-1 flex-col shadow-md bg-chatbox 
 			"
 			>
-				<ChatProvider config={{ setMessages, messages, roomId, user, containerRef }}>
-					<div ref={containerRef} className="flex-1 flex flex-col overflow-y-auto py-4 pb-10 ">
-						{type === "dm" && recipient && <DirectMessageCard roomId={roomId} currentUserId={user.id} user={recipient as User} />}
+				<ChatProvider config={{ setMessages, messages, roomId, user, containerRef, isBlocked }}>
+					<div ref={containerRef} className="flex-1 flex flex-col overflow-y-auto py-4 pb-10">
+						{type === "dm" && recipient && (
+							<DirectMessageCard roomId={roomId} currentUserId={user.id} user={recipient as User} />
+						)}
 
-						{type === "server" && isServerRoom(roomId) && recipient && <ServerCardHeader user={user} server={recipient as Room} />}
+						{type === "server" && isServerRoom(roomId) && recipient && (
+							<ServerCardHeader user={user} server={recipient as Room} />
+						)}
 
 						{initialLoading ? (
 							<Loading className="!w-full !flex-1"></Loading>
@@ -500,7 +525,7 @@ function ServerEditForm({server, user, setLocalServer}: {server: Room, user:User
 									!items-center
 									!relative
 									!px-3
-									!min-h-[45px]
+									!min-h-11
 									!outline-none
 									!rounded-lg
 									!border

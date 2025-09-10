@@ -33,10 +33,10 @@ const UserPanel = ({ user }: Props) => {
 
 	return (
 		<div
-			className="@container !absolute max-lg:max-w-[46px] !bottom-4.5 !left-2 !right-2.5 z-40
+			className="@container !absolute max-lg:max-w-11 !bottom-4.5 !left-2 !right-2.5 z-40
 
-		max-lg:[#sidebar.active_&]:!w-[325px]
-		max-lg:[#sidebar.active_&]:!max-w-[325px]
+		max-lg:[#sidebar.active_&]:!w-81
+		max-lg:[#sidebar.active_&]:!max-w-81
 		
 		"
 		>
@@ -54,7 +54,7 @@ const UserPanel = ({ user }: Props) => {
 				@min-[300px]:py-1 @min-[300px]:pr-1"
 				>
 					<div className="  ml-2 flex flex-1 flex-col justify-center overflow-hidden ">
-						<p className="text-sm font-semibold text-text truncate max-w-[140px] leading-tight">{user.displayName}</p>
+						<p className="text-sm font-semibold text-text truncate max-w-35 leading-tight">{user.displayName}</p>
 						<p className="text-xs font-medium text-muted">{isOnline ? "Online" : "Offline"}</p>
 					</div>
 					<Buttons />

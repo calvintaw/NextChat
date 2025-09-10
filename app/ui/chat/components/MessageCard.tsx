@@ -142,7 +142,7 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 
 			<div className="flex items-start gap-4 max-w-[95%]">
 				{(isFirstGroup || msg.replyTo) && (
-					<div className="min-w-11 flex justify-center mt-1">
+					<div className="min-w-11 flex justify-center">
 						<Avatar
 							size="size-10"
 							id={msg.sender_id}
@@ -192,7 +192,7 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 							))}
 
 						{(msg.type === "image" || msg.type === "video") && (
-							<div className="max-w-[400px] grid gap-2 rounded-md img-upload-scrollbar">
+							<div className="max-w-100 grid gap-2 rounded-md img-upload-scrollbar">
 								{JSON.parse(msg.content).map((src: string, i: number) => {
 									const isEven = JSON.parse(msg.content).length % 2 === 0;
 									const total = JSON.parse(msg.content).length;
@@ -204,7 +204,7 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 									return (
 										<div
 											key={`${src}-${i}`}
-											className="rounded-lg max-h-[225px] flex items-center justify-center bg-accent"
+											className="rounded-lg max-h-56 flex items-center justify-center bg-accent"
 											style={{
 												gridColumn: `span ${colSpan}`,
 												gridRow: `span ${rowSpan}`,

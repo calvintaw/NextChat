@@ -8,6 +8,7 @@ interface ChatContextType {
 	setMsgToEdit: React.Dispatch<React.SetStateAction<string | null>>;
 	replyToMsg: MessageType | null;
 	setReplyToMsg: React.Dispatch<React.SetStateAction<MessageType | null>>;
+	textRef: React.RefObject<HTMLTextAreaElement | null>;
 	[key: string]: any;
 }
 
@@ -24,6 +25,8 @@ export const ChatProvider = ({ children, config = {} }: ChatProviderProps) => {
 	const [input, setInput] = useState("");
 	const [replyToMsg, setReplyToMsg] = useState<MessageType | null>(null);
 	const [msgToEdit, setMsgToEdit] = useState<string | null>(null);
+		const textRef = useRef<HTMLTextAreaElement |null>(null)
+	
 
   const contextValue = {
 		input,
@@ -32,6 +35,7 @@ export const ChatProvider = ({ children, config = {} }: ChatProviderProps) => {
 		setMsgToEdit,
 		replyToMsg,
 		setReplyToMsg,
+		textRef,
 		...config,
 	};
 

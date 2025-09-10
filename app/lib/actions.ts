@@ -50,6 +50,21 @@ export async function getUser(user_id: string): Promise<User | null> {
 	return result[0] ?? null;
 }
 
+export async function checkIfBlocked(user: User, friend: User): Promise<boolean> {
+	const [user1_id, user2_id] = [user.id, friend.id].sort((a, b) => a.localeCompare(b));
+	const result = await sql<{ status: string }[]>`
+    SELECT status
+    FROM friends
+    WHERE user1_id = ${user1_id} AND user2_id = ${user2_id} LIMIT 1;
+  `;
+
+	if (result.length === 0) {
+		return false;
+	}
+
+	return result[0].status === "blocked";
+}
+
 
 export async function getServersInCommon(currentUserId: string, targetUserId: string): Promise<Room[]> {
 	return await sql`

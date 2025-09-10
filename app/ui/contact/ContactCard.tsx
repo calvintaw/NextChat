@@ -126,7 +126,7 @@ export const ContactPreview = ({
 
 	return (
 		<Link className="cursor-pointer group/contact no-underline" href={`/chat/${getDMRoom(user.id, contact.id)}`} onClick={handleClick}>
-			<div className="rounded-lg h-[60px] px-2.5 hover:bg-accent/25 flex items-start gap-2.5">
+			<div className="rounded-lg h-15 px-2.5 hover:bg-accent/25 flex items-start gap-2.5">
 				{/* Avatar */}
 				<div className="h-full flex flex-row py-2.5">
 					<Avatar

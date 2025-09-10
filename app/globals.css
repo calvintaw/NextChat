@@ -281,13 +281,13 @@ html {
 
 	/* --- Tooltip Styles --- */
 	.my-tooltip {
-		@apply !scale-95 !transition !duration-250 !ease-[cubic-bezier(0.16,1,0.3,1)] !origin-top !bg-surface dark:!bg-accent !p-2 !px-3 !max-w-[20rem] !text-text !rounded-lg !text-base !font-semibold !shadow-lg !shadow-black/45 dark:!shadow-black !z-50;
+		@apply !scale-95 !transition !duration-250 !ease-[cubic-bezier(0.16,1,0.3,1)] !origin-top !bg-surface dark:!bg-accent !p-2 !px-3 !max-w-80 !text-text !rounded-lg !text-base !font-semibold !shadow-lg !shadow-black/45 dark:!shadow-black !z-50;
 	}
 
 		/* --- Tooltip Styles --- */
 		.my-tooltip__chat {
 			@apply !scale-95 !transition  !duration-250 !ease-[cubic-bezier(0.16,1,0.3,1)] !origin-top 
-						!bg-surface dark:!bg-accent !p-1 !px-2.5 !max-w-[20rem] !text-text 
+						!bg-surface dark:!bg-accent !p-1 !px-2.5 !max-w-80 !text-text 
 						!rounded-md !font-light !text-sm !shadow-lg !z-50 ;
 		}
 
@@ -319,7 +319,7 @@ html {
 
 	/* --- Icon Specific Styles (used for message tooltips, chatbox, general icons) --- */
 	.icon-message-tooltip {
-		@apply flex items-center justify-center bg-surface hover:bg-accent cursor-pointer !size-[28px] !p-0 !m-0 scale-95 transition-transform duration-100 hover:scale-100 origin-center;
+		@apply flex items-center justify-center bg-surface hover:bg-accent cursor-pointer !size-7 !p-0 !m-0 scale-95 transition-transform duration-100 hover:scale-100 origin-center;
 	}
 
 	.icon-message-tooltip svg {
@@ -327,12 +327,12 @@ html {
 	}
 
 	.icon-chatbox {
-		@apply !size-[30px] bg-transparent hover:animate-wiggle;
+		@apply !size-7.5 bg-transparent hover:animate-wiggle;
 	}
 
 
 	.icon-small {
-		@apply !size-[30px] p-0 m-0;
+		@apply !size-7.5 p-0 m-0;
 	}
 
 	.icon-small svg {
@@ -349,7 +349,7 @@ html {
 	}
 
 	.icon-square {
-		@apply p-[7px] w-fit h-fit;
+		@apply p-1.5 w-fit h-fit;
 	}
 
 	.icon-secondary {
@@ -357,7 +357,7 @@ html {
 	}
 
 	.icon-contact-panel {
-		@apply group-hover/contact:bg-background bg-transparent !size-[30px] !p-4 !rounded-full
+		@apply group-hover/contact:bg-background bg-transparent !size-7.5 !p-4 !rounded-full
 		disabled:!bg-background 
 		;
 	}
@@ -372,7 +372,7 @@ html {
 		flex items-center
 		relative
 		px-3
-		min-h-[45px]
+		min-h-11
 		outline-none
 		rounded-lg
 		border
@@ -503,7 +503,7 @@ html {
 
 
 	.btn-small {
-		@apply size-[30px] p-0 m-0 text-sm;
+		@apply size-7.5 p-0 m-0 text-sm;
 	}
 
 	/* --- Dropdown Element (Custom/Non-Radix Dropdown?) --- */
@@ -830,4 +830,8 @@ html {
   height: 100%;
   pointer-events: none;
   background: linear-gradient(to top, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.15));
+}
+
+html {
+  font-size: clamp(12.5px, 4vw, 16px) !important;
 }

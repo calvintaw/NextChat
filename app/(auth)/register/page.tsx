@@ -30,7 +30,7 @@ const Page = () => {
 
 	return (
 		<>
-			<AuthFormWrapper className="max-w-[665px]">
+			<AuthFormWrapper className="max-w-166">
 				<form
 					onSubmit={async (e) => {
 						e.preventDefault();

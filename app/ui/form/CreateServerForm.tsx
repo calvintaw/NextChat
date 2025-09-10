@@ -159,7 +159,7 @@ export default function CreateServerFormDialog({ className, user }: { className:
 			<Dialog.Portal>
 				<Dialog.Overlay className="fixed inset-0 bg-black/80 z-[99]" />
 				<Dialog.Content
-					className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-[475px]  max-h-[95vh] 
+					className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-119  max-h-[95vh] 
 				bg-surface text-text rounded-2xl px-5 py-4 pt-7.5 shadow-lg shadow-black/95 not-dark:shadow-black/25
 				animate-in fade-in-0 zoom-in-95 z-[100] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
 				>

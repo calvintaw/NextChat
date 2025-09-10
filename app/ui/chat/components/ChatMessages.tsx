@@ -8,55 +8,68 @@ import isYesterday from "dayjs/plugin/isYesterday";
 import weekday from "dayjs/plugin/weekday";
 import MessageCard from "./MessageCard";
 import { useChatProvider } from "../ChatBoxWrapper";
+import { HiExclamationCircle } from "react-icons/hi";
 
 dayjs.extend(isToday);
 dayjs.extend(isYesterday);
 dayjs.extend(weekday);
 
 const ChatMessages = ({ messages, deleteMessage }: { messages: MessageType[]; deleteMessage: Function}) => {
+	const {isBlocked} = useChatProvider()
 
 	return (
-		<>
+		<div className="relative min-h-[calc(100vh-400px)]">
+			{isBlocked && (
+				<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+					<div className="bg-accent text-text px-4 py-2 rounded-lg flex items-center gap-2 max-w-[90vw] mx-3">
+						<HiExclamationCircle size={20} />
+						<span>You cannot send messages in this chat</span>
+					</div>
+				</div>
+			)}
+
 			{messages.map((msg, i) => {
 				const prevMsg = messages[i - 1];
 				const isFirstGroup =
 					i === 0 ||
-					prevMsg.sender_id !== msg.sender_id || prevMsg &&
-					dayjs(msg.createdAt).diff(dayjs(prevMsg.createdAt), "minute") >= 5;
-					const separateLogic = i === 0 || prevMsg && dayjs(msg.createdAt).diff(dayjs(prevMsg.createdAt), "day") >= 1;
+					prevMsg.sender_id !== msg.sender_id ||
+					(prevMsg && dayjs(msg.createdAt).diff(dayjs(prevMsg.createdAt), "minute") >= 5);
+				const separateLogic = i === 0 || (prevMsg && dayjs(msg.createdAt).diff(dayjs(prevMsg.createdAt), "day") >= 1);
 
 				return (
 					<React.Fragment key={msg.id}>
 						{separateLogic && <MessageSeparator date={msg.createdAt} />}
 
 						<MessageCard
-								msg={msg}
-								isFirstGroup={isFirstGroup}
-								onDelete={(id: string) => deleteMessage(id)}
-							></MessageCard>
-							
-
+							msg={msg}
+							isFirstGroup={isFirstGroup}
+							onDelete={(id: string) => deleteMessage(id)}
+						></MessageCard>
 					</React.Fragment>
 				);
 			})}
-
 			<RefAnchor></RefAnchor>
-		</>
+		</div>
 	);
 };
 
 const RefAnchor = () => {
-	const { messages, containerRef } = useChatProvider();
+	const { messages, containerRef, textRef } = useChatProvider();
 	const scrollRef = useRef<HTMLDivElement>(null);
 
+	const isFocused = (): boolean => {
+		return textRef.current === document.activeElement;
+	};
+
 	useLayoutEffect(() => {
+		// container ref is not really needed now as i added a much better solution of check if textarea has focus or cursor in it.
 		const container = containerRef.current;
 		if (!container) return;
 
 		const isAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
 		// "100px tolerance" for near-bottom
 
-		if (isAtBottom) {
+		if (isAtBottom || isFocused()) {
 			scrollRef.current?.scrollIntoView({ behavior: "smooth" });
 		}
 	}, [messages]);
