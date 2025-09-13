@@ -4,6 +4,7 @@ import "@/app/globals.css";
 import { cookies } from "next/headers";
 import { Suspense } from "react";
 import Loading from "../(root)/chat/[room_id]/loading";
+import "@/app/lib/passwordRules.js";
 
 const roboto = localFont({
 	src: [

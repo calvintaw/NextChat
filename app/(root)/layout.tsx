@@ -7,6 +7,7 @@ import { cookies } from "next/headers";
 import { Suspense } from "react";
 import Loading from "./chat/[room_id]/loading";
 import FriendsProvider from "../lib/friendsContext";
+import '@/app/lib/passwordRules.js'
 
 
 const roboto = localFont({

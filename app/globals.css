@@ -856,12 +856,57 @@ html {
 
 
 
-
-input[type="password"] {
-  -webkit-text-security: disc; /* for WebKit browsers */
-  -moz-appearance: textfield; /* remove Firefox special styling */
-  font-family: inherit;        /* force same font as normal input */
+.password-rules__meter {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+	width: 100%;
 }
 
+.password-rules__meter > :where(span) {
+	flex: 1;
+  width: 100%;
+  height: 0.25em;
+  background-color: lightgray;
+  border-radius: 360px;
+  transition: background-color 100ms ease-out;
+}
+
+.password-rules[data-score="1"] .password-rules__meter :first-child,
+.password-rules[data-score="2"] .password-rules__meter :nth-child(-n + 2),
+.password-rules[data-score="3"] .password-rules__meter :nth-child(-n + 3),
+.password-rules[data-score="4"] .password-rules__meter :nth-child(-n + 4) {
+  background-color: dodgerblue;
+}
+
+.password-rules[data-score="5"] .password-rules__meter :nth-child(-n + 5) {
+  background-color: mediumseagreen;
+}
+
+.password-rules__score::before {
+  display: block;
+  counter-reset: score var(--score, 0) total var(--total, 5);
+  content: counter(score) "/" counter(total);
+  font-feature-settings: "tnum";
+  font-size: 0.8em;
+}
+
+.password-rules__checklist {
+  --flow: 0.3rem;
+  padding-inline-start: 1.2em;
+}
+
+.password-rules__checklist li {
+  position: relative;
+  list-style-type: circle;
+}
+
+.password-rules__checklist .is-match::before {
+  content: "✅";
+  position: absolute;
+  top: 0;
+  right: calc(100% + 0.25em);
+  font-size: 0.9em;
+}
 
 
