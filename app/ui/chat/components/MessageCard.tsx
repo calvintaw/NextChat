@@ -10,6 +10,7 @@ import { MessageDropdownMenu } from './MessageDropdown';
 import { addReactionToMSG, editMsg, getUsername, removeReactionFromMSG } from '@/app/lib/actions';
 import { HiArrowTurnUpRight } from 'react-icons/hi2';
 import { flushSync } from 'react-dom';
+import { useToast } from '@/app/lib/hooks/useToast';
 
 type MessageCardType = {
   msg: MessageType;
@@ -21,7 +22,8 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 	const msg_date = getLocalTimeString(msg.createdAt);
 	const editInputRef = useRef<HTMLInputElement | null>(null)
 	const { msgToEdit, messages, setMessages, setMsgToEdit, roomId, replyToMsg } = useChatProvider();
-  
+	const toast = useToast()
+
 	const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setMsgToEdit(null);
@@ -54,6 +56,7 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 		const result = await editMsg({ id: msg.id, roomId, content: newContent })
 		if (!result.success) {
 			setMessages(originalMsgs)
+			toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			console.log(result.error)
 		}
 
@@ -241,6 +244,7 @@ export default MessageCard
 const ReactionsRow = ({ msg, isFirstGroup }: { msg: MessageType; isFirstGroup: boolean }) => {
 	const { messages, setMessages, user, roomId } = useChatProvider();
 	const [usernamesMap, setUsernamesMap] = useState<Record<string, string>>({});
+	const toast = useToast()
 
 	const handleRemoveReaction = async (msg_id: string, emoji: string) => {
 		const originalMsg = [...messages];
@@ -260,6 +264,7 @@ const ReactionsRow = ({ msg, isFirstGroup }: { msg: MessageType; isFirstGroup: b
 		const result = await removeReactionFromMSG({ id: msg_id, roomId, userId: user.id, emoji });
 		if (!result.success) {
 			setMessages(originalMsg);
+			toast({ title: "Error!", mode: "negative", subtitle: result.error });
 		}
 	};
 

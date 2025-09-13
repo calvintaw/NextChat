@@ -23,7 +23,7 @@ import z from "zod";
 import { getDMRoom } from "./utilities";
 import { newsData } from "./news";
 import { socket } from "./socket";
-import console from "console";
+import console, { error } from "console";
 
 async function withCurrentUser(callback: Function) {
 	const session = await auth()
@@ -80,7 +80,7 @@ export async function getServersInCommon(currentUserId: string, targetUserId: st
 export async function deleteMsg(
 	id: string,
 	roomId: string
-): Promise<{ success: true } | { success: false; error: any }> {
+): Promise<{ success: true, message: string } | { success: false; error: any;  message: string}> {
 	try {
 		await sql.begin(async (tx) => {
 			await tx`
@@ -89,10 +89,12 @@ export async function deleteMsg(
 			`;
 		});
 		socket.emit("delete message", id, roomId);
-		return { success: true };
-	} catch (error) {
-		return { success: false, error };
-	}
+
+	  return { success: true, message: "Message deleted successfully." };
+  } catch (error) {
+    console.error("Error deleting message:", error);
+    return { success: false, error, message: "Failed to delete the message. Please try again!" };
+  }
 }
 
 export async function getChats(currentUserId: string): Promise<ChatType[]> {
@@ -930,7 +932,7 @@ export async function editMsg({
 	id: string;
 	roomId: string;
 	content: string;
-}): Promise<{ success: true } | { success: false; error: any }> {
+}): Promise<{ success: true; message: string } | { success: false; error: any; message: string }> {
 	return withCurrentUser(async (user: User) => {
 		try {
 			await sql.begin(async (tx) => {
@@ -941,11 +943,11 @@ export async function editMsg({
 			`;
 			});
 			socket.emit("edit message", id, roomId, content);
-			return { success: true }; 
+			return { success: true, message: "Message edited successfully." };
 		} catch (error) {
-			return { success: false, error }; 
+			return { success: false, error, message: "Failed to edit the message. Please try again." };
 		}
-	})
+	});
 }
 
 export async function addReactionToMSG({
@@ -958,7 +960,7 @@ export async function addReactionToMSG({
 	userId: string;
 	roomId: string;
 	emoji: string;
-}): Promise<{ success: true } | { success: false; error: any }> {
+}): Promise<{ success: true, message : string} | { success: false; error: any, message: string }> {
 	try {
 		await sql.begin(async (tx) => {
 			await tx`
@@ -982,9 +984,9 @@ WHERE id = ${id};
 		});
 
 		socket.emit("add_reaction_msg", id, userId, roomId, emoji);
-		return { success: true };
+		return { success: true, message: "Reaction added successfully." };
 	} catch (error) {
-		return { success: false, error };
+		return { success: false, message: "Failed to add reaction. Please try again.", error };
 	}
 }
 
@@ -998,7 +1000,7 @@ export async function removeReactionFromMSG({
 	userId: string;
 	roomId: string;
 	emoji: string;
-}): Promise<{ success: true } | { success: false; error: any }> {
+}): Promise<{ success: true; message: string } | { success: false; error: any; message: string }> {
 	try {
 		await sql.begin(async (tx) => {
 			await tx`
@@ -1019,10 +1021,10 @@ WHERE id = ${id};
 
 			`;
 		});
-		socket.emit("remove_reaction_msg", id, userId, roomId, emoji, );
-		return { success: true };
+		socket.emit("remove_reaction_msg", id, userId, roomId, emoji);
+		return { success: true, message: "Reaction removed successfully." };
 	} catch (error) {
-		return { success: false, error };
+		return { success: false, message: "Failed to remove reaction. Please try again.", error };
 	}
 }
 

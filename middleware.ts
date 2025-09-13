@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-const freeRoutes = ["/login", "/register"];
+const freeRoutes = ["/login", "/register", "/terms_and_services"];
 
 const isProd = process.env.NODE_ENV === "production";
 

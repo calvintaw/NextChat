@@ -130,15 +130,28 @@ const ContactTabs = ({
 	initialFriendRequests,
 }: ContactTabsProps) => {
 	const router = useRouter()
+	const toast = useToast()
 	const [request, formAction, isPending] = useActionState(
 		async (prevState: { success: boolean; message: string }, formData: FormData) => {
-			const request = await requestFriendship(prevState, formData);
-			router.refresh()
-			return {success: request.success, message: request.message}
+			const result = await requestFriendship(prevState, formData);
 
+			router.refresh();
+
+			if (result.success) {
+				toast({ title: "Success!", mode: "positive", subtitle: "Friend request sent successfully." });
+			} else {
+				toast({
+					title: "Error!",
+					mode: "negative",
+					subtitle: result.message || "Failed to send friend request. Please try again.",
+				});
+			}
+
+			return { success: result.success, message: result.message };
 		},
 		{ success: false, message: "" }
 	);
+
 		
 		const [friendRequests, setFriendRequests] = useState<friendRequestsType>(initialFriendRequests);
 		const [contacts, setContacts] = useState(initialContacts);
@@ -274,11 +287,13 @@ const AddContactTab = ({ formAction, addFriendInputRef, request, isPending }: Ad
 import { BsFilterLeft } from "react-icons/bs";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/app/lib/hooks/useToast";
 
 const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps) => {
 
 	const [error, setError] = useState("")
 	const [isPending, setIsPendingIds] = useState(new Set<string>())
+	const toast = useToast()
 
 	function handlePending(id: string, pending: boolean) {
 		if (pending) {
@@ -295,21 +310,26 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 	}
 
 	const handleAccept = async (friend: User) => {
-		handlePending(friend.id, true)
+		handlePending(friend.id, true);
 		try {
 			const result = await acceptFriendshipRequest(friend);
-			
+
 			if (!result.success) {
 				setError(result.message);
+				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
 				socket.emit("refresh-contacts-page", user.id, friend.id);
+
 				setFriendRequests((prev) => ({
 					...prev,
 					incoming: prev.incoming.filter((req) => req.id !== friend.id),
 				}));
+
+				toast({ title: "Success!", mode: "positive", subtitle: result.message });
 			}
 		} catch (err) {
 			setError("Failed to accept friend request.");
+			toast({ title: "Error!", mode: "negative", subtitle: "Failed to accept friend request." });
 		} finally {
 			handlePending(friend.id, false);
 		}
@@ -321,6 +341,7 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 			const result = await removeFriendshipRequest(friend);
 			if (!result.success) {
 				setError(result.message);
+				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
 				setFriendRequests((prev) => {
 					if (type === "sent") {
@@ -336,9 +357,12 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 					};
 				});
 				socket.emit("refresh-contacts-page", user.id, friend.id);
+
+				toast({ title: "Success!", mode: "positive", subtitle: result.message });
 			}
 		} catch (err) {
 			setError("Failed to remove friend request");
+			toast({ title: "Error!", mode: "negative", subtitle: "Failed to remove friend request" });
 		} finally {
 			handlePending(friend.id, false);
 		}

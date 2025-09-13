@@ -16,7 +16,6 @@ import { nanoid } from 'nanoid';
 import { supabase } from '../lib/supabase';
 import { useRouter } from 'next/navigation';
 import clsx from 'clsx';
-import { success } from 'zod/v4';
 
 type EditProfileState = {
 	errors: Record<string, string[]>;
@@ -28,6 +27,8 @@ type EditProfileState = {
 const DashboardPage = ({ initialUser }: { initialUser: User }) => {
 	const [user, setUser] = useState<User>(initialUser);
 	const { update } = useSession();
+
+
 
 	const [{ errors, message, success }, setData] = useState<EditProfileState>({
 		errors: {},
@@ -48,7 +49,7 @@ const DashboardPage = ({ initialUser }: { initialUser: User }) => {
 		setData(result);
 		if(result.user) setUser(result.user)
 		setIsPending(false);
-		await update({...user, ...result.user});
+		await update({ ...user, ...result.user });
 		router.refresh();
 	}	
 

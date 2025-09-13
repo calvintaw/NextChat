@@ -4,7 +4,16 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { LoginFormSchema, sql } from "./app/lib/definitions";
 import { JWT } from "next-auth/jwt";
-import path from "path";
+
+// logins
+// P@ssword123
+// super
+// super@gmail.com
+// test email and credentials
+//
+
+
+
 
 type DBUser = {
 	id: string;
@@ -58,8 +67,8 @@ export const config = {
 		}),
 		Credentials({
 			async authorize(credentials, request) {
-if (credentials.email === "null") credentials.email = null;
-if (credentials.username === "null") credentials.username = null;
+				if (credentials.email === "null") credentials.email = null;
+				if (credentials.username === "null") credentials.username = null;
 
 				console.log("Credentials received:", credentials);
 
@@ -97,7 +106,17 @@ if (credentials.username === "null") credentials.username = null;
 	],
 
 	callbacks: {
-		jwt({ token, trigger, session, user }) {
+		jwt({
+			token,
+			trigger,
+			session,
+			user,
+		}: {
+			token: JWT;
+			trigger?: "signIn" | "signUp" | "update";
+			session?: User; // data sent from calling update({...user, ...new data})
+			user?: User;
+		}) {
 			if (trigger === "update" && session) {
 				token.id = session.id;
 				token.displayName = session.displayName;

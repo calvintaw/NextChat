@@ -11,6 +11,7 @@ import { signIn } from "next-auth/react";
 import InputField, { PasswordField } from "./InputField";
 import { clsx } from "clsx";
 import { ImSpinner9 } from "react-icons/im";
+import { Route } from "next";
 
 export const AuthFormWrapper = ({ className, children }: { className?: string; children: React.ReactNode }) => {
 	return (
@@ -89,101 +90,12 @@ export default function AuthForm() {
 	);
 }
 
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 
 export const TermsAndServices = () => {
 	return (
 		<div className="flex items-center gap-2 text-muted mt-1 ml-0.5 text-sm">
 			<input type="checkbox" defaultChecked name="term-services-agree" className="form-checkbox size-4.5 rounded-sm transform" />I agree to the
-			<DropdownMenu.Root>
-				<DropdownMenu.Trigger asChild>
-					<span className="text-primary hover:underline cursor-pointer -ml-1">Terms and Conditions</span>
-				</DropdownMenu.Trigger>
-
-				<DropdownMenu.Portal>
-					<DropdownMenu.Content
-						className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-119  max-h-[450px] overflow-y-scroll
-							bg-surface text-text rounded-2xl px-5 py-4 pt-7.5 shadow-lg shadow-black/95 not-dark:shadow-black/25
-							animate-in fade-in-0 zoom-in-95 z-[100] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 pb-25"
-					>
-						<h2 className="text-lg font-bold mb-2">Terms and Conditions</h2>
-						<p className="text-sm text-muted mb-2">Last updated: 2/5/2025</p>
-
-						<section className="mb-2">
-							<h3 className="font-semibold">1. Introduction</h3>
-							<p className="text-sm text-muted">
-								Welcome to [Your Company Name]! By using our services, you agree to these terms and conditions.
-							</p>
-						</section>
-
-						<section className="mb-2">
-							<h3 className="font-semibold">2. Use of Service</h3>
-							<p className="text-sm text-muted">
-								You agree to use the Service only for lawful purposes and in a manner that does not infringe on the
-								rights of others.
-							</p>
-						</section>
-
-						<section className="mb-2">
-							<h3 className="font-semibold">3. Account Registration</h3>
-							<p className="text-sm text-muted">
-								Some parts of the Service require registration. You are responsible for maintaining the confidentiality
-								of your account.
-							</p>
-						</section>
-
-						<section className="mb-2">
-							<h3 className="font-semibold">4. Intellectual Property</h3>
-							<p className="text-sm text-muted">
-								All content, trademarks, and logos are the property of [Your Company Name] or its licensors.
-							</p>
-						</section>
-
-						<section className="mb-2">
-							<h3 className="font-semibold">5. Limitation of Liability</h3>
-							<p className="text-sm text-muted">
-								The Service is provided "as is." [Your Company Name] is not liable for any damages arising from use of
-								the Service.
-							</p>
-						</section>
-
-						<section className="mb-2">
-							<h3 className="font-semibold">6. Privacy</h3>
-							<p className="text-sm text-muted">
-								Your use of the Service is governed by our Privacy Policy, which explains how we collect and use your
-								data.
-							</p>
-						</section>
-
-						<section className="mb-2">
-							<h3 className="font-semibold">7. Termination</h3>
-							<p className="text-sm text-muted">
-								We may suspend or terminate your access at any time for violations of these Terms.
-							</p>
-						</section>
-
-						<section className="mb-2">
-							<h3 className="font-semibold">8. Governing Law</h3>
-							<p className="text-sm text-muted">These Terms are governed by the laws of [Your State/Country].</p>
-						</section>
-
-						<section className="mb-2">
-							<h3 className="font-semibold">9. Changes to Terms</h3>
-							<p className="text-sm text-muted">
-								We may update these Terms at any time. Continued use constitutes acceptance.
-							</p>
-						</section>
-
-						<section>
-							<h3 className="font-semibold">10. Contact Us</h3>
-							<p className="text-sm text-muted">
-								Email: nextchat@gmail.com <br />
-								Phone: 1234-5678-9012
-							</p>
-						</section>
-					</DropdownMenu.Content>
-				</DropdownMenu.Portal>
-			</DropdownMenu.Root>
+			<Link href={"/terms_and_services" as Route} className="text-primary hover:underline cursor-pointer -ml-1">Terms and Conditions</Link>	
 		</div>
 	);
 };

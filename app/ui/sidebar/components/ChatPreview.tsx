@@ -20,6 +20,7 @@ import { blockFriendship, deleteDM, getChats, removeFriendshipRequest } from "@/
 import { usePathname, useRouter } from "next/navigation";
 import { Route } from "next";
 import { useFriendsProvider } from "@/app/lib/friendsContext";
+import { useToast } from "@/app/lib/hooks/useToast";
 
 dayjs.extend(isToday);
 dayjs.extend(isYesterday);
@@ -46,26 +47,29 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 			socket.off(`refresh-contacts-page`, refetchContacts);
 		};
 	}, []);
+	const toast = useToast()
 
-		const handleDMdelete = async () => {
-			if (!selectedChat) return;
+	const handleDMdelete = async () => {
+		if (!selectedChat) return;
 
-			const previousChats = [...localChats];
-			setLocalChats((prev) => prev.filter((chat) => chat.id !== selectedChat.id));
+		const previousChats = [...localChats];
+		setLocalChats((prev) => prev.filter((chat) => chat.id !== selectedChat.id));
 
-			try {
-				const result = await deleteDM(
-					{ id: selectedChat.id, username: selectedChat.username }
-				);
+		try {
+			const result = await deleteDM({ id: selectedChat.id, username: selectedChat.username });
 
-				if (!result.success) {
-					setLocalChats(previousChats);
-					console.error(result.message);
-				}
-			} catch (error) {
+			if (!result.success) {
 				setLocalChats(previousChats);
-				console.error("Failed to delete DM:", error);
+				console.error(result.message);
+				toast({ title: "Error!", mode: "negative", subtitle: result.message });
+			} else {
+				toast({ title: "Success!", mode: "positive", subtitle: `DM with ${selectedChat.username} deleted successfully.` });
 			}
+		} catch (error) {
+			setLocalChats(previousChats);
+			console.error("Failed to delete DM:", error);
+			toast({ title: "Error!", mode: "negative", subtitle: "Failed to delete DM. Please try again." });
+		}
 	};
 	
 	const pathname = usePathname()
@@ -122,7 +126,21 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 									onClick={async (e) => {
 										e.preventDefault();
 										const result = await removeFriendshipRequest(selectedChat);
-										if (result.success) router.refresh()
+
+										if (result.success) {
+											router.refresh();
+											toast({
+												title: "",
+												mode: "positive",
+												subtitle: `Friend request with ${selectedChat.username} removed successfully.`,
+											});
+										} else {
+											toast({
+												title: "",
+												mode: "negative",
+												subtitle: result.message || "Failed to remove friend request. Please try again.",
+											});
+										}
 									}}
 								>
 									Remove Friend

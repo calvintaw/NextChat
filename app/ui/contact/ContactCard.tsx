@@ -11,6 +11,7 @@ import { Avatar } from "../general/Avatar";
 import { IconWithSVG } from "../general/Buttons";
 import { getDMRoom } from "@/app/lib/utilities";
 import { useFriendsProvider } from "@/app/lib/friendsContext";
+import { useToast } from "@/app/lib/hooks/useToast";
 
 type MinimalUserType = { id: string; username: string };
 
@@ -50,6 +51,7 @@ export const ContactPreviewContainer = ({
 		};
 	}, []);
 
+	const toast = useToast()
 
 	const [error, setError] = useState('')
 	const handleRemove = async  (friend: MinimalUserType) => {
@@ -62,12 +64,16 @@ export const ContactPreviewContainer = ({
 					if (!result.success) {
 						setLocalContacts(originalContacts); // rollback
 						setError(result.message);
+									toast({ title: "Error!", mode: "negative", subtitle: result.message });
+
 					} else {
 						socket.emit("refresh-contacts-page", user.id, friend.id);
+									toast({ title: "Success!", mode: "positive", subtitle: result.message });
 					}
 				} catch (err) {
 					setLocalContacts(originalContacts); // rollback
-					setError("Failed to remove friend request");
+			setError("Failed to remove friend request");
+		toast({ title: "Error!", mode: "negative", subtitle: "Failed to remove friend request." });			
 				}
 	}
 

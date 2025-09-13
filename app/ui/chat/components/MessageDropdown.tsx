@@ -26,6 +26,7 @@ import { MessageType } from "@/app/lib/definitions";
 import { HiReply } from "react-icons/hi";
 import { emoji } from "zod/v4";
 import { flushSync } from "react-dom";
+import { useToast } from "@/app/lib/hooks/useToast";
 
 type Props = {
 	msg: MessageType,
@@ -36,6 +37,8 @@ export function MessageDropdownMenu({ msg,onDelete }: Props) {
 	const [open, toggleOpen] = useToggle(false);
 	const [copied, setCopied] = useState(false)
 	const { setMsgToEdit, messages, setMessages, user, roomId, setReplyToMsg} = useChatProvider()	
+	const toast = useToast()
+	
 	const toggleReaction = async (emoji: string) => {
 		const originalMsg = [...messages]
 		let didChange = false; // track if reaction changed
@@ -69,6 +72,7 @@ export function MessageDropdownMenu({ msg,onDelete }: Props) {
 			: await removeReactionFromMSG({ id: msg.id, roomId, userId: user.id, emoji });
 		if (!result.success) {
 			setMessages(originalMsg)
+			toast({ title: "Error!", mode: "negative", subtitle: result.message });
 		}		
 	}
 

@@ -151,6 +151,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		};
 	}, [roomId]);
 
+	const toast = useToast()
 	
 	const handleFileUpload = (url: string[], type: "image" | "video") => {
 		if (isBlocked) return;
@@ -173,6 +174,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		const result = await deleteMsg(id, roomId)
 		if (!result.success) {
 			setMessages(originalMsg)
+			toast({ title: "Error!", mode: "negative", subtitle: result.message });
 		}
 	};
 
@@ -591,6 +593,7 @@ import { ServerImageUploadBtn } from "./components/UploadButtons";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/app/lib/supabase";
 import imageCompression from "browser-image-compression";
+import { useToast } from "@/app/lib/hooks/useToast";
 
 export const ServerList = ({ servers }: { servers: Room[] }) => {
 	if (!servers || servers.length === 0) {

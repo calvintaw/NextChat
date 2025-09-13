@@ -176,3 +176,6 @@ export type NewsApiParams = {
 	page?: number;
 };
 
+
+
+
