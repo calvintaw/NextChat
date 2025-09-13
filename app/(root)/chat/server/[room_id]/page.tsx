@@ -1,7 +1,7 @@
 import { getServer } from "@/app/lib/actions";
 import { Chatbox } from "@/app/ui/chat/Chatbox";
 import { auth } from "@/auth";
-import { User } from "next-auth";
+import { User } from "@/app/lib/definitions";
 import { redirect } from "next/navigation";
 
 export default async function Page({ params }: { params: Promise<{ room_id: string }> }) {

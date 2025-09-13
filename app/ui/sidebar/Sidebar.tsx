@@ -17,7 +17,8 @@ const Sidebar = async ({ className }: { className?: string }) => {
 		<>
 			<nav
 				id="sidebar"
-				className={`relative flex-1 max-w-86  h-full flex flex-row items-start w-[400px] ${className} border-contrast border-r-2`}			
+				className={`relative max-w-86  h-full flex flex-row items-start w-min ${className} 
+				border-contrast lg:border-r`}
 			>
 				<OnlineIndicator name={user.displayName} userId={user.id}></OnlineIndicator>
 
@@ -26,7 +27,6 @@ const Sidebar = async ({ className }: { className?: string }) => {
 
 				<UserPanel user={user}></UserPanel>
 			</nav>
-
 		</>
 	);
 };

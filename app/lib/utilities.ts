@@ -78,4 +78,3 @@ export function getBannerColor(char: string) {
 
 	return "bg-secondary";
 }
-

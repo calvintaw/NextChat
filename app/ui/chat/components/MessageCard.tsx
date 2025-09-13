@@ -11,6 +11,8 @@ import { addReactionToMSG, editMsg, getUsername, removeReactionFromMSG } from '@
 import { HiArrowTurnUpRight } from 'react-icons/hi2';
 import { flushSync } from 'react-dom';
 import { useToast } from '@/app/lib/hooks/useToast';
+import { RxCross1, RxCross2 } from 'react-icons/rx';
+import { IconWithSVG } from '../../general/Buttons';
 
 type MessageCardType = {
   msg: MessageType;
@@ -133,7 +135,7 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 			data-content={msg.content.slice(0, 200)}
 			id={msg.id}
 			className={clsx(
-				"flex flex-col w-full dark:hover:bg-background/75 hover:bg-accent px-2 pl-3 py-2 relative",
+				"flex flex-col w-full dark:hover:bg-background/75 hover:bg-accent/75 px-2 pl-3 py-2 relative",
 				msgToEdit === msg.id ? "dark:bg-background/75 bg-accent" : "group",
 
 				replyToMsg &&
@@ -186,11 +188,11 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 								</div>
 							) : (
 								<form onSubmit={handleEditSubmit} className="w-full">
-									<InputField
-										ref={editInputRef}
-										name="edit"
-										defaultValue={msg.content}
-									/>
+									<InputField ref={editInputRef} name="edit" defaultValue={msg.content} place="right" icon={
+										<IconWithSVG className="icon-small" onClick={() => setMsgToEdit(null)}>
+																<RxCross2	 />
+															</IconWithSVG>
+									} />
 								</form>
 							))}
 

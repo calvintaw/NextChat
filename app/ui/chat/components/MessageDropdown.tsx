@@ -94,7 +94,7 @@ export function MessageDropdownMenu({ msg,onDelete }: Props) {
 						`
 							hidden
 							group-hover:!flex
-							absolute bg-surface z-40 -top-3 right-20 rounded-lg border border-border/30 gap-1 items-center p-[0.2rem]
+							absolute bg-background dark:bg-surface z-40 -top-3 right-20 rounded-lg border border-border/30 gap-1 items-center p-[0.2rem]
 							`,
 						open ? "!flex" : ""
 					)}
@@ -103,35 +103,35 @@ export function MessageDropdownMenu({ msg,onDelete }: Props) {
 					<IconWithSVG
 						data-tooltip-id="icon-message-dropdown-menu-id"
 						data-tooltip-content="Thumbs Up"
-						className="icon-message-tooltip text-yellow-400"
+						className="icon-message-tooltip text-lg text-yellow-400"
 						onClick={() => toggleReaction("👍")}
 					>
-						<FaThumbsUp />
+						👍
 					</IconWithSVG>
 
 					<IconWithSVG
 						data-tooltip-id="icon-message-dropdown-menu-id"
 						data-tooltip-content="Heart"
-						className="icon-message-tooltip text-red-500"
+						className="icon-message-tooltip text-lg text-red-500"
 						onClick={() => toggleReaction("❤️")}
 					>
-						<AiFillHeart />
+						❤️
 					</IconWithSVG>
 
 					<IconWithSVG
 						data-tooltip-id="icon-message-dropdown-menu-id"
 						data-tooltip-content="Laugh"
-						className="icon-message-tooltip text-yellow-300"
+						className="icon-message-tooltip text-lg text-yellow-300"
 						onClick={() => toggleReaction("😃")}
 					>
-						<FaLaughSquint />
+						😃
 					</IconWithSVG>
 
 					{msg.sender_id === user.id && (
 						<IconWithSVG
 							data-tooltip-id="icon-message-dropdown-menu-id"
 							data-tooltip-content="Edit"
-							className="icon-message-tooltip"
+							className="icon-message-tooltip text-lg"
 							onClick={() => {
 								setMsgToEdit(msg.id);
 								handleCopy(msg.id);
@@ -145,7 +145,7 @@ export function MessageDropdownMenu({ msg,onDelete }: Props) {
 						<IconWithSVG
 							data-tooltip-id="icon-message-dropdown-menu-id"
 							data-tooltip-content="Reply"
-							className="icon-message-tooltip"
+							className="icon-message-tooltip text-lg"
 							onClick={() => {
 								setReplyToMsg(msg);
 							}}
@@ -178,8 +178,8 @@ export function MessageDropdownMenu({ msg,onDelete }: Props) {
 								onClick={() => toggleReaction("👍")}
 								className="p-0 focus:outline-none data-[highlighted]:ring-2 data-[highlighted]:ring-blue-500 rounded-lg"
 							>
-								<IconWithSVG className="bg-accent/50 hover:bg-accent text-yellow-400">
-									<FaThumbsUp />
+								<IconWithSVG className="text-2xl bg-accent/50 hover:bg-accent text-yellow-400">
+									👍
 								</IconWithSVG>
 							</DropdownMenu.Item>
 
@@ -188,9 +188,7 @@ export function MessageDropdownMenu({ msg,onDelete }: Props) {
 								onClick={() => toggleReaction("❤️")}
 								className="p-0 focus:outline-none data-[highlighted]:ring-2 data-[highlighted]:ring-blue-500 rounded-lg"
 							>
-								<IconWithSVG className="bg-accent/50 hover:bg-accent text-red-500">
-									<AiFillHeart />
-								</IconWithSVG>
+								<IconWithSVG className="text-2xl bg-accent/50 hover:bg-accent text-red-500">❤️</IconWithSVG>
 							</DropdownMenu.Item>
 
 							<DropdownMenu.Item
@@ -198,9 +196,7 @@ export function MessageDropdownMenu({ msg,onDelete }: Props) {
 								onClick={() => toggleReaction("😃")}
 								className="p-0 focus:outline-none data-[highlighted]:ring-2 data-[highlighted]:ring-blue-500 rounded-lg"
 							>
-								<IconWithSVG className="bg-accent/50 hover:bg-accent text-yellow-300">
-									<FaLaughSquint />
-								</IconWithSVG>
+								<IconWithSVG className="text-2xl bg-accent/50 hover:bg-accent text-yellow-300">😃</IconWithSVG>
 							</DropdownMenu.Item>
 
 							<DropdownMenu.Item
@@ -208,9 +204,7 @@ export function MessageDropdownMenu({ msg,onDelete }: Props) {
 								onClick={() => toggleReaction("👎")}
 								className="p-0 focus:outline-none data-[highlighted]:ring-2 data-[highlighted]:ring-blue-500 rounded-lg"
 							>
-								<IconWithSVG className="bg-accent/50 hover:bg-accent text-yellow-300">
-									<FaThumbsDown />
-								</IconWithSVG>
+								<IconWithSVG className="text-2xl bg-accent/50 hover:bg-accent text-yellow-300">👎</IconWithSVG>
 							</DropdownMenu.Item>
 						</DropdownMenu.Group>
 

@@ -88,6 +88,9 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 						/>
 					))}
 
+			
+
+
 				{localChats.length < 1 && (
 					<div className="fade-container px-1">
 						{Array.from({ length: 7 }, (_, i) => (

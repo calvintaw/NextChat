@@ -1,15 +1,17 @@
 "use client";
 import React, { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { usePathProvider } from "@/app/lib/PathContext";
 
 export const PathBanner = () => {
 	const pathname = usePathname();
+	const {path} = usePathProvider()
 
 	const pathDisplayNameMap: { [key: string]: string } = {
 		"/discover": "Discover",
 		"/": "Main Dashboard",
 		"/news": "Top News",
-		"/dashboard/friends": "Friends",
+		"/dashboard": "Profile",
 	};
 
 	const getBannerTitle = (pathname: string): string => {
@@ -22,7 +24,7 @@ export const PathBanner = () => {
 			return "Chat with friends"
 		}
 
-		return "Explore";
+		return path === "" ? "Explore" : path;
 	};
 
 	const banner = getBannerTitle(pathname);
@@ -47,15 +49,18 @@ export const PathBanner = () => {
 		};
 	}, []);
 
+	// max-w-86
 
 	return (
 		<div
 			id="path-banner"
-				className="hidden lg:block p-1 w-full max-w-86 text-center border-contrast border-b-1 border-r-2
-			text-xl font-sans font-semibold
+			className="hidden lg:block p-1 w-full  text-center 
+			text-base text-muted font-sans font-semibold
+			border-contrast
+			max-lg:border-x
 			"
-			>
-				{banner}
-			</div>
+		>
+			{banner}
+		</div>
 	);
 };

@@ -178,10 +178,10 @@ const ContactTabs = ({
 
 	return (
 		<>
-			<section className="border-r-2 border-border/10 h-full flex flex-col px-4 py-2">
+			<section className="border-r-2 border-border/10 h-full flex flex-col px-4 py-2 pt-0 bg-contrast">
 				<Tabs.Root defaultValue="all" className="flex flex-col h-full">
 					<Tabs.List className="my-3 flex gap-2 items-center">
-						<div className="flex items-center gap-2 mr-2">
+						<div className="flex items-center gap-2 mr-2 max-sm:hidden">
 							<FaUserFriends className="text-2xl text-muted" />
 							<p className="text-muted font-medium">Friends</p>
 							<GoDotFill className="text-xs text-muted mt-0.5" />
@@ -390,7 +390,7 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 						<p className="text-base sm:block hidden">You can accept friendship requests here.</p>
 					</div>
 					<div className="flex gap-2">
-						<button className="bg-amber-500 cursor-default text-white">Total: {total}</button>
+						<button className="bg-amber-500 cursor-default text-white dark:bg-yellow-600">Total: {total}</button>
 						<DropdownMenu.Root>
 							<DropdownMenu.Trigger asChild>
 								<button className=" btn-wtih-icon flex items-center gap-1 !pl-2">
@@ -421,10 +421,10 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 				{error && <p className="text-error text-sm my-2">{error}</p>}
 			</div>
 
-			<div className="flex flex-col p-2 max-h-[75%] overflow-y-scroll fade-bg-bottom pb-[100px]">
+			<div className="flex flex-col p-2 h-full overflow-y-scroll fade-bg-bottom pb-[100px]">
 				{friendRequests.incoming.length !== 0 && filter !== "sent" && (
 					<>
-						<div className="flex flex-col gap-4">
+						<div className="flex flex-col gap-2">
 							{friendRequests.incoming.map((friend) => (
 								<div
 									key={friend.id}
@@ -481,7 +481,7 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 
 				{friendRequests.sent.length !== 0 && filter !== "incoming" && (
 					<>
-						<div className="flex flex-col gap-4">
+						<div className="flex flex-col gap-2">
 							{friendRequests.sent.map((friend) => (
 								<div
 									key={friend.id}

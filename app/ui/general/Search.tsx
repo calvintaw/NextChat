@@ -3,6 +3,7 @@ import InputField from "../form/InputField";
 import { IoSearch } from "react-icons/io5";
 import { IconWithSVG } from "./Buttons";
 
+//@ts-ignore
 const Search = ({setInput}) => {
 	return (
 		<form action="" className="w-full">

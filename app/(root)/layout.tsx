@@ -9,6 +9,7 @@ import Loading from "./chat/[room_id]/loading";
 import FriendsProvider from "../lib/friendsContext";
 import '@/app/lib/passwordRules.js'
 import Toaster from "../ui/Toast";
+import PathProvider from "../lib/PathContext";
 
 
 const roboto = localFont({
@@ -42,16 +43,19 @@ export default async function RootLayout({
 
 	return (
 		<html lang="en" className={theme}>
-			<body className={`font-sans ${roboto.className} antialiased flex h-screen w-screen scroll-smooth`}>
-					<FriendsProvider>
-						<section className="flex flex-col h-full">
-							<PathBanner />
+			<body className={`font-sans ${roboto.className} antialiased flex flex-col h-screen w-screen scroll-smooth`}>
+				<PathProvider>
+					<PathBanner />
+					<main className="flex w-full h-full">
+						<FriendsProvider>
 							<Sidebar />
-						</section>
-						<Suspense fallback={<Loading />}>{children}</Suspense>
-					</FriendsProvider>
-
+							<div className="flex w-full h-full border-t border-contrast">
+								<Suspense fallback={<Loading />}>{children}</Suspense>
+							</div>
+						</FriendsProvider>
+					</main>
 					<Toaster />
+				</PathProvider>
 			</body>
 		</html>
 	);

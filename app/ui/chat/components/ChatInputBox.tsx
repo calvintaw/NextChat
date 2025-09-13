@@ -7,12 +7,9 @@ import React from "react";
 import { socket } from "@/app/lib/socket";
 import { MessageType, User } from "@/app/lib/definitions";
 import useDebounce from "@/app/lib/hooks/useDebounce";
-import { EmojiClickData } from "emoji-picker-react";
 import { useChatProvider } from "../ChatBoxWrapper";
 import { RxCross2, RxCrossCircled } from "react-icons/rx";
 import { IconWithSVG } from "../../general/Buttons";
-
-type EmojiIcon = EmojiClickData["emoji"];
 
 type ChatInputBoxProps = {
 	activePersons: string[];
@@ -21,6 +18,7 @@ type ChatInputBoxProps = {
 	user: User;
 	setMessages: React.Dispatch<React.SetStateAction<MessageType[]>>;
 	tempIdsRef: React.MutableRefObject<Set<string>>;
+	isBlocked: boolean;
 };
 
 const ChatInputBox = ({ activePersons, roomId, user, handleFileUpload, setMessages, tempIdsRef, isBlocked }: ChatInputBoxProps) => {
@@ -129,7 +127,7 @@ const ChatInputBox = ({ activePersons, roomId, user, handleFileUpload, setMessag
 					/>
 
 					<ChatToolbar
-						setEmoji={(emoji: EmojiIcon) => {
+						setEmoji={(emoji: string) => {
 							if (!textRef.current) return;
 
 							const textarea = textRef.current;

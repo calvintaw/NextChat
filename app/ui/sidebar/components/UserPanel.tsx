@@ -98,10 +98,16 @@ const Buttons = () => {
 			</span>
 
 			<span data-tooltip-id="tooltip-settings">
-				<IconWithSVG className="!size-9 group hover:bg-background">
+				<IconWithSVG
+				onClick={() => {
+					document.documentElement.style.setProperty("--color-background", "red");
+				}}
+				className="!size-9 group hover:bg-background">
 					<IoMdSettings className="group-hover:animate-spin-delay" />
 				</IconWithSVG>
-				<Tooltip offset={15} className="my-tooltip" id="tooltip-settings" place="top" border={`var(--tooltip-border)`}>
+				<Tooltip
+					
+					offset={15} className="my-tooltip" id="tooltip-settings" place="top" border={`var(--tooltip-border)`}>
 					<span>Settings {`(Coming soon)`}</span>
 				</Tooltip>
 			</span>

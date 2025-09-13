@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {  MdSpaceDashboard } from "react-icons/md";
 import { RiCompassDiscoverFill } from "react-icons/ri";
 import Link from "next/link";
@@ -13,6 +13,7 @@ import { Room, User } from "@/app/lib/definitions";
 import { Avatar } from "../../general/Avatar";
 import { IconType } from "react-icons";
 import { Route } from "next";
+import useEventListener from "@/app/lib/hooks/useEventListener";
 type ActionIcon = React.FC<{ user: User; className?: string }>
 
 
@@ -43,6 +44,10 @@ const NavigationBar = ({ user, joined_servers }: { user: User, joined_servers: R
 	console.log("pathname: ",pathname)
 	const nav_icon_styles =
 		"group hover:bg-primary not-dark:hover:bg-foreground border-2 border-transparent !rounded-xl !size-11.5";
+	
+
+
+	
 
 	return (
 		<>
@@ -50,51 +55,47 @@ const NavigationBar = ({ user, joined_servers }: { user: User, joined_servers: R
 				id="nav-bar"
 				className="
 			bg-background
-			flex items-start flex-col gap-1 h-full w-fit py-2 border-contrast sticky top-0 md:border-r navigation-bar
-			[#sidebar.active_&]:!border-r-2	
+			flex items-start flex-col gap-1 h-full w-fit py-2 sticky top-0 navigation-bar
+			
 			"
 			>
 				<DashboardBtn />
 				{NavigationSections.map((icon, index) => {
-					
-					
-					
 					if (icon.href !== null) {
 						const Icon = icon.icon as IconType;
-						
-						return (<Link
-							href={icon.href as Route}
-							role="navigation"
-							key={index}
-							className={"px-2 min-h-13 relative flex items-center justify-center"}
-						>
-							<hr
-								className={clsx(
-									"absolute",
-									pathname === icon.href &&
-										"bg-foreground w-0.5 rounded-r-2xl border-foreground border-2 top-1/2 -translate-y-1/2 h-[65%] left-0"
-								)}
-							/>
-							<IconWithSVG
-								data-tooltip-id={"navigation-bar-tooltips"}
-								data-tooltip-content={icon.description}
-								className={clsx(nav_icon_styles, pathname === icon.href && "bg-primary not-dark:bg-foreground")}
-							>
-								<Icon
-									className={clsx(
-										"not-dark:group-hover:text-background text-[24px]",
-										pathname === icon.href && "not-dark:!text-white"
-									)}							/>
-							</IconWithSVG>
-						</Link>)
-					} else {
-						const Icon = icon.icon as ActionIcon;
+
 						return (
-							<div
+							<Link
+								href={icon.href as Route}
 								role="navigation"
 								key={index}
 								className={"px-2 min-h-13 relative flex items-center justify-center"}
 							>
+								<hr
+									className={clsx(
+										"absolute",
+										pathname === icon.href &&
+											"bg-foreground w-0.5 rounded-r-2xl border-foreground border-2 top-1/2 -translate-y-1/2 h-[65%] left-0"
+									)}
+								/>
+								<IconWithSVG
+									data-tooltip-id={"navigation-bar-tooltips"}
+									data-tooltip-content={icon.description}
+									className={clsx(nav_icon_styles, pathname === icon.href && "bg-primary not-dark:bg-foreground")}
+								>
+									<Icon
+										className={clsx(
+											"not-dark:group-hover:text-background text-[24px]",
+											pathname === icon.href && "not-dark:!text-white"
+										)}
+									/>
+								</IconWithSVG>
+							</Link>
+						);
+					} else {
+						const Icon = icon.icon as ActionIcon;
+						return (
+							<div role="navigation" key={index} className={"px-2 min-h-13 relative flex items-center justify-center"}>
 								<hr
 									className={clsx(
 										"absolute",
@@ -117,10 +118,7 @@ const NavigationBar = ({ user, joined_servers }: { user: User, joined_servers: R
 								</IconWithSVG>
 							</div>
 						);
-
 					}
-						
-					
 				})}
 
 				{joined_servers &&
@@ -159,6 +157,23 @@ const NavigationBar = ({ user, joined_servers }: { user: User, joined_servers: R
 };
 
 const DashboardBtn = () => {
+
+		const handleResize = () => {
+			const isLargeScreen = window.innerWidth > 767;
+			if (isLargeScreen) {
+				document?.getElementById("sidebar")?.classList.remove("active");
+			}
+		};
+	
+		useEffect(() => {
+			if (typeof window === "undefined") return
+			handleResize();
+		}, []);
+	
+		if (typeof window !== "undefined") {
+			useEventListener("resize", handleResize);
+		}
+
 		const nav_icon_styles =
 			"group hover:bg-primary not-dark:hover:bg-foreground border-2 border-transparent !rounded-xl !size-11.5";
 

@@ -13,7 +13,7 @@ import { RiCompass3Fill } from "react-icons/ri";
 import { Tooltip } from "react-tooltip";
 
 import { MdMotionPhotosOn } from "react-icons/md";
-import { User } from "next-auth";
+import { User } from "@/app/lib/definitions";
 import { RiLinksFill } from "react-icons/ri";
 import Link from "next/link";
 import { ServerImageUploadBtn } from "../chat/components/UploadButtons";
