@@ -72,7 +72,7 @@ function LoginForm() {
 						placeholder="Enter your email or username"
 					/>
 
-				<PasswordField disabled={isPending} name="password"></PasswordField>
+				<PasswordField hideRules disabled={isPending} name="password"></PasswordField>
 				</div>
 
 				{errorMessage && <span className="text-sm text-red-500">{errorMessage}</span>}

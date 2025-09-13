@@ -17,6 +17,7 @@ type InputFieldProps = {
 	parentClassName?: string;
 	labelClassName?: string;
 	place?: "left" | "right";
+	hideRules?: boolean;
 } & React.InputHTMLAttributes<HTMLInputElement> &
 	React.RefAttributes<HTMLInputElement>;
 
@@ -80,6 +81,7 @@ export function PasswordField({
 	errors,
 	className,
 	parentClassName = "",
+	hideRules = false,
 }: InputFieldProps) {
 	const [showPass, setShowPass] = useState(false);
 	const [value, setValue] = useState("");
@@ -126,34 +128,36 @@ export function PasswordField({
 			</label>
 
 			{/* Password rules UI */}
-			<div
-				className="password-rules mt-2 mx-4"
-				data-score={score}
-				style={{ "--score": score, "--total": RULES.length } as React.CSSProperties}
-			>
-				<div className="password-rules__meter flex-1 w-full">
-					<span></span>
-					<span></span>
-					<span></span>
-					<span></span>
-					<span></span>
-					<div className="password-rules__score ml-1 -mt-0.5"></div>
+			{!hideRules && (
+				<div
+					className="password-rules mt-2 mx-4"
+					data-score={score}
+					style={{ "--score": score, "--total": RULES.length } as React.CSSProperties}
+				>
+					<div className="password-rules__meter flex-1 w-full">
+						<span></span>
+						<span></span>
+						<span></span>
+						<span></span>
+						<span></span>
+						<div className="password-rules__score ml-1 -mt-0.5"></div>
+					</div>
+					<ul className="password-rules__checklist list-disc pl-5 text-sm text-muted">
+						{RULES.map((rule, idx) => {
+							const isMatched = rule.regex.test(value); // rule already satisfied
+							// only show the first unfinished rule
+							if (!isMatched && !RULES.slice(0, idx).some((r) => !r.regex.test(value))) {
+								return (
+									<li key={idx} className={clsx({ "is-match": isMatched })}>
+										{rule.label}
+									</li>
+								);
+							}
+							return null; // hide all other rules
+						})}
+					</ul>
 				</div>
-				<ul className="password-rules__checklist list-disc pl-5 text-sm text-muted">
-					{RULES.map((rule, idx) => {
-						const isMatched = rule.regex.test(value); // rule already satisfied
-						// only show the first unfinished rule
-						if (!isMatched && !RULES.slice(0, idx).some((r) => !r.regex.test(value))) {
-							return (
-								<li key={idx} className={clsx({ "is-match": isMatched })}>
-									{rule.label}
-								</li>
-							);
-						}
-						return null; // hide all other rules
-					})}
-				</ul>
-			</div>
+			)}
 		</fieldset>
 	);
 }
