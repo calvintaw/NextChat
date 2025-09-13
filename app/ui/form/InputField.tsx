@@ -1,5 +1,5 @@
 "use client";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { RiLockLine } from "react-icons/ri";
 import clsx from "clsx";
@@ -38,7 +38,7 @@ export default function InputField({
 		<fieldset>
 			<label htmlFor={name} className="flex flex-col gap-1 font-medium text-muted">
 				{label && <span className={`text-text font-semibold ${labelClassName}`}>{label}</span>}
-				<div className={clsx("form-input_custom", success && "border-success",  !icon && "pl-0", parentClassName)}>
+				<div className={clsx("form-input_custom", success && "border-success", !icon && "pl-0", parentClassName)}>
 					{place === "left" && icon && <div className="text-muted flex items-center justify-center">{icon}</div>}
 					<input
 						id={name}
@@ -50,17 +50,14 @@ export default function InputField({
 					/>
 					{place === "right" && icon && <div className="text-muted flex items-center justify-center">{icon}</div>}
 				</div>
-				{errors?.length !== 0 && !success &&
+				{errors?.length !== 0 &&
+					!success &&
 					errors?.map((error) => (
 						<p className="my-0.5 text-sm text-red-500" key={error}>
 							{error}
 						</p>
 					))}
-				{success && (
-					<p className="my-0.5 text-sm text-success">
-						{success}
-					</p>
-				)}
+				{success && <p className="my-0.5 text-sm text-success">{success}</p>}
 			</label>
 		</fieldset>
 	);
@@ -92,7 +89,6 @@ export function PasswordField({
 						type={showPass ? "text" : "password"}
 						placeholder={placeholder}
 						className={className}
-						
 					/>
 
 					<button
@@ -114,3 +110,4 @@ export function PasswordField({
 		</fieldset>
 	);
 }
+

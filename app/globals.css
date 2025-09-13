@@ -197,6 +197,8 @@ html {
 }
 
 @layer base {
+
+
 	body {
 		background-color: var(--color-background);
 		color: var(--color-text);
@@ -242,6 +244,21 @@ html {
 		@apply font-normal shrink-0 relative text-nowrap w-fit h-fit rounded-md outline-none cursor-pointer px-2.5 py-1 text-base bg-surface
 		hover:bg-secondary text-text;
 	}
+
+	  input:-webkit-autofill,
+		input:-webkit-autofill:hover,
+		input:-webkit-autofill:focus,
+		input:-moz-autofill,
+		input:-moz-autofill:hover,
+		input:-moz-autofill:focus {
+			-webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+			box-shadow: 0 0 0px 1000px transparent inset !important;
+			-webkit-text-fill-color: var(--color-text) !important;
+			-moz-text-fill-color: var(--color-text) !important;
+			background-color: transparent !important;
+			color: var(--color-text) !important;
+			transition: background-color 9999s ease-in-out 0s !important; /* trick to prevent flash */
+		}
 }
 
 .fade-bg-bottom {
@@ -835,3 +852,16 @@ html {
 html {
   font-size: clamp(12.5px, 4vw, 16px) !important;
 }
+
+
+
+
+
+input[type="password"] {
+  -webkit-text-security: disc; /* for WebKit browsers */
+  -moz-appearance: textfield; /* remove Firefox special styling */
+  font-family: inherit;        /* force same font as normal input */
+}
+
+
+
