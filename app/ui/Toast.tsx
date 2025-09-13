@@ -1,5 +1,4 @@
 "use client"
-import { Icon } from "@iconify-icon/react";
 import * as Toast from "@radix-ui/react-toast";
 import { useAtom } from "jotai";
 import { useEffect, useRef } from "react";
