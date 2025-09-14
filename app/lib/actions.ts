@@ -874,6 +874,9 @@ export async function acceptFriendshipRequest(targetUser: User): Promise<{ succe
 }
 
 export async function fetchNews(config?: NewsApiParams): Promise<NewsArticle[]> {
+	if (process.env.NODE_ENV === "production") {
+		return newsData.articles;
+	}
 	try {
 		const q = config?.q || "";
 		const url = new URL(`https://newsapi.org/v2/${q === "home" ? "top-headlines?sources=bbc-news" : "everything"}`);

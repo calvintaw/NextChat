@@ -204,7 +204,9 @@ const NewsGrid = () => {
 					{data?.pages[0].length === 0 ? (
 						<div className="flex flex-col items-center justify-center mt-25">
 							<MdOutlineArticle className="text-6xl text-muted mb-4" />
-							<p className="text-muted text-lg font-medium">No news available.</p>
+							<p className="text-muted text-lg font-medium">
+								No news available. {`API provider doesn't allow prod usage`}
+							</p>
 						</div>
 					) : (
 						<>
