@@ -82,7 +82,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 			socket.off("typing started", handleTypingStart);
 			socket.off("typing stopped", handleTypingStop);
 		};
-	}, []);
+	}, [isBlocked]);
 
 	// handle incoming msg sockets from server / handle msg delete sockets
 	useEffect(() => {
@@ -162,7 +162,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 			socket.off("remove_reaction_msg", toggleReaction);
 			socket.emit("leave", roomId);
 		};
-	}, [roomId]);
+	}, [roomId, isBlocked]);
 
 	const toast = useToast();
 

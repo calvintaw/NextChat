@@ -9,6 +9,7 @@ import weekday from "dayjs/plugin/weekday";
 import MessageCard from "./MessageCard";
 import { useChatProvider } from "../ChatBoxWrapper";
 import { HiExclamationCircle } from "react-icons/hi";
+import clsx from "clsx";
 
 dayjs.extend(isToday);
 dayjs.extend(isYesterday);
@@ -19,12 +20,7 @@ const ChatMessages = ({ messages, deleteMessage }: { messages: MessageType[]; de
 
 	// relative min-h-[calc(100vh-400px)] h-full
 	return (
-		<div
-			className="
-		
-		flex-1 flex flex-col relative
-		"
-		>
+		<div className={clsx("flex-1 flex flex-col relative")}>
 			{isBlocked && (
 				<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
 					<div className="bg-accent text-text px-4 py-2 rounded-lg flex items-center gap-2 max-w-[90vw] mx-3">
@@ -34,26 +30,27 @@ const ChatMessages = ({ messages, deleteMessage }: { messages: MessageType[]; de
 				</div>
 			)}
 
-			{messages.map((msg, i) => {
-				const prevMsg = messages[i - 1];
-				const isFirstGroup =
-					i === 0 ||
-					prevMsg.sender_id !== msg.sender_id ||
-					(prevMsg && dayjs(msg.createdAt).diff(dayjs(prevMsg.createdAt), "minute") >= 5);
-				const separateLogic = i === 0 || (prevMsg && dayjs(msg.createdAt).diff(dayjs(prevMsg.createdAt), "day") >= 1);
+			{!isBlocked &&
+				messages.map((msg, i) => {
+					const prevMsg = messages[i - 1];
+					const isFirstGroup =
+						i === 0 ||
+						prevMsg.sender_id !== msg.sender_id ||
+						(prevMsg && dayjs(msg.createdAt).diff(dayjs(prevMsg.createdAt), "minute") >= 5);
+					const separateLogic = i === 0 || (prevMsg && dayjs(msg.createdAt).diff(dayjs(prevMsg.createdAt), "day") >= 1);
 
-				return (
-					<React.Fragment key={msg.id}>
-						{separateLogic && <MessageSeparator date={msg.createdAt} />}
+					return (
+						<React.Fragment key={msg.id}>
+							{separateLogic && <MessageSeparator date={msg.createdAt} />}
 
-						<MessageCard
-							msg={msg}
-							isFirstGroup={isFirstGroup}
-							onDelete={(id: string) => deleteMessage(id)}
-						></MessageCard>
-					</React.Fragment>
-				);
-			})}
+							<MessageCard
+								msg={msg}
+								isFirstGroup={isFirstGroup}
+								onDelete={(id: string) => deleteMessage(id)}
+							></MessageCard>
+						</React.Fragment>
+					);
+				})}
 			<RefAnchor></RefAnchor>
 		</div>
 	);
