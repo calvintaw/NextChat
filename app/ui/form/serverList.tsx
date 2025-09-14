@@ -79,9 +79,7 @@ export const ServerList = ({ user, servers }: { user: User, servers: Room[] }) =
 						
 					
 
-					return (
-						<Card server={server} user={user}></Card>
-					);
+					return <Card key={server.id} server={server} user={user}></Card>;
 				})}
 			</div>
 		</section>
@@ -119,7 +117,6 @@ const Card = ({ server, user}: any) => {
 							}, [src]);
 	return (
 		<div
-			key={server.id}
 			className="bg-background p-0 rounded-xl overflow-hidden min-w-63 shadow-md flex flex-col border-2 border-border group hover:border-foreground/40 not-dark:hover:border-foreground/80 cursor-pointer 
 							"
 		>

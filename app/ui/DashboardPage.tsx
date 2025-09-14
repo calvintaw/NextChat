@@ -88,27 +88,25 @@ const DashboardPage = ({ initialUser }: { initialUser: User }) => {
 	}
 
 	return (
-		<div className="bg-contrast flex-1 flex justify-center items-center pt-16 px-2 sm:px-4">
-			<div className="mx-auto w-full max-w-lg bg-background border-2 border-border rounded-2xl shadow-lg p-4 sm:p-8 flex flex-col items-center gap-6">
-				{/* Header */}
-				<div className="flex justify-center items-center gap-4">
+		<>
+			<div className="bg-contrast flex-1 gap-4 flex flex-col pt-5 px-2 sm:px-4 max-w-89 border">
+				<div className="flex justify-center items-center gap-4 ">
 					<Avatar
 						src={user.image}
 						displayName={user.displayName}
-						size="md:size-20 size-10 sm:size-15"
-						fontSize="text-[1.75em]"
+						size="size-[clamp(3rem,8vw,5rem)]"
+						fontSize="text-[clamp(1.25rem,4vw,1.75rem)]"
 						radius="rounded-full"
 						statusIndicator={false}
 					/>
 
-					<div className="flex flex-col text-left">
-						<h1 className="text-2xl font-semibold text-text">{user.displayName}</h1>
-						<p className="text-text text-sm mt-1">@{user.username}</p>
+					<div className="flex flex-col text-left -mt-1">
+						<h1 className="text-[clamp(1.25rem,4vw,1.75rem)] font-semibold text-text">{user.displayName}</h1>
+						<p className="text-text text-sm">@{user.username}</p>
 					</div>
 				</div>
 
-				{/* Info Card */}
-				<div className="min-w-xs w-full bg-surface-variant rounded-xl p-6 flex flex-col gap-4 border border-border">
+				<div className="min-w-xs w-full bg-surface-variant rounded-xl p-1 sm:p-6 flex flex-col gap-4">
 					<div className="flex justify-between items-center gap-4">
 						<span className="text-muted font-medium">Email</span>
 						<span className="text-text break-words">{user.email}</span>
@@ -196,7 +194,7 @@ const DashboardPage = ({ initialUser }: { initialUser: User }) => {
 					</Button>
 				</div>
 			</div>
-		</div>
+		</>
 	);
 };
 

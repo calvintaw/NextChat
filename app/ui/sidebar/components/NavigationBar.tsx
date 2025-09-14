@@ -50,7 +50,7 @@ const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: R
 				className="
 			bg-background
 			flex items-start flex-col gap-1 h-full w-fit py-2 sticky top-0 navigation-bar
-			
+			border-red-500
 			"
 			>
 				<DashboardBtn />
@@ -63,7 +63,7 @@ const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: R
 								href={icon.href as Route}
 								role="navigation"
 								key={index}
-								className={"px-1 xs:px-2 min-h-13 relative flex items-center justify-center"}
+								className={"px-2 max-sm:px-1 sm:min-h-13 relative flex items-center justify-center"}
 							>
 								<hr
 									className={clsx(
@@ -92,7 +92,7 @@ const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: R
 							<div
 								role="navigation"
 								key={index}
-								className={"px-1 xs:px-2 min-h-13 relative flex items-center justify-center"}
+								className={"px-2 max-sm:px-1 sm:min-h-13 relative flex items-center justify-center"}
 							>
 								<hr
 									className={clsx(
@@ -126,7 +126,7 @@ const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: R
 							href={`/chat/server/${server.id}`}
 							role="navigation"
 							key={server.id}
-							className={"px-2 min-h-13 relative flex items-center justify-center"}
+							className={"px-2 max-sm:px-1 sm:min-h-13 relative flex items-center justify-center"}
 						>
 							<hr
 								className={clsx(
@@ -175,7 +175,7 @@ const DashboardBtn = () => {
 		"group hover:bg-primary not-dark:hover:bg-foreground border-2 border-transparent !rounded-xl !size-11.5";
 
 	return (
-		<div className={"lg:hidden  px-2 min-h-13 relative flex items-center justify-center z-50"}>
+		<div className={"lg:hidden px-2 max-sm:px-1 sm:min-h-13 relative flex items-center justify-center z-50"}>
 			<IconWithSVG
 				onClick={() => {
 					document?.getElementById("sidebar")?.classList.toggle("active");
