@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import {  MdSpaceDashboard } from "react-icons/md";
+import { MdSpaceDashboard } from "react-icons/md";
 import { RiCompassDiscoverFill } from "react-icons/ri";
 import Link from "next/link";
 import { IconWithSVG } from "../../general/Buttons";
@@ -14,8 +14,7 @@ import { Avatar } from "../../general/Avatar";
 import { IconType } from "react-icons";
 import { Route } from "next";
 import useEventListener from "@/app/lib/hooks/useEventListener";
-type ActionIcon = React.FC<{ user: User; className?: string }>
-
+type ActionIcon = React.FC<{ user: User; className?: string }>;
 
 const NavigationSections = [
 	{
@@ -38,16 +37,11 @@ const NavigationSections = [
 	},
 ];
 
-
-const NavigationBar = ({ user, joined_servers }: { user: User, joined_servers: Room[]}) => {
+const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: Room[] }) => {
 	const pathname = usePathname();
-	console.log("pathname: ",pathname)
+	console.log("pathname: ", pathname);
 	const nav_icon_styles =
 		"group hover:bg-primary not-dark:hover:bg-foreground border-2 border-transparent !rounded-xl !size-11.5";
-	
-
-
-	
 
 	return (
 		<>
@@ -69,7 +63,7 @@ const NavigationBar = ({ user, joined_servers }: { user: User, joined_servers: R
 								href={icon.href as Route}
 								role="navigation"
 								key={index}
-								className={"px-2 min-h-13 relative flex items-center justify-center"}
+								className={"px-1 xs:px-2 min-h-13 relative flex items-center justify-center"}
 							>
 								<hr
 									className={clsx(
@@ -95,7 +89,11 @@ const NavigationBar = ({ user, joined_servers }: { user: User, joined_servers: R
 					} else {
 						const Icon = icon.icon as ActionIcon;
 						return (
-							<div role="navigation" key={index} className={"px-2 min-h-13 relative flex items-center justify-center"}>
+							<div
+								role="navigation"
+								key={index}
+								className={"px-1 xs:px-2 min-h-13 relative flex items-center justify-center"}
+							>
 								<hr
 									className={clsx(
 										"absolute",
@@ -157,25 +155,24 @@ const NavigationBar = ({ user, joined_servers }: { user: User, joined_servers: R
 };
 
 const DashboardBtn = () => {
-
-		const handleResize = () => {
-			const isLargeScreen = window.innerWidth > 767;
-			if (isLargeScreen) {
-				document?.getElementById("sidebar")?.classList.remove("active");
-			}
-		};
-	
-		useEffect(() => {
-			if (typeof window === "undefined") return
-			handleResize();
-		}, []);
-	
-		if (typeof window !== "undefined") {
-			useEventListener("resize", handleResize);
+	const handleResize = () => {
+		const isLargeScreen = window.innerWidth > 767;
+		if (isLargeScreen) {
+			document?.getElementById("sidebar")?.classList.remove("active");
 		}
+	};
 
-		const nav_icon_styles =
-			"group hover:bg-primary not-dark:hover:bg-foreground border-2 border-transparent !rounded-xl !size-11.5";
+	useEffect(() => {
+		if (typeof window === "undefined") return;
+		handleResize();
+	}, []);
+
+	if (typeof window !== "undefined") {
+		useEventListener("resize", handleResize);
+	}
+
+	const nav_icon_styles =
+		"group hover:bg-primary not-dark:hover:bg-foreground border-2 border-transparent !rounded-xl !size-11.5";
 
 	return (
 		<div className={"lg:hidden  px-2 min-h-13 relative flex items-center justify-center z-50"}>
@@ -191,6 +188,6 @@ const DashboardBtn = () => {
 			</IconWithSVG>
 		</div>
 	);
-}
+};
 
 export default NavigationBar;
