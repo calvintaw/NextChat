@@ -8,7 +8,7 @@ import { Tooltip } from "react-tooltip";
 import { Avatar } from "../../general/Avatar";
 import { ServerEditForm } from "./Server_edit_form";
 
-export function ServerCardHeader({ server, user }: { server: Room; user: User }) {
+export function ServerCardHeader({ server, user, isBlocked}: { server: Room; user: User; isBlocked: boolean }) {
 	const [clipboard, setClipboard] = useState("");
 	const [localServer, setLocalServer] = useState(() => server);
 

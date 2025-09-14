@@ -1,6 +1,6 @@
 "use client";
 
-import { getServersInCommon, blockFriendship, removeFriendshipRequest } from "@/app/lib/actions";
+import { getServersInCommon, blockFriendship, removeFriendshipRequest, unblockFriendship } from "@/app/lib/actions";
 import { Room } from "@/app/lib/definitions";
 import { User } from "@/app/lib/definitions";
 import { useState, useEffect } from "react";
@@ -13,11 +13,13 @@ import { usePathProvider } from "@/app/lib/PathContext";
 export function DirectMessageCard({
 	roomId,
 	currentUserId,
+	isBlocked,
 	user,
 }: {
 	roomId: string;
 	currentUserId: string;
 	user: User;
+	isBlocked: boolean;
 }) {
 	const [clipboard, setClipboard] = useState("");
 	const [commonServers, setCommonServers] = useState<Room[]>([]);
@@ -87,8 +89,17 @@ export function DirectMessageCard({
 				{!roomId.startsWith("system-room") && <span className="text-text font-medium">{user.username}</span>}.
 			</div>
 			<div className="flex items-center gap-2">
-				<button className="btn btn-secondary" onClick={() => blockFriendship(currentUserId, user.id)}>
-					Block
+				<button
+					className="btn btn-secondary"
+					onClick={() => {
+						if (isBlocked) {
+							unblockFriendship(currentUserId, user.id);
+						} else {
+							blockFriendship(currentUserId, user.id);
+						}
+					}}
+				>
+					{isBlocked ? "Unblock" : "Block"}
 				</button>
 				<button
 					className="btn btn-secondary"

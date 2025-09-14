@@ -795,6 +795,37 @@ export async function blockFriendship(
 	}
 }
 
+export async function unblockFriendship(
+	currentUserId: string,
+	targetUserId: string
+): Promise<{ success: boolean; message: string }> {
+	try {
+		const [user1_id, user2_id] = [currentUserId, targetUserId].sort((a, b) => a.localeCompare(b));
+
+		await sql.begin(async (tx) => {
+			await tx`
+        UPDATE friends
+        SET status = 'accepted',
+            request_sender_id = NULL
+        WHERE user1_id = ${user1_id}
+          AND user2_id = ${user2_id}
+          AND status = 'blocked';
+      `;
+		});
+
+		return {
+			success: true,
+			message: `${targetUserId} has been unblocked.`,
+		};
+	} catch (error) {
+		console.error("unblockFriendship error:", error);
+		return {
+			success: false,
+			message: "Oops, an error occurred! Please try again later.",
+		};
+	}
+}
+
 export async function acceptFriendshipRequest(targetUser: User): Promise<{ success: boolean; message: string }> {
 	return withCurrentUser(async (currentUser: User) => {
 		try {
