@@ -235,7 +235,7 @@ export const ChatPanelHeader = () => {
 							className={clsx(
 								"btn btn-secondary w-full text-base py-1.5 px-4 pl-3 text-left btn-with-icon no-underline",
 								pathname === href
-									? "bg-tertiary text-white hover:bg-tertiary/85"
+									? "bg-accent/85 text-text hover:bg-surface"
 									: "bg-transparent hover:bg-accent/25 not-dark:hover:bg-accent/50 text-muted hover:text-text"
 							)}
 							onClick={() => router.push(href as Route)}
