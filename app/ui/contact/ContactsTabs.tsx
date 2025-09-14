@@ -1,5 +1,11 @@
-"use client"
-import { requestFriendship, getContacts, getFriendRequests, acceptFriendshipRequest, removeFriendshipRequest } from "@/app/lib/actions";
+"use client";
+import {
+	requestFriendship,
+	getContacts,
+	getFriendRequests,
+	acceptFriendshipRequest,
+	removeFriendshipRequest,
+} from "@/app/lib/actions";
 import { ContactType } from "@/app/lib/definitions";
 import { socket } from "@/app/lib/socket";
 import * as Tabs from "@radix-ui/react-tabs";
@@ -21,9 +27,9 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 type friendRequestsType = { sent: User[]; incoming: User[] };
 
 type ContactTabsProps = {
-  user: User;
-  initialContacts: ContactType[];
-  initialFriendRequests: friendRequestsType;
+	user: User;
+	initialContacts: ContactType[];
+	initialFriendRequests: friendRequestsType;
 };
 
 type AddContactTabProps = {
@@ -35,14 +41,14 @@ type AddContactTabProps = {
 
 type RequestTabProps = {
 	user: User;
-  friendRequests: friendRequestsType;
-  setFriendRequests: React.Dispatch<React.SetStateAction<friendRequestsType>>;
+	friendRequests: friendRequestsType;
+	setFriendRequests: React.Dispatch<React.SetStateAction<friendRequestsType>>;
 };
-  
+
 type AllContactsTabProps = {
-  friendsCount: number;
-  contacts: ContactType[];
-  user: User;
+	friendsCount: number;
+	contacts: ContactType[];
+	user: User;
 };
 
 // const test_data: friendRequestsType = {
@@ -124,13 +130,9 @@ type AllContactsTabProps = {
 // 	],
 // };
 
-const ContactTabs = ({
-	user,
-	initialContacts,
-	initialFriendRequests,
-}: ContactTabsProps) => {
-	const router = useRouter()
-	const toast = useToast()
+const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTabsProps) => {
+	const router = useRouter();
+	const toast = useToast();
 	const [request, formAction, isPending] = useActionState(
 		async (prevState: { success: boolean; message: string }, formData: FormData) => {
 			const result = await requestFriendship(prevState, formData);
@@ -152,29 +154,25 @@ const ContactTabs = ({
 		{ success: false, message: "" }
 	);
 
-		
-		const [friendRequests, setFriendRequests] = useState<friendRequestsType>(initialFriendRequests);
-		const [contacts, setContacts] = useState(initialContacts);
-		const addFriendInputRef = useRef<HTMLInputElement | null>(null);
-		const friendsCount = contacts.length;
-
+	const [friendRequests, setFriendRequests] = useState<friendRequestsType>(initialFriendRequests);
+	const [contacts, setContacts] = useState(initialContacts);
+	const addFriendInputRef = useRef<HTMLInputElement | null>(null);
+	const friendsCount = contacts.length;
 
 	useEffect(() => {
 		async function refrechContactsPage() {
-			console.log("refetching contacts")
-			const [newContacts, newRequests] = await Promise.all([getContacts(user.id), getFriendRequests(user.id)])
-			console.log("newCOntacts: ", newContacts)
+			console.log("refetching contacts");
+			const [newContacts, newRequests] = await Promise.all([getContacts(user.id), getFriendRequests(user.id)]);
+			console.log("newCOntacts: ", newContacts);
 			setContacts(newContacts);
-			setFriendRequests(newRequests)
+			setFriendRequests(newRequests);
 		}
 
 		socket.on(`refresh-contacts-page`, refrechContactsPage);
 		return () => {
 			socket.off(`refresh-contacts-page`, refrechContactsPage);
-		}
-	
-	}, [])
-
+		};
+	}, []);
 
 	return (
 		<>
@@ -238,9 +236,6 @@ const ContactTabs = ({
 	);
 };
 
-
-
-
 const AddContactTab = ({ formAction, addFriendInputRef, request, isPending }: AddContactTabProps) => {
 	return (
 		<div className="p-4">
@@ -279,7 +274,6 @@ const AddContactTab = ({ formAction, addFriendInputRef, request, isPending }: Ad
 			<hr className="hr-separator my-2 bg-transparent" />
 
 			<p className="text-muted">- Recommended Friends functionality coming soon...</p>
-
 		</div>
 	);
 };
@@ -290,23 +284,20 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/app/lib/hooks/useToast";
 
 const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps) => {
-
-	const [error, setError] = useState("")
-	const [isPending, setIsPendingIds] = useState(new Set<string>())
-	const toast = useToast()
+	const [error, setError] = useState("");
+	const [isPending, setIsPendingIds] = useState(new Set<string>());
+	const toast = useToast();
 
 	function handlePending(id: string, pending: boolean) {
 		if (pending) {
 			setIsPendingIds((prev) => new Set(prev).add(id));
+		} else {
+			setIsPendingIds((prev) => {
+				const newSet = new Set(prev);
+				newSet.delete(id);
+				return newSet;
+			});
 		}
-		else {
-				setIsPendingIds((prev) => {
-					const newSet = new Set(prev);
-					newSet.delete(id);
-					return newSet;
-				});
-		}
-
 	}
 
 	const handleAccept = async (friend: User) => {
@@ -319,11 +310,10 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
 				socket.emit("refresh-contacts-page", user.id, friend.id);
-
-				setFriendRequests((prev) => ({
-					...prev,
-					incoming: prev.incoming.filter((req) => req.id !== friend.id),
-				}));
+				// setFriendRequests((prev) => ({
+				// 	...prev,
+				// 	incoming: prev.incoming.filter((req) => req.id !== friend.id),
+				// }));
 
 				toast({ title: "Success!", mode: "positive", subtitle: result.message });
 			}
@@ -343,21 +333,20 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 				setError(result.message);
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
-				setFriendRequests((prev) => {
-					if (type === "sent") {
-						return {
-							...prev,
-							sent: prev.sent.filter((req) => req.id !== friend.id),
-						};
-					}
+				// setFriendRequests((prev) => {
+				// 	if (type === "sent") {
+				// 		return {
+				// 			...prev,
+				// 			sent: prev.sent.filter((req) => req.id !== friend.id),
+				// 		};
+				// 	}
 
-					return {
-						...prev,
-						incoming: prev.incoming.filter((req) => req.id !== friend.id),
-					};
-				});
+				// 	return {
+				// 		...prev,
+				// 		incoming: prev.incoming.filter((req) => req.id !== friend.id),
+				// 	};
+				// });
 				socket.emit("refresh-contacts-page", user.id, friend.id);
-
 				toast({ title: "Success!", mode: "positive", subtitle: result.message });
 			}
 		} catch (err) {
@@ -369,17 +358,14 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 	};
 
 	const [filter, setFiltered] = useState<"all" | "incoming" | "sent">("all");
-	let total = 0
+	let total = 0;
 	if (filter === "all") {
 		total = friendRequests.incoming.length + friendRequests.sent.length;
-	}
-	else if (filter === "incoming") {
+	} else if (filter === "incoming") {
 		total = friendRequests.incoming.length;
-	}			
-	else if (filter === "sent") {
+	} else if (filter === "sent") {
 		total = friendRequests.sent.length;
 	}
-
 
 	return (
 		<>
@@ -416,7 +402,6 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 				</div>
 
 				<hr className="hr-separator my-2 bg-transparent" />
-
 
 				{error && <p className="text-error text-sm my-2">{error}</p>}
 			</div>
@@ -471,8 +456,6 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 											<RxCross2 className="group-hover/icon:text-error" />
 										</IconWithSVG>
 									</div>
-
-									
 								</div>
 							))}
 						</div>
@@ -532,15 +515,15 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 			</div>
 		</>
 	);
-} 
+};
 
 const AllContactsTab = ({ friendsCount, contacts, user }: AllContactsTabProps) => {
-	const [input, setInput] = useState("")
-const filteredContacts = contacts.filter(
-	(s) =>
-		s.displayName.toLowerCase().includes(input.toLowerCase()) ||
-		s.username.toLowerCase().includes(input.toLowerCase())
-);
+	const [input, setInput] = useState("");
+	const filteredContacts = contacts.filter(
+		(s) =>
+			s.displayName.toLowerCase().includes(input.toLowerCase()) ||
+			s.username.toLowerCase().includes(input.toLowerCase())
+	);
 	return (
 		<div className="flex flex-col flex-1">
 			<Search setInput={setInput} />
@@ -553,7 +536,6 @@ const filteredContacts = contacts.filter(
 			<ContactPreviewContainer user={user} contacts={filteredContacts} />
 		</div>
 	);
-}
-
+};
 
 export default ContactTabs;
