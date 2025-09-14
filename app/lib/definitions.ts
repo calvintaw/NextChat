@@ -133,8 +133,8 @@ export type MessageType = {
 	type: "text" | "video" | "image" | "system" | "file" | "reaction" | "reply";
 	edited: boolean;
 	reactions: Record<string, string[]>;
-	local?: boolean;
 	replyTo: string | null;
+	tempId?: string;
 };
 
 export type ChatType = Omit<User, "createdAt"> & {

@@ -1,17 +1,18 @@
 import { AttachmentDropdown } from "./AttachmentDropdown";
 import TextareaAutosize from "react-textarea-autosize";
 import { ChatToolbar } from "./ChatToolBar";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { clsx } from "clsx";
 import React from "react";
 import { socket } from "@/app/lib/socket";
 import { MessageType, User } from "@/app/lib/definitions";
 import useDebounce from "@/app/lib/hooks/useDebounce";
 import { useChatProvider } from "../ChatBoxWrapper";
-import { RxCross2, RxCrossCircled } from "react-icons/rx";
+import { RxCross2 } from "react-icons/rx";
 import { IconWithSVG } from "../../general/Buttons";
-import { useToast } from "@/app/lib/hooks/useToast";
 import { useMessageLimiter } from "@/app/lib/hooks/useMsgLimiter";
+import { v4 as uuidv4 } from "uuid";
+import { time } from "console";
 
 type ChatInputBoxProps = {
 	activePersons: string[];
@@ -50,12 +51,14 @@ const ChatInputBox = ({
 		delay: 2000,
 	});
 
-	const limit = useRef(15);
-	const toast = useToast();
-
 	const sendMessage = (input: string) => {
 		if (!input.trim()) return;
+		// instantly displaying for visuals
+		const tempId = uuidv4();
+		tempIdsRef.current.add(tempId);
+
 		const temp_msg = {
+			tempId: tempId,
 			room_id: roomId,
 			sender_id: user.id,
 			sender_image: user.image ?? null,
@@ -72,10 +75,6 @@ const ChatInputBox = ({
 			socket.emit("message", temp_msg);
 		}
 
-		// instantly displaying for visuals
-		const time = new Date().toISOString();
-		tempIdsRef.current.add(time);
-
 		setMessages((prev) => {
 			return [
 				...prev,
@@ -84,10 +83,9 @@ const ChatInputBox = ({
 					content: `${temp_msg.content}`,
 					type: "text",
 					id: "",
-					createdAt: time,
+					createdAt: new Date().toISOString(),
 					edited: false,
 					reactions: {},
-					local: true,
 				},
 			];
 		});

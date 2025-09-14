@@ -92,7 +92,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 			setMessages((prev) => {
 				if (msg.sender_id !== user.id) return [...prev, msg];
 
-				const index = prev.findIndex((item) => item.local && tempIdsRef.current.has(item.createdAt));
+				const index = prev.findIndex((item) => item.tempId && tempIdsRef.current.has(item.tempId));
 				if (index === -1) return [...prev, msg];
 
 				const updated = [...prev];
@@ -100,7 +100,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 				return updated;
 			});
-			tempIdsRef.current = new Set();
+			if (msg.tempId) tempIdsRef.current.delete(msg.tempId);
 		};
 
 		const handleMessageDeleted = (id: string) => {
@@ -262,7 +262,6 @@ import Loading from "@/app/(root)/chat/[room_id]/loading";
 import { useToast } from "@/app/lib/hooks/useToast";
 import { DirectMessageCard } from "./components/ChatHeaderForDM";
 import { ServerCardHeader } from "./components/ChatHeaderForServer";
-import { usePathProvider } from "@/app/lib/PathContext";
 
 export const ServerList = ({ servers }: { servers: Room[] }) => {
 	if (!servers || servers.length === 0) {
