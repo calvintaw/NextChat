@@ -38,7 +38,8 @@ export default async function RootLayout({
 	children: React.ReactNode;
 }>) {
 	const cookieStore = await cookies();
-	const theme = cookieStore.get("theme")?.value || "dark";
+	const theme = cookieStore.get("theme")?.value;
+	console.log("cookie STORE: ", theme);
 
 	return (
 		<html lang="en" className={theme}>
@@ -48,8 +49,8 @@ export default async function RootLayout({
 					<main className="flex w-full h-full">
 						<FriendsProvider>
 							<Sidebar />
-							<div className="flex w-full h-full border-t border-contrast">
-								<Suspense fallback={<Loading />}>{children}</Suspense>
+							<div className="flex flex-1 w-full h-full border-t border-contrast">
+								<Suspense fallback={<Loading className="!w-full !h-full" />}>{children}</Suspense>
 							</div>
 						</FriendsProvider>
 					</main>

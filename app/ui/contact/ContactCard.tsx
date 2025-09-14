@@ -105,19 +105,28 @@ export const ContactPreview = ({
 		const result = await createDM({ id: contact.id, username: contact.username });
 
 		if (result.success) {
-			setContacts((prev) => [
-				...prev,
-				{
-					id: contact.id,
-					image: contact.image,
-					username: contact.username,
-					displayName: contact.displayName,
-					email: contact.email,
-					online: false,
-					room_id,
-				},
-			]);
-			router.refresh();
+			setContacts((prev) => {
+				// Check if contact with same id already exists
+				const exists = prev.some((c) => c.id === contact.id);
+
+				if (exists) {
+					return prev; // do nothing if already exists
+				}
+
+				// Otherwise, add the new contact
+				return [
+					...prev,
+					{
+						id: contact.id,
+						image: contact.image,
+						username: contact.username,
+						displayName: contact.displayName,
+						email: contact.email,
+						online: false,
+						room_id,
+					},
+				];
+			});
 		} else {
 			console.error(result.message);
 		}

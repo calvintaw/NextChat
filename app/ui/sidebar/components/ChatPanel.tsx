@@ -2,8 +2,8 @@ import { getChats } from "@/app/lib/actions";
 import { ChatPanelHeader, ChatPreviewContainer } from "./ChatPreview";
 import { User } from "@/app/lib/definitions";
 
-const ChatPanel = async ({user}:{user:User}) => {
-	const chats = await getChats(user.id);	
+const ChatPanel = async ({ user }: { user: User }) => {
+	const chats = await getChats(user.id);
 	return (
 		<section
 			id="chat-panel"
@@ -13,13 +13,12 @@ const ChatPanel = async ({user}:{user:User}) => {
 		border
 		border-r-0
 		lg:rounded-tl-2xl
-    absolute left-[64px] 
+    absolute left-15.75
 		bottom-0
 		max-lg:border-border
 		-translate-x-[calc(100%+64px)] z-30 bg-background 
     lg:static lg:translate-x-0 lg:flex lg:z-auto lg:bg-transparent 
     
-		fade-bg-bottom-early
     sidebar-scrollbar
 
   "

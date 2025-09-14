@@ -1,21 +1,21 @@
-"use client"
+"use client";
 
-import { signOut, useSession } from 'next-auth/react';
-import * as Dialog from '@radix-ui/react-dialog';
-import { Avatar } from '@/app/ui/general/Avatar';
-import { Button } from '@/app/ui/general/Buttons';
-import { User } from '../lib/definitions';
-import React, { useEffect, useState } from 'react'
-import { FaUser, FaIdBadge, FaEnvelope } from 'react-icons/fa6';
-import { editProfile } from '../lib/actions';
-import InputField from './form/InputField';
-import { ImSpinner9 } from 'react-icons/im';
-import { ServerImageUploadBtn } from './chat/components/UploadButtons';
-import imageCompression from 'browser-image-compression';
-import { nanoid } from 'nanoid';
-import { supabase } from '../lib/supabase';
-import { useRouter } from 'next/navigation';
-import clsx from 'clsx';
+import { signOut, useSession } from "next-auth/react";
+import * as Dialog from "@radix-ui/react-dialog";
+import { Avatar } from "@/app/ui/general/Avatar";
+import { Button } from "@/app/ui/general/Buttons";
+import { User } from "../lib/definitions";
+import React, { useEffect, useState } from "react";
+import { FaUser, FaIdBadge, FaEnvelope } from "react-icons/fa6";
+import { editProfile } from "../lib/actions";
+import InputField from "./form/InputField";
+import { ImSpinner9 } from "react-icons/im";
+import { ServerImageUploadBtn } from "./chat/components/UploadButtons";
+import imageCompression from "browser-image-compression";
+import { nanoid } from "nanoid";
+import { supabase } from "../lib/supabase";
+import { useRouter } from "next/navigation";
+import clsx from "clsx";
 
 type EditProfileState = {
 	errors: Record<string, string[]>;
@@ -28,8 +28,6 @@ const DashboardPage = ({ initialUser }: { initialUser: User }) => {
 	const [user, setUser] = useState<User>(initialUser);
 	const { update } = useSession();
 
-
-
 	const [{ errors, message, success }, setData] = useState<EditProfileState>({
 		errors: {},
 		message: "",
@@ -37,7 +35,7 @@ const DashboardPage = ({ initialUser }: { initialUser: User }) => {
 		user: null,
 	});
 	const [isPending, setIsPending] = useState(false);
-	  const router = useRouter();
+	const router = useRouter();
 
 	async function handleSubmit(e: React.FormEvent) {
 		e.preventDefault();
@@ -47,51 +45,50 @@ const DashboardPage = ({ initialUser }: { initialUser: User }) => {
 		formData.set("server_image", url);
 		const result = await editProfile(user, formData);
 		setData(result);
-		if(result.user) setUser(result.user)
+		if (result.user) setUser(result.user);
 		setIsPending(false);
 		await update({ ...user, ...result.user });
 		router.refresh();
-	}	
+	}
 
-	const [uploaded, setUploaded] = useState<string>(user.image); 
+	const [uploaded, setUploaded] = useState<string>(user.image);
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
 	const [publicImgUrl] = useState<string>(user.image);
 
 	async function uploadAndGetURL() {
-				if (selectedFile === null) {
-					return publicImgUrl;
-				}
-		
-				try {
-					const options = {
-						maxSizeMB: 0.2,
-						maxWidthOrHeight: 256,
-						useWebWorker: true,
-					};
+		if (selectedFile === null) {
+			return publicImgUrl;
+		}
 
-					const compressedFile = await imageCompression(selectedFile, options);
-	
-					const filename = `${nanoid()}.${compressedFile.name.split(".").pop()}`;
-					const { data, error } = await supabase.storage.from("uploads").upload(filename, compressedFile);
-					if (error) throw error;
-		
-					const { data: publicData } = supabase.storage.from("uploads").getPublicUrl(data?.path || "");
-		
-					if (publicData?.publicUrl) {
-						return publicData.publicUrl
-					}
-	
-					setUploaded("");
-					return ""
-				} catch (err) {
-					console.error("Upload error:", err);
-					return "";
-				}
+		try {
+			const options = {
+				maxSizeMB: 0.2,
+				maxWidthOrHeight: 256,
+				useWebWorker: true,
+			};
+
+			const compressedFile = await imageCompression(selectedFile, options);
+
+			const filename = `${nanoid()}.${compressedFile.name.split(".").pop()}`;
+			const { data, error } = await supabase.storage.from("uploads").upload(filename, compressedFile);
+			if (error) throw error;
+
+			const { data: publicData } = supabase.storage.from("uploads").getPublicUrl(data?.path || "");
+
+			if (publicData?.publicUrl) {
+				return publicData.publicUrl;
 			}
 
+			setUploaded("");
+			return "";
+		} catch (err) {
+			console.error("Upload error:", err);
+			return "";
+		}
+	}
 
 	return (
-		<div className="bg-background flex-1 flex justify-center items-center pt-16 px-4">
+		<div className="bg-contrast flex-1 flex justify-center items-center pt-16 px-4">
 			<div className=" mx-auto w-fit h-fit max-w-lg bg-background border-2 border-border rounded-2xl shadow-lg p-8 flex flex-col items-center gap-6">
 				{/* Header */}
 				<div className="flex justify-center items-center gap-4">
@@ -140,12 +137,14 @@ const DashboardPage = ({ initialUser }: { initialUser: User }) => {
 							<Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface rounded-xl p-6 w-full max-w-md shadow-lg border border-border">
 								<Dialog.Title className="text-xl font-semibold text-text mb-4">Edit Profile</Dialog.Title>
 
-								
-
 								{/* Example form */}
 								<form className="flex flex-col gap-2" onSubmit={handleSubmit}>
-
-									<ServerImageUploadBtn uploaded={uploaded} setUploaded={setUploaded}setSelectedFile={setSelectedFile} publicImgUrl={publicImgUrl}></ServerImageUploadBtn>
+									<ServerImageUploadBtn
+										uploaded={uploaded}
+										setUploaded={setUploaded}
+										setSelectedFile={setSelectedFile}
+										publicImgUrl={publicImgUrl}
+									></ServerImageUploadBtn>
 
 									{/* Display Name */}
 									<InputField
@@ -153,7 +152,6 @@ const DashboardPage = ({ initialUser }: { initialUser: User }) => {
 										name="displayName"
 										icon={<FaUser />}
 										defaultValue={user.displayName}
-										
 										errors={errors?.displayName}
 									/>
 
@@ -164,7 +162,6 @@ const DashboardPage = ({ initialUser }: { initialUser: User }) => {
 										icon={<FaIdBadge />}
 										defaultValue={user.username}
 										errors={errors?.username}
-										
 									/>
 
 									{/* Email */}
@@ -175,10 +172,11 @@ const DashboardPage = ({ initialUser }: { initialUser: User }) => {
 										type="email"
 										errors={errors?.email}
 										defaultValue={user.email}
-										
 									/>
 
-									{message && <span className={clsx("text-sm my-1 ", success ? "text-success" : "text-error")}>{message}</span>}
+									{message && (
+										<span className={clsx("text-sm my-1 ", success ? "text-success" : "text-error")}>{message}</span>
+									)}
 
 									<div className="flex justify-end gap-2 mt-2">
 										<Dialog.Close asChild>
@@ -207,10 +205,4 @@ const DashboardPage = ({ initialUser }: { initialUser: User }) => {
 	);
 };
 
-
-
-
-
-
-
-export default DashboardPage
+export default DashboardPage;

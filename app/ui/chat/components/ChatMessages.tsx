@@ -14,11 +14,17 @@ dayjs.extend(isToday);
 dayjs.extend(isYesterday);
 dayjs.extend(weekday);
 
-const ChatMessages = ({ messages, deleteMessage }: { messages: MessageType[]; deleteMessage: Function}) => {
-	const {isBlocked} = useChatProvider()
+const ChatMessages = ({ messages, deleteMessage }: { messages: MessageType[]; deleteMessage: Function }) => {
+	const { isBlocked } = useChatProvider();
 
+	// relative min-h-[calc(100vh-400px)] h-full
 	return (
-		<div className="relative min-h-[calc(100vh-400px)]">
+		<div
+			className="
+		
+		flex-1 flex flex-col relative
+		"
+		>
 			{isBlocked && (
 				<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
 					<div className="bg-accent text-text px-4 py-2 rounded-lg flex items-center gap-2 max-w-[90vw] mx-3">
@@ -78,11 +84,9 @@ const RefAnchor = () => {
 		if (scrollRef.current) {
 			scrollRef.current?.scrollIntoView({ behavior: "instant" });
 		}
-	}, [])
+	}, []);
 
-	return (
-			<span ref={scrollRef}></span>
-	);
+	return <span ref={scrollRef}></span>;
 };
 
 const MessageSeparator = ({ date }: { date: string }) => {
@@ -96,6 +100,5 @@ const MessageSeparator = ({ date }: { date: string }) => {
 		</div>
 	);
 };
-
 
 export default ChatMessages;

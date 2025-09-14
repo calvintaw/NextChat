@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import dayjs from "dayjs";
 import isToday from "dayjs/plugin/isToday";
@@ -14,7 +14,7 @@ import { socket } from "@/app/lib/socket";
 import { CgProfile } from "react-icons/cg";
 import { FaUserFriends } from "react-icons/fa";
 import { FaRegNewspaper, FaPlus } from "react-icons/fa6";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import clsx from "clsx";
 import { blockFriendship, deleteDM, getChats, removeFriendshipRequest } from "@/app/lib/actions";
 import { usePathname, useRouter } from "next/navigation";
@@ -27,15 +27,14 @@ dayjs.extend(isYesterday);
 dayjs.extend(weekday);
 
 export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatType[] }) => {
-	const {friends: localChats, setFriends: setLocalChats} = useFriendsProvider()
+	const { friends: localChats, setFriends: setLocalChats } = useFriendsProvider();
 	const [selectedChat, setSelectedChat] = useState<ChatType | null>(null); // store clicked chat
 
 	useEffect(() => {
-		setLocalChats(chats)
+		setLocalChats(chats);
 	}, [chats]);
 
 	useEffect(() => {
-
 		async function refetchContacts() {
 			const newContacts = await getChats(user.id);
 			setLocalChats(newContacts);
@@ -47,7 +46,7 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 			socket.off(`refresh-contacts-page`, refetchContacts);
 		};
 	}, []);
-	const toast = useToast()
+	const toast = useToast();
 
 	const handleDMdelete = async () => {
 		if (!selectedChat) return;
@@ -63,7 +62,11 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 				console.error(result.message);
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
-				toast({ title: "Success!", mode: "positive", subtitle: `DM with ${selectedChat.username} deleted successfully.` });
+				toast({
+					title: "Success!",
+					mode: "positive",
+					subtitle: `DM with ${selectedChat.username} deleted successfully.`,
+				});
 			}
 		} catch (error) {
 			setLocalChats(previousChats);
@@ -71,9 +74,9 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 			toast({ title: "Error!", mode: "negative", subtitle: "Failed to delete DM. Please try again." });
 		}
 	};
-	
-	const pathname = usePathname()
-	const router = useRouter()
+
+	const pathname = usePathname();
+	const router = useRouter();
 
 	return (
 		<>
@@ -87,9 +90,6 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 							selectChat={() => setSelectedChat(chat)}
 						/>
 					))}
-
-			
-
 
 				{localChats.length < 1 && (
 					<div className="fade-container px-1">
@@ -115,7 +115,6 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 								<DropdownMenu.Item
 									className="DropdownMenuItem"
 									onClick={(e) => {
-										e.preventDefault();
 										handleDMdelete();
 									}}
 								>
@@ -175,8 +174,15 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 	);
 };
 
-
-export const ChatPreview = ({ isSelected, chat, selectChat }: { isSelected:boolean, chat: ChatType; selectChat: () => void }) => {
+export const ChatPreview = ({
+	isSelected,
+	chat,
+	selectChat,
+}: {
+	isSelected: boolean;
+	chat: ChatType;
+	selectChat: () => void;
+}) => {
 	return (
 		<Link className="cursor-pointer no-underline" href={`/chat/${chat.room_id}`}>
 			<div
@@ -208,8 +214,6 @@ export const ChatPreview = ({ isSelected, chat, selectChat }: { isSelected:boole
 	);
 };
 
-
-
 const headerButtons = [
 	{ id: 0, icon: FaUserFriends, label: "Friends", href: "/" },
 	{ id: 1, icon: CgProfile, label: "My Profile", href: "/dashboard" },
@@ -217,8 +221,8 @@ const headerButtons = [
 ];
 
 export const ChatPanelHeader = () => {
-	const router = useRouter()
-	const pathname = usePathname()
+	const router = useRouter();
+	const pathname = usePathname();
 	return (
 		<>
 			<div className="flex flex-col gap-0.5">
@@ -262,4 +266,3 @@ export const ChatPanelHeader = () => {
 		</>
 	);
 };
-

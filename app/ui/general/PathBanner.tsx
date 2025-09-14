@@ -5,7 +5,7 @@ import { usePathProvider } from "@/app/lib/PathContext";
 
 export const PathBanner = () => {
 	const pathname = usePathname();
-	const {path} = usePathProvider()
+	const { path } = usePathProvider();
 
 	const pathDisplayNameMap: { [key: string]: string } = {
 		"/discover": "Discover",
@@ -15,13 +15,12 @@ export const PathBanner = () => {
 	};
 
 	const getBannerTitle = (pathname: string): string => {
-
 		if (pathDisplayNameMap[pathname]) {
 			return pathDisplayNameMap[pathname];
 		}
 
 		if (pathname.includes("@me:")) {
-			return "Chat with friends"
+			return "Chat with friends";
 		}
 
 		return path === "" ? "Explore" : path;
@@ -30,7 +29,7 @@ export const PathBanner = () => {
 	const banner = getBannerTitle(pathname);
 
 	useEffect(() => {
-		if (typeof window === "undefined") return; 
+		if (typeof window === "undefined") return;
 
 		const handleClick = (e: MouseEvent) => {
 			const sidebar = document.getElementById("sidebar");
@@ -57,7 +56,8 @@ export const PathBanner = () => {
 			className="hidden lg:block p-1 w-full  text-center 
 			text-base text-muted font-sans font-semibold
 			border-contrast
-			max-lg:border-x
+			max-lg:border-l
+			max-lg:left-15.5
 			"
 		>
 			{banner}

@@ -6,7 +6,6 @@ import UserPanel from "./components/UserPanel";
 import { getJoinedServers } from "@/app/lib/actions";
 import { redirect } from "next/navigation";
 
-
 const Sidebar = async ({ className }: { className?: string }) => {
 	const session = await auth();
 	if (!session) redirect("/login");
@@ -18,7 +17,7 @@ const Sidebar = async ({ className }: { className?: string }) => {
 			<nav
 				id="sidebar"
 				className={`relative max-w-86  h-full flex flex-row items-start w-min ${className} 
-				border-contrast lg:border-r`}
+				border-contrast lg:border-r bg-background`}
 			>
 				<OnlineIndicator name={user.displayName} userId={user.id}></OnlineIndicator>
 

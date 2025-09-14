@@ -46,15 +46,15 @@ export async function middleware(request: NextRequest) {
 	// console.log("Proceeding to next middleware or route handler");
 
 	// Set default theme cookie if missing
-	if (!request.cookies.has("theme")) {
+	// if (!request.cookies.has("theme")) {
 		// console.log("Theme cookie missing, setting default theme cookie to 'dark'");
 		response.cookies.set("theme", "dark", {
 			path: "/",
 			maxAge: 60 * 60 * 24 * 30, // 30 days
 		});
-	} else {
+	// } else {
 		// console.log("Theme cookie exists:", request.cookies.get("theme")?.value);
-	}
+	// }
 
 	return response;
 }

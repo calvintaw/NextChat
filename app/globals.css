@@ -1,5 +1,3 @@
-
-
 @import "tailwindcss";
 @plugin "@tailwindcss/forms";
 
@@ -9,8 +7,8 @@
 	--breakpoint-xxs: 20rem;
 	--tooltip-border: 2px solid rgba(0, 0, 0, 0.75);
 	--tooltip-chat: 1px solid var(--color-gray-800);
-  --font-chunk: Arial, Helvetica, sans-serif;
-	
+	--font-chunk: Arial, Helvetica, sans-serif;
+
 	/* === Background System === */
 	--color-background: #fff; /* gray-50 — soft background */
 	--color-surface: #e5e7eb; /* gray-200 — surface layer (e.g. cards, chat) */
@@ -33,9 +31,6 @@
 	--color-error: #dc2626; /* red-400 */
 	--color-info: #38bdf8; /* sky-400 */
 	--color-tertiary: #22c55e;
-
-
-
 
 	/* === Animations (unchanged) === */
 	--animate-bounce-scale: bounce-scale 1s ease-in-out infinite;
@@ -162,7 +157,7 @@
 	--color-warning: #fef08a; /* yellow-200 */
 	--color-error: #dc2626; /* red-300 */
 	--color-info: #7dd3fc; /* sky-300 */
-	
+
 	--color-text: #f3f4f6; /* gray-100 */
 	--color-muted: rgb(156, 163, 175); /* gray-400 */
 	--color-border: #2c3542;
@@ -170,11 +165,11 @@
 }
 
 body:has(#ChatInputBox:focus) #replyToBox {
-  border: 1px solid rgba(156, 163, 175, 0.75) !important;
+	border: 1px solid rgba(156, 163, 175, 0.75) !important;
 }
 
 html {
-  scroll-behavior: smooth;
+	scroll-behavior: smooth;
 }
 
 /* WebKit-based browsers (Chrome, Edge, Safari) */
@@ -203,8 +198,6 @@ html {
 }
 
 @layer base {
-
-
 	body {
 		background-color: var(--color-background);
 		color: var(--color-text);
@@ -251,29 +244,29 @@ html {
 		hover:bg-secondary text-text;
 	}
 
-	  input:-webkit-autofill,
-		input:-webkit-autofill:hover,
-		input:-webkit-autofill:focus,
-		input:-moz-autofill,
-		input:-moz-autofill:hover,
-		input:-moz-autofill:focus {
-			-webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
-			box-shadow: 0 0 0px 1000px transparent inset !important;
-			-webkit-text-fill-color: var(--color-text) !important;
-			-moz-text-fill-color: var(--color-text) !important;
-			background-color: transparent !important;
-			color: var(--color-text) !important;
-			transition: background-color 9999s ease-in-out 0s !important; /* trick to prevent flash */
-		}
+	input:-webkit-autofill,
+	input:-webkit-autofill:hover,
+	input:-webkit-autofill:focus,
+	input:-moz-autofill,
+	input:-moz-autofill:hover,
+	input:-moz-autofill:focus {
+		-webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+		box-shadow: 0 0 0px 1000px transparent inset !important;
+		-webkit-text-fill-color: var(--color-text) !important;
+		-moz-text-fill-color: var(--color-text) !important;
+		background-color: transparent !important;
+		color: var(--color-text) !important;
+		transition: background-color 9999s ease-in-out 0s !important; /* trick to prevent flash */
+	}
 }
 
 .fade-bg-bottom {
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%);
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-size: 100% 100%;
-  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%);
-  mask-repeat: no-repeat;
-  mask-size: 100% 100%;
+	-webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 85%, rgba(0, 0, 0, 0) 100%);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-size: 100% 100%;
+	mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 85%, rgba(0, 0, 0, 0) 100%);
+	mask-repeat: no-repeat;
+	mask-size: 100% 100%;
 }
 
 @layer utilities {
@@ -317,13 +310,12 @@ html {
 		@apply !scale-95 !transition !duration-250 !ease-[cubic-bezier(0.16,1,0.3,1)] !origin-top !bg-surface dark:!bg-accent !p-2 !px-3 !max-w-80 !text-text !rounded-lg !text-base !font-semibold !shadow-lg !shadow-black/25 dark:!shadow-black !z-50;
 	}
 
-		/* --- Tooltip Styles --- */
-		.my-tooltip__chat {
-			@apply !scale-95 !transition  !duration-250 !ease-[cubic-bezier(0.16,1,0.3,1)] !origin-top 
+	/* --- Tooltip Styles --- */
+	.my-tooltip__chat {
+		@apply !scale-95 !transition  !duration-250 !ease-[cubic-bezier(0.16,1,0.3,1)] !origin-top 
 						!bg-surface dark:!bg-accent !p-1 !px-2.5 !max-w-80 !text-text 
-						!rounded-md !font-light !text-sm !shadow-lg !z-50 ;
-		}
-
+						!rounded-md !font-light !text-sm !shadow-lg !z-50;
+	}
 
 	/* --- Menu & Dropdown Styles (Radix UI related) --- */
 	.MenubarContent {
@@ -363,7 +355,6 @@ html {
 		@apply !size-7.5 bg-transparent hover:animate-wiggle;
 	}
 
-
 	.icon-small {
 		@apply !size-7.5 p-0 m-0;
 	}
@@ -391,8 +382,7 @@ html {
 
 	.icon-contact-panel {
 		@apply group-hover/contact:bg-background bg-transparent !size-7.5 !p-4 !rounded-full
-		disabled:!bg-background 
-		;
+		disabled:!bg-background;
 	}
 
 	.icon-contact-panel svg {
@@ -420,9 +410,7 @@ html {
 		/* focus-within:border-primary */
 		focus-within:ring-primary
 		ring-1
-		ring-transparent
-		
-		;
+		ring-transparent;
 	}
 
 	.form-input_custom input {
@@ -482,8 +470,7 @@ html {
 
 	.btn-primary-dark {
 		@apply duration-125 text-white bg-gray-200 hover:bg-gray-200/90 active:bg-gray-200/70 filter active:brightness-[0.85];
-		}
-
+	}
 
 	.btn-purple {
 		@apply duration-125 text-white bg-primary hover:bg-primary/90 active:bg-primary/70 filter active:brightness-[0.85];
@@ -494,9 +481,7 @@ html {
 	}
 
 	.btn-inverted {
-		@apply 
-
-		bg-background 
+		@apply bg-background 
   border border-foreground
   text-slate-950
 
@@ -513,15 +498,11 @@ html {
   dark:hover:bg-gray-800
   dark:hover:text-white
   dark:data-[state=open]:bg-gray-800
-  dark:data-[state=open]:text-white
-	
-		;
+  dark:data-[state=open]:text-white;
 	}
 
 	.btn-third {
-		@apply 
-				
-			bg-gray-100 text-slate-950 shadow-sm border border-gray-200
+		@apply bg-gray-100 text-slate-950 shadow-sm border border-gray-200
 
 			not-dark:bg-slate-950 not-dark:text-white not-dark:border-gray-950
 			not-dark:hover:text-slate-950
@@ -531,10 +512,8 @@ html {
 
 			dark:hover:bg-background
 			dark:hover:border-white
-			dark:hover:text-white
-		;
+			dark:hover:text-white;
 	}
-
 
 	.btn-small {
 		@apply size-7.5 p-0 m-0 text-sm;
@@ -699,8 +678,6 @@ html {
 	position: absolute;
 }
 
-
-
 @keyframes slideInForward {
 	from {
 		transform: translate(100%, -50%);
@@ -777,234 +754,206 @@ html {
 }
 
 .fade-container {
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 100%);
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-size: cover;
+	-webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 75%, rgba(0, 0, 0, 0) 100%);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-size: cover;
 
-  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 100%);
-  mask-repeat: no-repeat;
-  mask-size: cover;
+	mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 75%, rgba(0, 0, 0, 0) 100%);
+	mask-repeat: no-repeat;
+	mask-size: cover;
 }
 
 .fade-bg-bottom-early {
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 100%);
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-size: 100% 100%;
-  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 100%);
-  mask-repeat: no-repeat;
-  mask-size: 100% 100%;
+	-webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 65%, rgba(0, 0, 0, 0) 100%);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-size: 100% 100%;
+	mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 65%, rgba(0, 0, 0, 0) 100%);
+	mask-repeat: no-repeat;
+	mask-size: 100% 100%;
 }
 
-
 .sidebar-scrollbar {
-
-  scrollbar-gutter: stable;
+	scrollbar-gutter: stable;
 }
 /* Put this in globals.css or a component-level CSS file */
 .sidebar-scrollbar {
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: var(--color-background) transparent; /* Firefox */
+	scrollbar-width: thin; /* Firefox */
+	scrollbar-color: var(--color-background) transparent; /* Firefox */
 }
 
 /* Webkit browsers (Chrome, Safari, Edge) */
 .sidebar-scrollbar::-webkit-scrollbar {
-  width: 7px !important; /* thickness */
-  background: transparent !important; /* track background */
+	width: 7px !important; /* thickness */
+	background: transparent !important; /* track background */
 	border-radius: 0 !important;
 	border: none !important;
 }
 
 .sidebar-scrollbar::-webkit-scrollbar-thumb {
-  background-color: var(--color-background) !important;
-  border-radius: 0 !important;
+	background-color: var(--color-background) !important;
+	border-radius: 0 !important;
 	border: none !important;
-  transition: background-color 0.3s !important;
+	transition: background-color 0.3s !important;
 }
 
 .sidebar-scrollbar:hover::-webkit-scrollbar-thumb {
-  background-color: var(--color-border);
+	background-color: var(--color-border);
 }
 
 .sidebar-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+	background: transparent;
 }
 
-
 @media (max-width: 1023px) {
-	
-
-  #sidebar.active #chat-panel {
-    transform: translateX(calc(100% + 3.938rem)) !important;
+	#sidebar.active #chat-panel {
+		transform: translateX(calc(100% + 3.938rem)) !important;
 		top: 40px;
 		max-height: calc(100vh - 40px) !important;
-  }
+	}
 
 	#sidebar.active #nav-bar {
 		z-index: 10;
-		
 	}
 
-	body:has(#sidebar.active)::after{
+	body:has(#sidebar.active)::after {
 		content: "";
 		position: fixed;
 		top: 0;
 		left: 0;
 		width: 100vw;
 		height: 100vh;
-		background: rgba(0,0,0,0.75);
+		background: rgba(0, 0, 0, 0.75);
 		z-index: 5;
 		pointer-events: none;
 	}
 
 	body:has(#sidebar.active) #path-banner {
-    display: flex !important;
+		display: flex !important;
 		position: fixed !important;
 		top: 0 !important;
-		left: 3.938rem !important;
 		height: 40px !important;
 		background: var(--color-background);
 		z-index: 40;
 		max-width: 280px !important;
 		align-items: center !important;
 		justify-content: center !important;
-  }
+	}
 }
 
-
-
 .newsblock:hover .newsblock-img-container::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  background: linear-gradient(to top, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.15));
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	background: linear-gradient(to top, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.15));
 }
 
 html {
-  font-size: clamp(12.5px, 4vw, 16px) !important;
+	font-size: clamp(12.5px, 4vw, 16px) !important;
 }
 
-
-
-
 .password-rules__meter {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
 	width: 100%;
 }
 
 .password-rules__meter > :where(span) {
 	flex: 1;
-  width: 100%;
-  height: 0.25em;
-  background-color: lightgray;
-  border-radius: 360px;
-  transition: background-color 100ms ease-out;
+	width: 100%;
+	height: 0.25em;
+	background-color: lightgray;
+	border-radius: 360px;
+	transition: background-color 100ms ease-out;
 }
 
 .password-rules[data-score="1"] .password-rules__meter :first-child,
 .password-rules[data-score="2"] .password-rules__meter :nth-child(-n + 2),
 .password-rules[data-score="3"] .password-rules__meter :nth-child(-n + 3),
 .password-rules[data-score="4"] .password-rules__meter :nth-child(-n + 4) {
-  background-color: dodgerblue;
+	background-color: dodgerblue;
 }
 
 .password-rules[data-score="5"] .password-rules__meter :nth-child(-n + 5) {
-  background-color: mediumseagreen;
+	background-color: mediumseagreen;
 }
 
 .password-rules__score::before {
-  display: block;
-  counter-reset: score var(--score, 0) total var(--total, 5);
-  content: counter(score) "/" counter(total);
-  font-feature-settings: "tnum";
-  font-size: 0.8em;
+	display: block;
+	counter-reset: score var(--score, 0) total var(--total, 5);
+	content: counter(score) "/" counter(total);
+	font-feature-settings: "tnum";
+	font-size: 0.8em;
 }
 
 .password-rules__checklist {
-  --flow: 0.3rem;
-  padding-inline-start: 1.2em;
+	--flow: 0.3rem;
+	padding-inline-start: 1.2em;
 }
 
 .password-rules__checklist li {
-  position: relative;
-  list-style-type: circle;
+	position: relative;
+	list-style-type: circle;
 }
 
 .password-rules__checklist .is-match::before {
-  content: "✅";
-  position: absolute;
-  top: 0;
-  right: calc(100% + 0.25em);
-  font-size: 0.9em;
+	content: "✅";
+	position: absolute;
+	top: 0;
+	right: calc(100% + 0.25em);
+	font-size: 0.9em;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /* terms and conditions  */
 
-[data-custom-class='body'], [data-custom-class='body'] * {
-    background: transparent !important;
+[data-custom-class="body"],
+[data-custom-class="body"] * {
+	background: transparent !important;
 }
 
-[data-custom-class='title'], [data-custom-class='title'] * {
-    font-family: Arial !important;
-    font-size: 26px !important;
-    color: #000000 !important;
+[data-custom-class="title"],
+[data-custom-class="title"] * {
+	font-family: Arial !important;
+	font-size: 26px !important;
+	color: #000000 !important;
 }
 
-[data-custom-class='subtitle'], [data-custom-class='subtitle'] * {
-    font-family: Arial !important;
-    color: #595959 !important;
-    font-size: 14px !important;
+[data-custom-class="subtitle"],
+[data-custom-class="subtitle"] * {
+	font-family: Arial !important;
+	color: #595959 !important;
+	font-size: 14px !important;
 }
 
-[data-custom-class='heading_1'], [data-custom-class='heading_1'] * {
-    font-family: Arial !important;
-    font-size: 19px !important;
-    color: #000000 !important;
+[data-custom-class="heading_1"],
+[data-custom-class="heading_1"] * {
+	font-family: Arial !important;
+	font-size: 19px !important;
+	color: #000000 !important;
 }
 
-[data-custom-class='heading_2'], [data-custom-class='heading_2'] * {
-    font-family: Arial !important;
-    font-size: 17px !important;
-    color: #000000 !important;
+[data-custom-class="heading_2"],
+[data-custom-class="heading_2"] * {
+	font-family: Arial !important;
+	font-size: 17px !important;
+	color: #000000 !important;
 }
 
-[data-custom-class='body_text'], [data-custom-class='body_text'] * {
-    color: #595959 !important;
-    font-size: 14px !important;
-    font-family: Arial !important;
+[data-custom-class="body_text"],
+[data-custom-class="body_text"] * {
+	color: #595959 !important;
+	font-size: 14px !important;
+	font-family: Arial !important;
 }
 
-[data-custom-class='link'], [data-custom-class='link'] * {
-    color: #3030F1 !important;
-    font-size: 14px !important;
-    font-family: Arial !important;
-    word-break: break-word !important;
+[data-custom-class="link"],
+[data-custom-class="link"] * {
+	color: #3030f1 !important;
+	font-size: 14px !important;
+	font-family: Arial !important;
+	word-break: break-word !important;
 }

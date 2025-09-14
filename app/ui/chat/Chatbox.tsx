@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { socket } from "../../lib/socket";
-import {  MessageType, Room, User } from "../../lib/definitions";
-import {  checkIfBlocked, deleteMsg, getRecentMessages } from "../../lib/actions";
+import { MessageType, Room, User } from "../../lib/definitions";
+import { checkIfBlocked, deleteMsg, getRecentMessages } from "../../lib/actions";
 import dayjs from "dayjs";
 import isToday from "dayjs/plugin/isToday";
 import isYesterday from "dayjs/plugin/isYesterday";
@@ -13,13 +13,13 @@ dayjs.extend(isToday);
 dayjs.extend(isYesterday);
 dayjs.extend(weekday);
 
-type ChatboxProps = { recipient: User | Room; user: User; roomId: string, type: "dm" | "server" };
+type ChatboxProps = { recipient: User | Room; user: User; roomId: string; type: "dm" | "server" };
 
 export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	const [messages, setMessages] = useState<MessageType[]>([]);
 	const [activePersons, setActivePersons] = useState<string[]>([]);
 	const tempIdsRef = useRef<Set<string>>(new Set());
-	const [initialLoading, setInitialLoading] = useState(true)
+	const [initialLoading, setInitialLoading] = useState(true);
 	const [isBlocked, setIsBlocked] = useState(false);
 
 	useEffect(() => {
@@ -35,23 +35,40 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 			setIsBlocked(false);
 		}
 	}, [type, recipient, user.id]);
-	
+
 	const firstRunRef = useRef(true);
 
 	// fetching msgs at startup and add listeners for typing event
 	useEffect(() => {
 		if (!firstRunRef.current || isBlocked) return; // firstRunRef purpose: to solve some msgs appearing twice sometimes on first render i guess
 
+		// test msgs
+
+		const chatMessages: MessageType[] = Array.from({ length: 30 }, (_, i) => ({
+			id: (i + 1).toString(),
+			sender_id: `user-${(i % 5) + 1}`,
+			sender_display_name: `User ${(i % 5) + 1}`,
+			sender_image: `https://i.pravatar.cc/150?img=${(i % 5) + 1}`,
+			content: `This is message number ${i + 1}`,
+			createdAt: new Date(Date.now() - i * 60000).toISOString(),
+			type: "text",
+			edited: false,
+			reactions: {},
+			replyTo: null,
+		}));
+
+		setMessages(chatMessages);
+
 		const fetchMessages = async () => {
 			const recent = await getRecentMessages(roomId);
 			setMessages((prev) => [...prev, ...recent]);
-			setInitialLoading(false)
+			setInitialLoading(false);
 		};
 
 		fetchMessages();
 
 		const handleTypingStart = (displayName: string) => {
-			setActivePersons(prev => [...prev, displayName]);
+			setActivePersons((prev) => [...prev, displayName]);
 		};
 
 		const handleTypingStop = () => setActivePersons([]);
@@ -59,10 +76,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		socket.on("typing started", handleTypingStart);
 		socket.on("typing stopped", handleTypingStop);
 
-
-
 		firstRunRef.current = false;
-
 
 		return () => {
 			socket.off("typing started", handleTypingStart);
@@ -111,26 +125,26 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 			setMessages((prev) => {
 				const index = prev.findIndex((tx) => tx.id === id);
 				if (index === -1) return prev;
-				
-				const newMsg = [...prev]
-				const currentReactors = new Set(newMsg[index].reactions?.[emoji] || [])
-				
+
+				const newMsg = [...prev];
+				const currentReactors = new Set(newMsg[index].reactions?.[emoji] || []);
+
 				if (operation === "remove") {
-					currentReactors.delete(userId)
+					currentReactors.delete(userId);
 				} else {
-					currentReactors.add(userId)
+					currentReactors.add(userId);
 				}
-	
+
 				newMsg[index] = {
 					...newMsg[index],
 					reactions: {
 						...newMsg[index].reactions,
-						[emoji]: [...currentReactors ],
+						[emoji]: [...currentReactors],
 					},
 				};
 				return newMsg;
-			})
-		}
+			});
+		};
 
 		socket.emit("join", roomId);
 		socket.on("message", handleIncomingMsg);
@@ -150,11 +164,11 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		};
 	}, [roomId]);
 
-	const toast = useToast()
-	
+	const toast = useToast();
+
 	const handleFileUpload = (url: string[], type: "image" | "video") => {
 		if (isBlocked) return;
-		
+
 		socket.emit("message", {
 			room_id: roomId,
 			sender_id: user.id,
@@ -168,26 +182,29 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	const deleteMessage = async (id: string) => {
 		if (isBlocked) return;
 
-		const originalMsg = [...messages]
+		const originalMsg = [...messages];
 		setMessages((prev) => prev.filter((tx) => tx.id != id));
-		const result = await deleteMsg(id, roomId)
+		const result = await deleteMsg(id, roomId);
 		if (!result.success) {
-			setMessages(originalMsg)
+			setMessages(originalMsg);
 			toast({ title: "Error!", mode: "negative", subtitle: result.message });
 		}
 	};
 
 	const containerRef = useRef<HTMLDivElement>(null);
 
-	
 	return (
 		<>
 			<div
-				className="flex flex-1 flex-col shadow-md bg-contrast 
+				className="flex flex-1 max-h-[calc(100vh-33px)] overflow-hidden flex-col shadow-md bg-contrast 
 			"
 			>
 				<ChatProvider config={{ setMessages, messages, roomId, user, containerRef, isBlocked }}>
-					<div ref={containerRef} className="flex-1 flex flex-col overflow-y-auto py-4 pb-10">
+					<div
+						ref={containerRef}
+						className="flex-1 h-full flex flex-col overflow-y-scroll py-4 px-1 pb-10"
+						// className="flex-1 min-h-0 flex flex-col overflow-y-auto py-4 pb-10"
+					>
 						{type === "dm" && recipient && (
 							<DirectMessageCard roomId={roomId} currentUserId={user.id} user={recipient as User} />
 						)}
