@@ -9,6 +9,7 @@ import { Tooltip } from "react-tooltip";
 import { Avatar } from "../../general/Avatar";
 import { ServerList } from "../Chatbox";
 import { usePathProvider } from "@/app/lib/PathContext";
+import clsx from "clsx";
 
 export function DirectMessageCard({
 	roomId,
@@ -90,7 +91,7 @@ export function DirectMessageCard({
 			</div>
 			<div className="flex items-center gap-2">
 				<button
-					className="btn btn-secondary"
+					className={clsx("btn", isBlocked ? "btn-inverted" : "btn-secondary")}
 					onClick={() => {
 						if (isBlocked) {
 							unblockFriendship(currentUserId, user.id);
