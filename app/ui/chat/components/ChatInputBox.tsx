@@ -10,6 +10,8 @@ import useDebounce from "@/app/lib/hooks/useDebounce";
 import { useChatProvider } from "../ChatBoxWrapper";
 import { RxCross2, RxCrossCircled } from "react-icons/rx";
 import { IconWithSVG } from "../../general/Buttons";
+import { useToast } from "@/app/lib/hooks/useToast";
+import { useMessageLimiter } from "@/app/lib/hooks/useMsgLimiter";
 
 type ChatInputBoxProps = {
 	activePersons: string[];
@@ -21,8 +23,16 @@ type ChatInputBoxProps = {
 	isBlocked: boolean;
 };
 
-const ChatInputBox = ({ activePersons, roomId, user, handleFileUpload, setMessages, tempIdsRef, isBlocked }: ChatInputBoxProps) => {
-	const {input, setInput, replyToMsg, setReplyToMsg, textRef} = useChatProvider()
+const ChatInputBox = ({
+	activePersons,
+	roomId,
+	user,
+	handleFileUpload,
+	setMessages,
+	tempIdsRef,
+	isBlocked,
+}: ChatInputBoxProps) => {
+	const { input, setInput, replyToMsg, setReplyToMsg, textRef } = useChatProvider();
 	const [style, setStyle] = useState("!max-h-10");
 
 	useEffect(() => {
@@ -40,19 +50,22 @@ const ChatInputBox = ({ activePersons, roomId, user, handleFileUpload, setMessag
 		delay: 2000,
 	});
 
+	const limit = useRef(15);
+	const toast = useToast();
+
 	const sendMessage = (input: string) => {
 		if (!input.trim()) return;
-				const temp_msg = {
+		const temp_msg = {
 			room_id: roomId,
 			sender_id: user.id,
 			sender_image: user.image ?? null,
 			sender_display_name: user.displayName,
 			content: input,
 			type: "text",
-			replyTo: replyToMsg ? replyToMsg.id : null
+			replyTo: replyToMsg ? replyToMsg.id : null,
 		};
 
-		cancel(750)
+		cancel(750);
 		if (roomId.startsWith("system-room")) {
 			socket.emit("system", temp_msg);
 		} else {
@@ -79,22 +92,25 @@ const ChatInputBox = ({ activePersons, roomId, user, handleFileUpload, setMessag
 			];
 		});
 	};
-	
-	
+
+	const { canSendMessage } = useMessageLimiter(18, 60_000);
+
 	const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 		if (e.key === "Enter" && !e.shiftKey && textRef.current) {
 			e.preventDefault(); // prevents new line from being written
+
+			if (!canSendMessage()) return;
+
 			sendMessage(textRef.current?.value);
-			textRef.current.value = "";	
+			textRef.current.value = "";
 			setInput("");
 			setReplyToMsg(null);
 		}
 	};
 
-
 	useEffect(() => {
-		if (replyToMsg) textRef.current?.focus()
-	}, [replyToMsg])
+		if (replyToMsg) textRef.current?.focus();
+	}, [replyToMsg]);
 
 	return (
 		<div className={clsx(isBlocked && "cursor-not-allowed")}>
@@ -149,10 +165,10 @@ const ChatInputBox = ({ activePersons, roomId, user, handleFileUpload, setMessag
 };
 
 const ReplyToBox = () => {
-	const { replyToMsg, setReplyToMsg } = useChatProvider()
+	const { replyToMsg, setReplyToMsg } = useChatProvider();
 
-	if (!replyToMsg) return null
-	console.log(replyToMsg)
+	if (!replyToMsg) return null;
+	console.log(replyToMsg);
 
 	return (
 		<a
@@ -175,7 +191,7 @@ const ReplyToBox = () => {
 			</IconWithSVG>
 		</a>
 	);
-}
+};
 
 const TypingIndicator = ({ displayName }: { displayName: string[] }) => {
 	if (!displayName || displayName.length === 0) return null;
@@ -215,6 +231,5 @@ const TypingIndicator = ({ displayName }: { displayName: string[] }) => {
 		</span>
 	);
 };
-
 
 export default ChatInputBox;
