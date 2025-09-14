@@ -44,20 +44,21 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 		// test msgs
 
-		const chatMessages: MessageType[] = Array.from({ length: 30 }, (_, i) => ({
-			id: (i + 1).toString(),
-			sender_id: `user-${(i % 5) + 1}`,
-			sender_display_name: `User ${(i % 5) + 1}`,
-			sender_image: `https://i.pravatar.cc/150?img=${(i % 5) + 1}`,
-			content: `This is message number ${i + 1}`,
-			createdAt: new Date(Date.now() - i * 60000).toISOString(),
-			type: "text",
-			edited: false,
-			reactions: {},
-			replyTo: null,
-		}));
+		// const chatMessages: MessageType[] = Array.from({ length: 30 }, (_, i) => ({
+		// 	id: (i + 1).toString(),
+		// 	sender_id: `user-${(i % 5) + 1}`,
+		// 	sender_display_name: `User ${(i % 5) + 1}`,
+		// 	sender_image: `https://i.pravatar.cc/150?img=${(i % 5) + 1}`,
+		// 	content: `This is message number ${i + 1}`,
+		// 	createdAt: new Date(Date.now() - i * 60000).toISOString(),
+		// 	type: "text",
+		// 	edited: false,
+		// 	reactions: {},
+		// 	replyTo: null,
+		// }));
+		// setMessages(chatMessages);
 
-		setMessages(chatMessages);
+		//==============
 
 		const fetchMessages = async () => {
 			const recent = await getRecentMessages(roomId);
