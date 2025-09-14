@@ -26,12 +26,11 @@ import { socket } from "./socket";
 import console, { error } from "console";
 
 async function withCurrentUser(callback: Function) {
-	const session = await auth()
-	const userId = session?.user?.id
-	if (!userId) throw new Error("not authenticated")
+	const session = await auth();
+	const userId = session?.user?.id;
+	if (!userId) throw new Error("not authenticated");
 	return callback(session.user as User);
 }
-
 
 export async function getUser(user_id: string): Promise<User | null> {
 	if (user_id.includes("system-room")) {
@@ -39,9 +38,8 @@ export async function getUser(user_id: string): Promise<User | null> {
 		SELECT id, username, display_name as "displayName", email, created_at as "createdAt", image FROM users WHERE username = ${"system"}
 	`;
 
-		return result[0] ?? null;	
+		return result[0] ?? null;
 	}
-
 
 	const result = await sql<User[]>`
 		SELECT id, username, display_name as "displayName", email, created_at as "createdAt", image FROM users WHERE id = ${user_id} LIMIT 1
@@ -65,7 +63,6 @@ export async function checkIfBlocked(user: User, friend: User): Promise<boolean>
 	return result[0].status === "blocked";
 }
 
-
 export async function getServersInCommon(currentUserId: string, targetUserId: string): Promise<Room[]> {
 	return await sql`
 		SELECT r.id, r.name, r.type, r.profile, r.owner_id
@@ -80,7 +77,7 @@ export async function getServersInCommon(currentUserId: string, targetUserId: st
 export async function deleteMsg(
 	id: string,
 	roomId: string
-): Promise<{ success: true, message: string } | { success: false; error: any;  message: string}> {
+): Promise<{ success: true; message: string } | { success: false; error: any; message: string }> {
 	try {
 		await sql.begin(async (tx) => {
 			await tx`
@@ -90,15 +87,15 @@ export async function deleteMsg(
 		});
 		socket.emit("delete message", id, roomId);
 
-	  return { success: true, message: "Message deleted successfully." };
-  } catch (error) {
-    console.error("Error deleting message:", error);
-    return { success: false, error, message: "Failed to delete the message. Please try again!" };
-  }
+		return { success: true, message: "Message deleted successfully." };
+	} catch (error) {
+		console.error("Error deleting message:", error);
+		return { success: false, error, message: "Failed to delete the message. Please try again!" };
+	}
 }
 
 export async function getChats(currentUserId: string): Promise<ChatType[]> {
-		return await sql`
+	return await sql`
 			SELECT 
 				us.online as "online", 
 				rm.room_id as "room_id", 
@@ -116,7 +113,7 @@ export async function getChats(currentUserId: string): Promise<ChatType[]> {
 }
 
 export async function getContacts(currentUserId: string): Promise<ContactType[]> {
-		return await sql`
+	return await sql`
 			    SELECT 
 					u.id,
 					u.username,
@@ -135,7 +132,7 @@ export async function getContacts(currentUserId: string): Promise<ContactType[]>
 }
 
 export async function getRecentMessages(room_id: string) {
-		return (await sql`
+	return (await sql`
 			SELECT 
 				m.id,
 				users.image as "sender_image",
@@ -172,71 +169,72 @@ GROUP BY r.id
 }
 
 export async function editProfile(user: User, formData: FormData) {
-		const parsedFormSchema = z.object({
-			displayName: z.string().trim().min(1).max(50).optional(),
-			username: z.string().trim().min(1).max(30).optional(),
-			email: z.string().trim().email().optional(),
-			image: z.string().url("Profile image must be a valid URL").or(z.literal("")),
-		});
+	const parsedFormSchema = z.object({
+		displayName: z.string().trim().min(1).max(50).optional(),
+		username: z.string().trim().min(1).max(30).optional(),
+		email: z.string().trim().email().optional(),
+		image: z.string().url("Profile image must be a valid URL").or(z.literal("")),
+	});
 
-		const rawData = {
-			displayName: formData.get("displayName")?.toString(),
-			username: formData.get("username")?.toString(),
-			email: formData.get("email")?.toString(),
-			image: formData.get("server_image")?.toString(),
+	const rawData = {
+		displayName: formData.get("displayName")?.toString(),
+		username: formData.get("username")?.toString(),
+		email: formData.get("email")?.toString(),
+		image: formData.get("server_image")?.toString(),
+	};
+
+	const result = parsedFormSchema.safeParse(rawData);
+
+	if (!result.success) {
+		return {
+			errors: result.error.flatten().fieldErrors,
+			message: "Validation failed. Please check your input.",
+			success: false,
+			user: null,
 		};
+	}
 
-		const result = parsedFormSchema.safeParse(rawData);
+	const { displayName = null, username = null, email = null, image } = result.data ?? {};
 
-		if (!result.success) {
-			return {
-				errors: result.error.flatten().fieldErrors,
-				message: "Validation failed. Please check your input.",
-				success: false,
-				user: null
-			};
-		}
+	if (displayName === user.displayName && username === user.username && email === user.email && image === user.image) {
+		return {
+			errors: {},
+			message: "No changes made to the profile.",
+			success: true,
+			user: null,
+		};
+	}
 
-		const { displayName = null, username = null, email = null, image } = result.data ?? {};
-
-		if (displayName === user.displayName && username === user.username && email === user.email && image === user.image) { 
-			return {
-				errors: {},
-				message: "No changes made to the profile.",
-				success: true,
-				user: null
-			};
-		}
-
-		// Check for duplicate username
-		if (username && username !== user.username) {
-			try {
-				const duplicates = await sql`
+	// Check for duplicate username
+	if (username && username !== user.username) {
+		try {
+			const duplicates = await sql`
           SELECT username FROM users
           WHERE username = ${username} AND id != ${user.id}
           LIMIT 1
         `;
-				if (duplicates.length > 0 && duplicates[0].username === username) {
-					return {
-						errors: { username: ["Username already taken."] },
-						message: "Please choose a different username.",
-						success: false,
-						user: null
-					};
-				}
-			} catch (err) {
+			if (duplicates.length > 0 && duplicates[0].username === username) {
 				return {
-					errors: {},
-					message: "Something went wrong while checking username.",
+					errors: { username: ["Username already taken."] },
+					message: "Please choose a different username.",
 					success: false,
-					user	: null
+					user: null,
 				};
 			}
+		} catch (err) {
+			console.log("error in edit profile: ", error);
+			return {
+				errors: {},
+				message: "Something went wrong while checking username.",
+				success: false,
+				user: null,
+			};
 		}
+	}
 
-		// Update the user in the database
-		try {
-			const rows = await sql<User[]>`
+	// Update the user in the database
+	try {
+		const rows = await sql<User[]>`
 				UPDATE users
 				SET
 					display_name = ${displayName ?? user.displayName},
@@ -247,30 +245,26 @@ export async function editProfile(user: User, formData: FormData) {
 				returning id, username, display_name as "displayName", email, created_at as "createdAt", image
 			`;
 
-			if (rows.length === 0) {
-				throw new Error("No Data Returned")
-			}
-
-			return {
-				errors: {},
-				message: "Profile updated successfully.",
-				success: true,
-				user: rows[0],
-			};		
-			
-		} catch (err) {
-			console.error("editProfile ERROR: ", err)
-			return {
-				errors: {},
-				message: "Database Error: Failed to update profile.",
-				success: false,
-				user: null
-			};
+		if (rows.length === 0) {
+			throw new Error("No Data Returned");
 		}
 
-
+		return {
+			errors: {},
+			message: "Profile updated successfully.",
+			success: true,
+			user: rows[0],
+		};
+	} catch (err) {
+		console.error("editProfile ERROR: ", err);
+		return {
+			errors: {},
+			message: "Database Error: Failed to update profile.",
+			success: false,
+			user: null,
+		};
+	}
 }
-
 
 export async function editServer(formData: FormData, server: Room, currentUserId: string) {
 	let result_server: Room | null = null;
@@ -342,15 +336,13 @@ export async function editServer(formData: FormData, server: Room, currentUserId
 	};
 }
 
-
 export async function getJoinedServers(userId: string) {
-		return (await sql`	
+	return (await sql`	
 		select r.id, r.profile, r.name from rooms r
 		join room_members rm on r.id = rm.room_id
 		where rm.user_id = ${userId} and r.type != 'dm'
 	`) as Room[];
 }
-
 
 export async function deleteServer(server_id: string) {
 	return withCurrentUser(async (user: User) => {
@@ -361,18 +353,17 @@ export async function deleteServer(server_id: string) {
 }
 
 export async function joinServer(room_id: string) {
-	return withCurrentUser(async (user: User) => { 
+	return withCurrentUser(async (user: User) => {
 		await sql`
         INSERT INTO room_members (room_id, user_id)
         VALUES
           (${room_id}, ${user.id})
         ON CONFLICT DO NOTHING
       `;
-
-	})
+	});
 }
 
-export async function createServer(formData: FormData): Promise<{errors: {}, message: string, success: boolean}> {
+export async function createServer(formData: FormData): Promise<{ errors: {}; message: string; success: boolean }> {
 	console.log("formData: ", formData);
 	const parsedForm = createServerSchema.safeParse({
 		server_name: formData.get("server_name"),
@@ -385,7 +376,7 @@ export async function createServer(formData: FormData): Promise<{errors: {}, mes
 		return {
 			errors: parsedForm.error.flatten().fieldErrors,
 			message: "Something happened. Please try again later!",
-			success: false
+			success: false,
 		};
 	}
 	const { server_name, visibility, server_image } = parsedForm.data;
@@ -402,7 +393,7 @@ export async function createServer(formData: FormData): Promise<{errors: {}, mes
 
 	try {
 		await sql.begin(async (sql) => {
-				await sql`
+			await sql`
 					INSERT INTO rooms (id, owner_id, name, type, profile)
 					VALUES (
 						${id},
@@ -411,9 +402,9 @@ export async function createServer(formData: FormData): Promise<{errors: {}, mes
 						${visibility},
 						${server_image}
 					);
-				`
-			
-				await sql`
+				`;
+
+			await sql`
 					INSERT INTO room_members (room_id, user_id, role)
 					VALUES (
 						${id},
@@ -421,20 +412,20 @@ export async function createServer(formData: FormData): Promise<{errors: {}, mes
 						${"admin"}
 					)
 				`;
-		} )
+		});
 
 		console.log("server created successfully");
 		return {
 			errors: {},
 			message: "Server created successfully",
-			success: true
+			success: true,
 		};
 	} catch (error) {
 		console.error("Error creating server:", error);
 		return {
 			errors: {},
 			message: "Database Error: Failed to create server",
-			success: false
+			success: false,
 		};
 	}
 }
@@ -478,6 +469,7 @@ export async function registerUser(formData: FormData): Promise<FormState> {
 			};
 		}
 	} catch (error) {
+		console.log("error in register User:", error);
 		return {
 			errors: {},
 			message: "Something went wrong. Please try again.",
@@ -486,23 +478,21 @@ export async function registerUser(formData: FormData): Promise<FormState> {
 
 	try {
 		const hashedPassword = await bcrypt.hash(password, 10);
-		
 
-		await sql.begin(async (sql) => { 
+		await sql.begin(async (sql) => {
 			const [{ id }] = await sql<{ id: string }[]>`
 				INSERT INTO users (email, password, username, display_name)
 				VALUES (${email}, ${hashedPassword}, ${username}, ${displayName})
 				returning id;
 			`;
 
-			const result = (await getUserIdByUsername("system"));
-			if (!result.success) return
+			const result = await getUserIdByUsername("system");
+			if (!result.success) return;
 			const systemUserId = result.id!;
 			const roomId = `system-room-${id}`;
 			const [user1_id, user2_id] = [id, systemUserId].sort((a, b) => a.localeCompare(b));
-				
 
-		await sql`
+			await sql`
 				INSERT INTO friends (user1_id, user2_id, request_sender_id, status)
 				VALUES (
 					${user1_id},  -- deterministic system UUID
@@ -511,8 +501,8 @@ export async function registerUser(formData: FormData): Promise<FormState> {
 					'accepted'
 				);
 			`;
-				// Create system room
-				await sql`
+			// Create system room
+			await sql`
     INSERT INTO rooms (id, owner_id, description, type)
     VALUES (
       ${roomId},
@@ -523,8 +513,8 @@ export async function registerUser(formData: FormData): Promise<FormState> {
     ON CONFLICT (id) DO NOTHING;
   `;
 
-				// Add members: system, new user
-				await sql`
+			// Add members: system, new user
+			await sql`
     INSERT INTO room_members (room_id, user_id, role)
     VALUES
       (${roomId}, ${systemUserId}, 'admin'),
@@ -536,10 +526,9 @@ export async function registerUser(formData: FormData): Promise<FormState> {
 				INSERT INTO user_status (user_id, online)
 				VALUES (${id}, true)
 			`;
-
-		})
+		});
 	} catch (error) {
-		console.log(error)
+		console.log("error in register user:", error);
 		return {
 			errors: {},
 			message: "Database Error: Failed to create account",
@@ -561,10 +550,10 @@ export async function registerUser(formData: FormData): Promise<FormState> {
 
 export async function authenticate(prevState: string | undefined, formData: FormData) {
 	try {
-		const indentifier = formData.get("identifier")
-		const EmailSchema = z.string().trim().email()
+		const indentifier = formData.get("identifier");
+		const EmailSchema = z.string().trim().email();
 		const emailResult = EmailSchema.safeParse(indentifier);
-		console.log(indentifier)
+		console.log(indentifier);
 
 		const data = {
 			email: emailResult.success ? indentifier : null,
@@ -591,17 +580,16 @@ export async function setThemeCookie(theme: "" | "dark") {
 }
 
 export async function updateOnlineStatus(status: boolean, user_id: string) {
-		try {
-			await sql`UPDATE user_status set online = ${status} where user_id = ${user_id}`;
-		} catch (error) {
-			console.log(error);
-		}
+	try {
+		await sql`UPDATE user_status set online = ${status} where user_id = ${user_id}`;
+	} catch (error) {
+		console.log(error);
+	}
 }
 
-
 export async function getFriendRequests(userId: string) {
-		try {
-			const incoming: User[] = await sql<User[]>`
+	try {
+		const incoming: User[] = await sql<User[]>`
       SELECT
         users.id,
         users.username,
@@ -615,7 +603,7 @@ export async function getFriendRequests(userId: string) {
         AND friends.request_sender_id != ${userId};
     `;
 
-			const sent: User[] = await sql<User[]>`
+		const sent: User[] = await sql<User[]>`
 			SELECT
 				users.id,
 				users.username,
@@ -631,47 +619,41 @@ export async function getFriendRequests(userId: string) {
 				AND friends.request_sender_id = ${userId};
     `;
 
-			return { sent, incoming };
-		} catch (error) {
-			console.error("Error fetching friend requests:", error);
-			throw new Error("Failed to fetch friend requests.");
-		}
+		return { sent, incoming };
+	} catch (error) {
+		console.error("Error fetching friend requests:", error);
+		throw new Error("Failed to fetch friend requests.");
+	}
 }
-
 
 /// DELETE DM ROOM
 
-export async function deleteDM(
-	targetUser: MinimalUserType
-): Promise<{ success: boolean; message: string }> {
+export async function deleteDM(targetUser: MinimalUserType): Promise<{ success: boolean; message: string }> {
 	return withCurrentUser(async (currentUser: User) => {
+		try {
+			console.log(`Deleting DM between ${currentUser.username} and ${targetUser.username}...`);
 
-		
-	try {
-		console.log(`Deleting DM between ${currentUser.username} and ${targetUser.username}...`);
+			const room_id = getDMRoom(currentUser.id, targetUser.id);
 
-		const room_id = getDMRoom(currentUser.id, targetUser.id);
-
-		await sql.begin(async (sql) => {
-			await sql`
+			await sql.begin(async (sql) => {
+				await sql`
 				DELETE FROM rooms
 				WHERE id = ${room_id}
 			`;
 
-			await sql`
+				await sql`
 				DELETE FROM room_members
 				WHERE room_id = ${room_id}
 			`;
-		});
+			});
 
-		console.log(`Success! Deleted DM with ${targetUser.username}.`);
-		return { success: true, message: `Deleted DM with ${targetUser.username}.` };
-	} catch (error) {
-		console.error("Error deleting DM:", error);
-		return { success: false, message: "Failed to delete DM. Please try again later." };
-	}
+			console.log(`Success! Deleted DM with ${targetUser.username}.`);
+			return { success: true, message: `Deleted DM with ${targetUser.username}.` };
+		} catch (error) {
+			console.error("Error deleting DM:", error);
+			return { success: false, message: "Failed to delete DM. Please try again later." };
+		}
 	});
-
 }
 
 export async function createDM(
@@ -709,14 +691,11 @@ export async function createDM(
 	});
 }
 
-
-
 export async function requestFriendship(
 	prevState: { success: boolean; message: string },
 	formData: FormData
-): Promise<{ success: boolean; message: string, target_id?: string }> {
+): Promise<{ success: boolean; message: string; target_id?: string }> {
 	return withCurrentUser(async (currentUser: User) => {
-
 		try {
 			const username = z.string().min(1).parse(formData.get("username"));
 			console.log("Sarting friendship request. Console log");
@@ -736,8 +715,7 @@ export async function requestFriendship(
 					INSERT INTO friends (user1_id, user2_id, request_sender_id,  status)
 					VALUES (${user1_id}, ${user2_id}, ${currentUser.id}, 'pending')
 				`;
-			})
-
+			});
 
 			console.log(`Success! Your friend requests to ${username} was sent.`);
 			socket.emit("refresh-contacts-page", currentUser.id, id);
@@ -752,45 +730,44 @@ export async function requestFriendship(
 				// Unique violation from Postgres meaning friendship already exists
 				return { success: false, message: "You already have a pending or accepted friendship with this user." };
 			}
+
+			console.log("error in request friendship:", error);
 			return {
 				success: false,
 				message: "Hm, didn't work. Double check that the username is correct.",
 			};
 		}
-		
-	})
-};
+	});
+}
 
 type MinimalUserType = {
-	id: string,
+	id: string;
 	username: string;
-}
+};
 
 export async function removeFriendshipRequest(
 	targetUser: MinimalUserType
 ): Promise<{ success: boolean; message: string }> {
 	return withCurrentUser(async (currentUser: User) => {
-
 		try {
 			console.log("Starting friendship cancel.");
 
 			const [user1_id, user2_id] = [targetUser.id, currentUser.id].sort((a, b) => a.localeCompare(b));
 
 			await sql.begin(async (tx) => {
-
 				await tx`
 			DELETE FROM friends
 			WHERE user1_id = ${user1_id} AND user2_id = ${user2_id}
 		`;
-			})
+			});
 
 			console.log(`Success! Removed friend request to ${targetUser.username}.`);
 			return { success: true, message: `Removed friend request to ${targetUser.username}.` };
 		} catch (error) {
-			console.error(error);
+			console.error("error in remove friend req: ", error);
 			return { success: false, message: "Oops, an error occurred! Please try again later." };
 		}
-	})
+	});
 }
 
 export async function blockFriendship(
@@ -823,17 +800,13 @@ export async function blockFriendship(
 	}
 }
 
-
-export async function acceptFriendshipRequest(
-	targetUser: User
-): Promise<{ success: boolean; message: string }> {
+export async function acceptFriendshipRequest(targetUser: User): Promise<{ success: boolean; message: string }> {
 	return withCurrentUser(async (currentUser: User) => {
-
 		try {
 			console.log("Starting friendship accept...");
 
 			const room_id = getDMRoom(targetUser.id, currentUser.id);
-			const [user1_id, user2_id] = [currentUser.id, targetUser.id].sort((a, b) => a.localeCompare(b))
+			const [user1_id, user2_id] = [currentUser.id, targetUser.id].sort((a, b) => a.localeCompare(b));
 
 			await sql.begin(async (tx) => {
 				await tx`
@@ -858,7 +831,6 @@ export async function acceptFriendshipRequest(
       `;
 			});
 
-
 			console.log(`Success! Accepted friend request from ${targetUser.username}.`);
 
 			return {
@@ -866,18 +838,14 @@ export async function acceptFriendshipRequest(
 				message: `Friend request from ${targetUser.username} accepted.`,
 			};
 		} catch (error) {
-			console.error(error);
+			console.error("error in accept friend req", error);
 			return {
 				success: false,
 				message: `Failed to accept friend request from ${targetUser.username}. Please try again.`,
 			};
 		}
-		
-	})
+	});
 }
-
-
-
 
 export async function fetchNews(config?: NewsApiParams): Promise<NewsArticle[]> {
 	try {
@@ -914,15 +882,13 @@ export async function fetchNews(config?: NewsApiParams): Promise<NewsArticle[]> 
 		throw new Error("Unexpected API response structure");
 	} catch (err) {
 		console.error("Network/server error:", err);
-		return []; 
+		return [];
 	}
 }
-
 
 export async function mockFetchNews() {
 	return { articles: newsData.articles as NewsArticle[], error: "" };
 }
-
 
 export async function editMsg({
 	id,
@@ -945,6 +911,7 @@ export async function editMsg({
 			socket.emit("edit message", id, roomId, content);
 			return { success: true, message: "Message edited successfully." };
 		} catch (error) {
+			console.log("error in edit msg: ", error);
 			return { success: false, error, message: "Failed to edit the message. Please try again." };
 		}
 	});
@@ -960,7 +927,7 @@ export async function addReactionToMSG({
 	userId: string;
 	roomId: string;
 	emoji: string;
-}): Promise<{ success: true, message : string} | { success: false; error: any, message: string }> {
+}): Promise<{ success: true; message: string } | { success: false; error: any; message: string }> {
 	try {
 		await sql.begin(async (tx) => {
 			await tx`
@@ -986,6 +953,8 @@ WHERE id = ${id};
 		socket.emit("add_reaction_msg", id, userId, roomId, emoji);
 		return { success: true, message: "Reaction added successfully." };
 	} catch (error) {
+		console.log("error in add reactiont to msg: ", error);
+
 		return { success: false, message: "Failed to add reaction. Please try again.", error };
 	}
 }
@@ -1024,21 +993,21 @@ WHERE id = ${id};
 		socket.emit("remove_reaction_msg", id, userId, roomId, emoji);
 		return { success: true, message: "Reaction removed successfully." };
 	} catch (error) {
+		console.log("error in remove reaction msg: ", error);
+
 		return { success: false, message: "Failed to remove reaction. Please try again.", error };
 	}
 }
-
 
 export async function getUsername(id: string) {
 	const result = await sql<User[]>`
 		SELECT username from users where id = ${id} LIMIT 1
 	`;
 	if (result.length === 0) {
-		return {success: false}
-	} 
-	return {success: true, username: result[0].username};
+		return { success: false };
+	}
+	return { success: true, username: result[0].username };
 }
-
 
 export async function getUserIdByUsername(username: string) {
 	const result = await sql<User[]>`
