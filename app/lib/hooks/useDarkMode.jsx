@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import useMediaQuery from "./useMediaQuery";
 import { useLocalStorage } from "./useStorage";
-import { setThemeCookie } from "../actions";
 
 export default function useDarkMode() {
 	const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
@@ -14,11 +13,17 @@ export default function useDarkMode() {
 	};
 
 	useEffect(() => {
-		const update = async () => {
+		const update = () => {
 			if (typeof window === "undefined") return;
 			document.documentElement.classList.toggle("dark", darkMode);
-			await setThemeCookie(darkMode ? "dark" : "");
+
+			fetch("/api/theme", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ theme: darkMode ? "dark" : "" }),
+			});
 		};
+
 		update();
 	}, [darkMode]);
 

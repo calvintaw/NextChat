@@ -18,7 +18,6 @@ import {
 	Room,
 } from "./definitions";
 import bcrypt from "bcryptjs";
-import { cookies } from "next/headers";
 import z from "zod";
 import { getDMRoom } from "./utilities";
 import { newsData } from "./news";
@@ -573,10 +572,6 @@ export async function authenticate(prevState: string | undefined, formData: Form
 		}
 		throw error;
 	}
-}
-
-export async function setThemeCookie(theme: "" | "dark") {
-	(await cookies()).set("theme", theme);
 }
 
 export async function updateOnlineStatus(status: boolean, user_id: string) {
