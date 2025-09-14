@@ -1,4 +1,5 @@
 import { sql } from "@/app/lib/definitions";
+import { seedRegisterUsers } from "@/app/lib/seedUsers";
 
 async function resetTables() {
 	await sql`DROP TABLE IF EXISTS msg_status CASCADE`;
@@ -312,10 +313,48 @@ export async function GET() {
 
 // 		`;
 		
-		
-		await sql`ALTER TABLE users
-ADD COLUMN role TEXT DEFAULT 'user' CHECK (role IN ('user', 'admin'));
-`;
+		await seedRegisterUsers([
+			{
+				email: "alice@example.com",
+				password: "Password123!",
+				username: "alice_dev",
+				displayName: "Alice Dev",
+			},
+			{
+				email: "bob@example.com",
+				password: "Password123!",
+				username: "bobby",
+				displayName: "Bobby Tables",
+			},
+			{
+				email: "charlie@example.com",
+				password: "Password123!",
+				username: "charlie_c",
+				displayName: "Charlie Code",
+			},
+			{
+				email: "diana@example.com",
+				password: "Password123!",
+				username: "diana_d",
+				displayName: "Diana Debug",
+			},
+			{
+				email: "evan@example.com",
+				password: "Password123!",
+				username: "evan_js",
+				displayName: "Evan JS",
+			},
+			{
+				email: "frank@example.com",
+				password: "Password123!",
+				username: "franklin",
+				displayName: "Franklin Flow",
+			},
+		]);
+
+// 		await sql`ALTER TABLE users
+// ADD COLUMN role TEXT DEFAULT 'user' CHECK (role IN ('user', 'admin'));
+// `;
 		return Response.json({ message: "Database policies set successfully" });
 	} catch (error) {
 		console.error("Policy setup failed:", error);

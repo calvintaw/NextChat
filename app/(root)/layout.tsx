@@ -7,10 +7,9 @@ import { cookies } from "next/headers";
 import { Suspense } from "react";
 import Loading from "./chat/[room_id]/loading";
 import FriendsProvider from "../lib/friendsContext";
-import '@/app/lib/passwordRules.js'
+import "@/app/lib/passwordRules.js";
 import Toaster from "../ui/Toast";
 import PathProvider from "../lib/PathContext";
-
 
 const roboto = localFont({
 	src: [
@@ -39,7 +38,7 @@ export default async function RootLayout({
 	children: React.ReactNode;
 }>) {
 	const cookieStore = await cookies();
-	const theme = cookieStore.get("theme")?.value;
+	const theme = cookieStore.get("theme")?.value || "dark";
 
 	return (
 		<html lang="en" className={theme}>
@@ -60,4 +59,3 @@ export default async function RootLayout({
 		</html>
 	);
 }
-
