@@ -88,14 +88,14 @@ const DashboardPage = ({ initialUser }: { initialUser: User }) => {
 	}
 
 	return (
-		<div className="bg-contrast flex-1 flex justify-center items-center pt-16 px-4">
-			<div className=" mx-auto w-fit h-fit max-w-lg bg-background border-2 border-border rounded-2xl shadow-lg p-8 flex flex-col items-center gap-6">
+		<div className="bg-contrast flex-1 flex justify-center items-center pt-16 px-2 sm:px-4">
+			<div className="mx-auto w-full max-w-lg bg-background border-2 border-border rounded-2xl shadow-lg p-4 sm:p-8 flex flex-col items-center gap-6">
 				{/* Header */}
 				<div className="flex justify-center items-center gap-4">
 					<Avatar
 						src={user.image}
 						displayName={user.displayName}
-						size="size-20"
+						size="md:size-20 size-10 sm:size-15"
 						fontSize="text-[1.75em]"
 						radius="rounded-full"
 						statusIndicator={false}
@@ -117,11 +117,6 @@ const DashboardPage = ({ initialUser }: { initialUser: User }) => {
 					<div className="flex justify-between items-center gap-4">
 						<span className="text-muted font-medium">Joined</span>
 						<span className="text-text">{new Date(user.createdAt as string).toLocaleDateString()}</span>
-					</div>
-
-					<div className="flex justify-between items-center gap-4">
-						<span className="text-muted font-medium">User ID</span>
-						<span className="text-text break-words text-sm">{user.id}</span>
 					</div>
 				</div>
 
