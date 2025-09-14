@@ -133,14 +133,14 @@ type AllContactsTabProps = {
 const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTabsProps) => {
 	const router = useRouter();
 	const toast = useToast();
+
 	const [request, formAction, isPending] = useActionState(
 		async (prevState: { success: boolean; message: string }, formData: FormData) => {
 			const result = await requestFriendship(prevState, formData);
 
-			router.refresh();
-
 			if (result.success) {
 				toast({ title: "Success!", mode: "positive", subtitle: "Friend request sent successfully." });
+				router.refresh();
 			} else {
 				toast({
 					title: "Error!",
@@ -287,6 +287,7 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 	const [error, setError] = useState("");
 	const [isPending, setIsPendingIds] = useState(new Set<string>());
 	const toast = useToast();
+	const router = useRouter()
 
 	function handlePending(id: string, pending: boolean) {
 		if (pending) {
@@ -309,6 +310,7 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 				setError(result.message);
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
+				router.refresh()
 				socket.emit("refresh-contacts-page", user.id, friend.id);
 				// setFriendRequests((prev) => ({
 				// 	...prev,
@@ -333,6 +335,8 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 				setError(result.message);
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
+				router.refresh();
+
 				// setFriendRequests((prev) => {
 				// 	if (type === "sent") {
 				// 		return {

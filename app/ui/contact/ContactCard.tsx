@@ -12,6 +12,7 @@ import { IconWithSVG } from "../general/Buttons";
 import { getDMRoom } from "@/app/lib/utilities";
 import { useFriendsProvider } from "@/app/lib/friendsContext";
 import { useToast } from "@/app/lib/hooks/useToast";
+import { useRouter } from "next/navigation";
 
 type MinimalUserType = { id: string; username: string };
 
@@ -44,6 +45,7 @@ export const ContactPreviewContainer = ({ user, contacts }: { user: User; contac
 	}, []);
 
 	const toast = useToast();
+	const router = useRouter();
 
 	const [error, setError] = useState("");
 	const handleRemove = async (friend: MinimalUserType) => {
@@ -58,6 +60,7 @@ export const ContactPreviewContainer = ({ user, contacts }: { user: User; contac
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
 				socket.emit("refresh-contacts-page", user.id, friend.id);
+				router.refresh();
 				toast({ title: "Success!", mode: "positive", subtitle: result.message });
 			}
 		} catch (err) {
@@ -87,6 +90,7 @@ export const ContactPreview = ({
 	contact: ContactType;
 }) => {
 	const { friends: contacts, setFriends: setContacts } = useFriendsProvider();
+	const router = useRouter();
 	const handleClick = async () => {
 		const room_id = getDMRoom(user.id, contact.id);
 
@@ -113,6 +117,7 @@ export const ContactPreview = ({
 					room_id,
 				},
 			]);
+			router.refresh();
 		} else {
 			console.error(result.message);
 		}
