@@ -97,11 +97,25 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 				if (index === -1) return [...prev, msg];
 
 				const updated = [...prev];
-				updated[index] = { ...msg };
+
+				if (msg.tempId) tempIdsRef.current.delete(msg.tempId);
+				updated[index] = { ...msg, tempId: undefined };
+				// {
+				// 		id: msg.id,
+				// 		sender_id: msg.sender_id,
+				// 		sender_display_name: msg.sender_display_name;
+				// 		sender_image: msg.sender_image,
+				// 		content: msg.content,
+				// 		createdAt: msg.createdAt,
+				// 		type:msg.type,
+				// 		edited: msg.edited,
+				// 		reactions: msg.reactions,
+				// 	replyTo: msg.replyTo,
+				// 	tempId: null;
+				// };
 
 				return updated;
 			});
-			if (msg.tempId) tempIdsRef.current.delete(msg.tempId);
 		};
 
 		const handleMessageDeleted = (id: string) => {
