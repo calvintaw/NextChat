@@ -243,12 +243,14 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 				setError(result.message);
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
-				router.refresh();
+				// router.refresh();
 				socket.emit("refresh-contacts-page", user.id, friend.id);
-				// setFriendRequests((prev) => ({
-				// 	...prev,
-				// 	incoming: prev.incoming.filter((req) => req.id !== friend.id),
-				// }));
+				// local ui instant updates
+
+				setFriendRequests((prev) => ({
+					...prev,
+					incoming: prev.incoming.filter((req) => req.id !== friend.id),
+				}));
 
 				toast({ title: "Success!", mode: "positive", subtitle: result.message });
 			}
@@ -268,21 +270,23 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 				setError(result.message);
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
-				router.refresh();
+				// router.refresh();
+				// local ui instant updates
 
-				// setFriendRequests((prev) => {
-				// 	if (type === "sent") {
-				// 		return {
-				// 			...prev,
-				// 			sent: prev.sent.filter((req) => req.id !== friend.id),
-				// 		};
-				// 	}
+				setFriendRequests((prev) => {
+					if (type === "sent") {
+						return {
+							...prev,
+							sent: prev.sent.filter((req) => req.id !== friend.id),
+						};
+					}
 
-				// 	return {
-				// 		...prev,
-				// 		incoming: prev.incoming.filter((req) => req.id !== friend.id),
-				// 	};
-				// });
+					return {
+						...prev,
+						incoming: prev.incoming.filter((req) => req.id !== friend.id),
+					};
+				});
+
 				socket.emit("refresh-contacts-page", user.id, friend.id);
 				toast({ title: "Success!", mode: "positive", subtitle: result.message });
 			}

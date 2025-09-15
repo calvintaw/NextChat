@@ -49,22 +49,24 @@ export const ContactPreviewContainer = ({ user, contacts }: { user: User; contac
 
 	const [error, setError] = useState("");
 	const handleRemove = async (friend: MinimalUserType) => {
-		// const originalContacts = [...localContacts]
-		// setLocalContacts((prev) => prev.filter((req) => req.id !== friend.id));
+		// local ui instant updates
+
+		const originalContacts = [...localContacts]
+		setLocalContacts((prev) => prev.filter((req) => req.id !== friend.id));
 
 		try {
 			const result = await removeFriendshipRequest(friend);
 			if (!result.success) {
-				// setLocalContacts(originalContacts); // rollback
+				setLocalContacts(originalContacts); // rollback
 				setError(result.message);
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
 				socket.emit("refresh-contacts-page", user.id, friend.id);
-				router.refresh();
+				// router.refresh();
 				toast({ title: "Success!", mode: "positive", subtitle: result.message });
 			}
 		} catch (err) {
-			// setLocalContacts(originalContacts); // rollback
+			setLocalContacts(originalContacts); // rollback
 			setError("Failed to remove friend request");
 			toast({ title: "Error!", mode: "negative", subtitle: "Failed to remove friend request." });
 		}
