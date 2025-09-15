@@ -757,6 +757,8 @@ export async function removeFriendshipRequest(
 			});
 
 			console.log(`Success! Removed friend request to ${targetUser.username}.`);
+			socket.emit("refresh-contacts-page", currentUser.id, targetUser.id);
+
 			return { success: true, message: `Removed friend request to ${targetUser.username}.` };
 		} catch (error) {
 			console.error("error in remove friend req: ", error);
@@ -858,6 +860,7 @@ export async function acceptFriendshipRequest(targetUser: User): Promise<{ succe
 			});
 
 			console.log(`Success! Accepted friend request from ${targetUser.username}.`);
+			socket.emit("refresh-contacts-page", currentUser.id, targetUser);
 
 			return {
 				success: true,

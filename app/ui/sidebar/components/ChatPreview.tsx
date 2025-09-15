@@ -52,11 +52,11 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 		if (!selectedChat) return;
 
 		const previousChats = [...localChats];
+		// local ui instant updates
 		setLocalChats((prev) => prev.filter((chat) => chat.id !== selectedChat.id));
 
 		try {
 			const result = await deleteDM({ id: selectedChat.id, username: selectedChat.username });
-
 			if (!result.success) {
 				setLocalChats(previousChats);
 				console.error(result.message);

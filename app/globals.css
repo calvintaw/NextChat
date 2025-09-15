@@ -164,6 +164,10 @@
 	--color-tertiary: #16a34a;
 }
 
+html {
+	font-size: clamp(12.5px, 4vw, 16px) !important;
+}
+
 body:has(#ChatInputBox:focus) #replyToBox {
 	border: 1px solid rgba(156, 163, 175, 0.75) !important;
 }
@@ -849,10 +853,6 @@ html {
 	height: 100%;
 	pointer-events: none;
 	background: linear-gradient(to top, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.15));
-}
-
-html {
-	font-size: clamp(12.5px, 4vw, 16px) !important;
 }
 
 .password-rules__meter {

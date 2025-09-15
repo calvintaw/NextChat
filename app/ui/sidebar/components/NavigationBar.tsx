@@ -41,7 +41,7 @@ const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: R
 	const pathname = usePathname();
 	console.log("pathname: ", pathname);
 	const nav_icon_styles =
-		"group hover:bg-primary not-dark:hover:bg-foreground border-2 border-transparent !rounded-xl !size-11.5";
+		"group hover:bg-primary not-dark:hover:bg-foreground border-2 border-transparent max-sm:!rounded-xl !rounded-xl max-sm:!size-10 !size-11.5";
 
 	return (
 		<>
@@ -49,7 +49,7 @@ const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: R
 				id="nav-bar"
 				className="
 			bg-background
-			flex items-start flex-col gap-1 h-full w-fit py-2 sticky top-0 navigation-bar
+			flex items-start flex-col max-sm:gap-2 gap-1 h-full w-fit py-2 sticky top-0 navigation-bar
 			border-red-500
 			"
 			>
@@ -79,7 +79,7 @@ const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: R
 								>
 									<Icon
 										className={clsx(
-											"not-dark:group-hover:text-background text-[24px]",
+											"not-dark:group-hover:text-background text-[24px] max-sm:text-",
 											pathname === icon.href && "not-dark:!text-white"
 										)}
 									/>
@@ -109,7 +109,7 @@ const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: R
 									<Icon
 										user={{ ...user, createdAt: user.createdAt ?? "" }}
 										className={clsx(
-											"not-dark:group-hover:text-background text-[24px]",
+											"not-dark:group-hover:text-background text-[24px] max-sm:text-",
 											pathname === icon.href && "not-dark:!text-white"
 										)}
 									/>
@@ -172,7 +172,7 @@ const DashboardBtn = () => {
 	}
 
 	const nav_icon_styles =
-		"group hover:bg-primary not-dark:hover:bg-foreground border-2 border-transparent !rounded-xl !size-11.5";
+		"group hover:bg-primary not-dark:hover:bg-foreground border-2 border-transparent max-sm:!rounded-xl !rounded-xl max-sm:!size-10 !size-11.5";
 
 	return (
 		<div className={"lg:hidden px-2 max-sm:px-1 sm:min-h-13 relative flex items-center justify-center z-50"}>
@@ -184,7 +184,7 @@ const DashboardBtn = () => {
 				data-tooltip-content={"Toggle Sidebar"}
 				className={nav_icon_styles}
 			>
-				<MdSpaceDashboard className={"not-dark:group-hover:text-background text-[24px]"} />
+				<MdSpaceDashboard className={"not-dark:group-hover:text-background text-[24px] max-sm:text-"} />
 			</IconWithSVG>
 		</div>
 	);

@@ -51,85 +51,6 @@ type AllContactsTabProps = {
 	user: User;
 };
 
-// const test_data: friendRequestsType = {
-// 	sent: [
-// 		{
-// 			id: "1",
-// 			image: "https://randomuser.me/api/portraits/men/1.jpg",
-// 			username: "john_doe",
-// 			displayName: "John Doe",
-// 			email: "john@example.com",
-// 			createdAt: "2025-01-01T12:00:00Z",
-// 			password: "hashed_password_1",
-// 		},
-// 		{
-// 			id: "2",
-// 			image: "https://randomuser.me/api/portraits/women/2.jpg",
-// 			username: "jane_smith",
-// 			displayName: "Jane Smith",
-// 			email: "jane@example.com",
-// 			createdAt: "2025-02-15T09:30:00Z",
-// 			password: "hashed_password_2",
-// 		},
-// 	],
-// 	incoming: [
-// 		{
-// 			id: "3",
-// 			image: "https://randomuser.me/api/portraits/men/3.jpg",
-// 			username: "bob_brown",
-// 			displayName: "Bob Brown",
-// 			email: "bob@example.com",
-// 			createdAt: "2025-03-10T15:45:00Z",
-// 			password: "hashed_password_3",
-// 		},
-// 		{
-// 			id: "4",
-// 			image: "https://randomuser.me/api/portraits/women/4.jpg",
-// 			username: "alice_white",
-// 			displayName: "Alice White",
-// 			email: "alice@example.com",
-// 			createdAt: "2025-04-22T11:20:00Z",
-// 			password: "hashed_password_4",
-// 		},
-// 		{
-// 			id: "8",
-// 			image: "https://randomuser.me/api/portraits/men/3.jpg",
-// 			username: "bob_brown",
-// 			displayName: "Bob Brown",
-// 			email: "bob@example.com",
-// 			createdAt: "2025-03-10T15:45:00Z",
-// 			password: "hashed_password_3",
-// 		},
-// 		{
-// 			id: "9",
-// 			image: "https://randomuser.me/api/portraits/women/4.jpg",
-// 			username: "alice_white",
-// 			displayName: "Alice White",
-// 			email: "alice@example.com",
-// 			createdAt: "2025-04-22T11:20:00Z",
-// 			password: "hashed_password_4",
-// 		},
-// 		{
-// 			id: "10",
-// 			image: "https://randomuser.me/api/portraits/men/3.jpg",
-// 			username: "bob_brown",
-// 			displayName: "Bob Brown",
-// 			email: "bob@example.com",
-// 			createdAt: "2025-03-10T15:45:00Z",
-// 			password: "hashed_password_3",
-// 		},
-// 		{
-// 			id: "11",
-// 			image: "https://randomuser.me/api/portraits/women/4.jpg",
-// 			username: "alice_white",
-// 			displayName: "Alice White",
-// 			email: "alice@example.com",
-// 			createdAt: "2025-04-22T11:20:00Z",
-// 			password: "hashed_password_4",
-// 		},
-// 	],
-// };
-
 const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTabsProps) => {
 	const router = useRouter();
 	const toast = useToast();
@@ -163,7 +84,7 @@ const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTa
 		async function refrechContactsPage() {
 			console.log("refetching contacts");
 			const [newContacts, newRequests] = await Promise.all([getContacts(user.id), getFriendRequests(user.id)]);
-			console.log("newCOntacts: ", newContacts);
+			console.log("newContacts: ", newContacts);
 			setContacts(newContacts);
 			setFriendRequests(newRequests);
 		}
@@ -176,24 +97,24 @@ const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTa
 
 	return (
 		<>
-			<section className="border-r-2 border-border/10 h-full flex flex-col px-4 py-2 pt-0 bg-contrast">
+			<section className="border-r-2 border-border/10 h-full flex flex-col px-[clamp(6px,2vw,16px)] py-2 pt-0 bg-contrast">
 				<Tabs.Root defaultValue="all" className="flex flex-col h-full">
 					<Tabs.List className="my-3 flex gap-2 items-center">
 						<div className="flex items-center gap-2 mr-2 max-sm:hidden">
-							<FaUserFriends className="text-2xl text-muted" />
+							<FaUserFriends className="text-[clamp(1rem,4vw,1.5rem)] text-muted" />
 							<p className="text-muted font-medium">Friends</p>
 							<GoDotFill className="text-xs text-muted mt-0.5" />
 						</div>
 
 						<Tabs.Trigger value="all" asChild>
-							<Button className="bg-transparent border-transparent text-text hover:bg-accent/50 data-[state=active]:bg-accent/50 data-[state=active]:cursor-default">
+							<Button className="bg-accent/25 border-transparent text-text hover:bg-accent/50 data-[state=active]:bg-accent/50 data-[state=active]:cursor-default">
 								All
 							</Button>
 						</Tabs.Trigger>
 
 						{(friendRequests.sent.length > 0 || friendRequests.incoming.length > 0) && (
 							<Tabs.Trigger value="request" asChild>
-								<Button className="bg-transparent border-transparent text-text hover:bg-accent/50 data-[state=active]:bg-accent/50 data-[state=active]:cursor-default">
+								<Button className="bg-accent/25 border-transparent text-text hover:bg-accent/50 data-[state=active]:bg-accent/50 data-[state=active]:cursor-default">
 									Pending
 								</Button>
 							</Tabs.Trigger>
@@ -238,16 +159,16 @@ const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTa
 
 const AddContactTab = ({ formAction, addFriendInputRef, request, isPending }: AddContactTabProps) => {
 	return (
-		<div className="p-4">
+		<div className="p-2 sm:p-4 border">
 			<div className="flex flex-col gap-2 my-3 mb-5">
-				<h1 className="text-2xl font-semibold ">Add Friends</h1>
+				<h1 className="text-[clamp(1rem,4vw,1.5rem)] font-semibold ">Add Friends</h1>
 				<p className="text-base">You can add friends with their username.</p>
 			</div>
 			<form action={formAction}>
 				<InputField
 					disabled={isPending}
 					ref={addFriendInputRef}
-					parentClassName="h-fit py-2 group"
+					parentClassName="h-fit py-0.5 px-1.5 sm:py-2 group rounded-lg"
 					name="username"
 					placeholder="You can add friends with their username."
 					place="right"
@@ -258,7 +179,9 @@ const AddContactTab = ({ formAction, addFriendInputRef, request, isPending }: Ad
 							<button
 								disabled={isPending}
 								type="submit"
-								className="bg-primary btn-with-icon opacity-65 group-focus-within:opacity-100 hover:bg-primary/75 active:bg-primary/50 py-1.5 px-3 text-[15px] text-white rounded-lg"
+								className="
+								max-sm:hidden
+								bg-primary btn-with-icon opacity-65 group-focus-within:opacity-100 hover:bg-primary/75 active:bg-primary/50 py-1 sm:py-1.5 px-2 sm:px-3 text-[0.938rem] text-white rounded-md sm:rounded-lg sm:mr-0.5"
 							>
 								{isPending ? "Sending Friend Request" : "Send Friend Request"}
 								{isPending && <ImSpinner9 className="animate-spin"></ImSpinner9>}
@@ -266,6 +189,16 @@ const AddContactTab = ({ formAction, addFriendInputRef, request, isPending }: Ad
 						</>
 					}
 				></InputField>
+				<button
+					disabled={isPending}
+					type="submit"
+					className="
+								min-sm:hidden
+								bg-primary btn-with-icon opacity-65 group-focus-within:opacity-100 hover:bg-primary/75 active:bg-primary/50 py-1 sm:py-1.5 px-2 sm:px-3 text-[0.938rem] text-white rounded-md sm:rounded-lg sm:mr-0.5"
+				>
+					{isPending ? "Sending Friend Request" : "Send Friend Request"}
+					{isPending && <ImSpinner9 className="animate-spin"></ImSpinner9>}
+				</button>
 			</form>
 
 			<hr className="hr-separator" />
@@ -287,7 +220,7 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 	const [error, setError] = useState("");
 	const [isPending, setIsPendingIds] = useState(new Set<string>());
 	const toast = useToast();
-	const router = useRouter()
+	const router = useRouter();
 
 	function handlePending(id: string, pending: boolean) {
 		if (pending) {
@@ -310,7 +243,7 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 				setError(result.message);
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
-				router.refresh()
+				router.refresh();
 				socket.emit("refresh-contacts-page", user.id, friend.id);
 				// setFriendRequests((prev) => ({
 				// 	...prev,
@@ -373,10 +306,10 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 
 	return (
 		<>
-			<div className="p-2 pb-0">
+			<div className="p-2 px-1.5 pb-0">
 				<div className="flex flex-row justify-between items-center sm:items-end gap-2 my-3">
 					<div className="flex flex-col gap-2">
-						<h1 className="text-2xl font-semibold ">Friendship Requests</h1>
+						<h1 className="text-[clamp(1rem,4vw,1.5rem)] font-semibold ">Friendship Requests</h1>
 						<p className="text-base sm:block hidden">You can accept friendship requests here.</p>
 					</div>
 					<div className="flex gap-2">
@@ -384,7 +317,7 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 						<DropdownMenu.Root>
 							<DropdownMenu.Trigger asChild>
 								<button className=" btn-wtih-icon flex items-center gap-1 !pl-2">
-									<BsFilterLeft className="text-2xl"></BsFilterLeft>
+									<BsFilterLeft className="text-[clamp(1rem,4vw,1.5rem)]"></BsFilterLeft>
 									Filter: {filter.charAt(0).toUpperCase() + filter.slice(1)}
 								</button>
 							</DropdownMenu.Trigger>
@@ -410,7 +343,7 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 				{error && <p className="text-error text-sm my-2">{error}</p>}
 			</div>
 
-			<div className="flex flex-col p-2 h-full overflow-y-scroll fade-bg-bottom pb-[100px]">
+			<div className="flex flex-col p-2 px-0 pr-1 h-full overflow-y-scroll fade-bg-bottom pb-[100px]">
 				{friendRequests.incoming.length !== 0 && filter !== "sent" && (
 					<>
 						<div className="flex flex-col gap-2">
