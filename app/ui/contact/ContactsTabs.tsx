@@ -159,7 +159,7 @@ const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTa
 
 const AddContactTab = ({ formAction, addFriendInputRef, request, isPending }: AddContactTabProps) => {
 	return (
-		<div className="p-2 sm:p-4 border">
+		<div className="p-2 sm:p-4">
 			<div className="flex flex-col gap-2 my-3 mb-5">
 				<h1 className="text-[clamp(1rem,4vw,1.5rem)] font-semibold ">Add Friends</h1>
 				<p className="text-base">You can add friends with their username.</p>
