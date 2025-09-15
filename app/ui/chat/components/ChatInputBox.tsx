@@ -82,7 +82,7 @@ const ChatInputBox = ({
 					...temp_msg,
 					content: `${temp_msg.content}`,
 					type: "text",
-					id: "",
+					id: tempId,
 					createdAt: new Date().toISOString(),
 					edited: false,
 					reactions: {},

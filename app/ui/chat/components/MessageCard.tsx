@@ -1,47 +1,48 @@
-"use client"
-import { getLocalTimeString } from '@/app/lib/utilities';
-import clsx from 'clsx';
-import React, { useEffect, useRef, useState } from 'react'
-import { Avatar } from '../../general/Avatar';
-import { MessageType } from '@/app/lib/definitions';
-import { useChatProvider } from '../ChatBoxWrapper';
-import InputField from '../../form/InputField';
-import { MessageDropdownMenu } from './MessageDropdown';
-import { addReactionToMSG, editMsg, getUsername, removeReactionFromMSG } from '@/app/lib/actions';
-import { HiArrowTurnUpRight } from 'react-icons/hi2';
-import { flushSync } from 'react-dom';
-import { useToast } from '@/app/lib/hooks/useToast';
-import { RxCross1, RxCross2 } from 'react-icons/rx';
-import { IconWithSVG } from '../../general/Buttons';
+"use client";
+import { getLocalTimeString } from "@/app/lib/utilities";
+import clsx from "clsx";
+import React, { useEffect, useRef, useState } from "react";
+import { Avatar } from "../../general/Avatar";
+import { MessageType } from "@/app/lib/definitions";
+import { useChatProvider } from "../ChatBoxWrapper";
+import InputField from "../../form/InputField";
+import { MessageDropdownMenu } from "./MessageDropdown";
+import { addReactionToMSG, editMsg, getUsername, removeReactionFromMSG } from "@/app/lib/actions";
+import { HiArrowTurnUpRight } from "react-icons/hi2";
+import { flushSync } from "react-dom";
+import { useToast } from "@/app/lib/hooks/useToast";
+import { RxCross1, RxCross2 } from "react-icons/rx";
+import { IconWithSVG } from "../../general/Buttons";
 
 type MessageCardType = {
-  msg: MessageType;
-  isFirstGroup: boolean
-  onDelete: (id: string) => void;
-}
+	msg: MessageType;
+	isFirstGroup: boolean;
+	onDelete: (id: string) => void;
+};
 
 const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 	const msg_date = getLocalTimeString(msg.createdAt);
-	const editInputRef = useRef<HTMLInputElement | null>(null)
+	const editInputRef = useRef<HTMLInputElement | null>(null);
 	const { msgToEdit, messages, setMessages, setMsgToEdit, roomId, replyToMsg } = useChatProvider();
-	const toast = useToast()
+	const toast = useToast();
+
+	useEffect(() => {
+		console.log("MSG TO EDIT ID:", msgToEdit);
+	}, [msgToEdit]);
 
 	const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setMsgToEdit(null);
-    
+
 		const formData = new FormData(e.currentTarget as HTMLFormElement);
 		const newContent = formData.get("edit")?.toString().trim() ?? "";
-    
+
 		if (!newContent) return;
 
-
-		const originalMsgs = [...messages]
+		const originalMsgs = [...messages];
 		setMessages((prev: MessageType[]) => {
 			const index = prev.findIndex((msg) => msg.id === msgToEdit);
 			if (index === -1) return prev;
-
-
 
 			if (!newContent) return prev;
 
@@ -55,13 +56,12 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 			return updatedMessages;
 		});
 
-		const result = await editMsg({ id: msg.id, roomId, content: newContent })
+		const result = await editMsg({ id: msg.id, roomId, content: newContent });
 		if (!result.success) {
-			setMessages(originalMsgs)
+			setMessages(originalMsgs);
 			toast({ title: "Error!", mode: "negative", subtitle: result.message });
-			console.log(result.error)
+			console.log(result.error);
 		}
-
 	};
 
 	let replyBlock = null;
@@ -124,9 +124,9 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 
 	useEffect(() => {
 		if (msgToEdit && editInputRef.current) {
-			editInputRef.current.focus()
+			editInputRef.current.focus();
 		}
-	}, [msgToEdit])
+	}, [msgToEdit]);
 
 	return (
 		<div
@@ -180,7 +180,7 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 
 						{msg.type === "text" &&
 							(msgToEdit !== msg.id ? (
-								<div id={msg.id} className="relative max-w-full break-words break-all whitespace-pre-wrap text-sm">
+								<div className="relative max-w-full break-words break-all whitespace-pre-wrap text-sm">
 									{msg.content}{" "}
 									{msg.edited && (
 										<span className="text-[11px] tracking-wide text-muted relative top-[1px]">{"(edited)"}</span>
@@ -188,11 +188,23 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 								</div>
 							) : (
 								<form onSubmit={handleEditSubmit} className="w-full">
-									<InputField ref={editInputRef} name="edit" defaultValue={msg.content} place="right" icon={
-										<IconWithSVG className="icon-small" onClick={() => setMsgToEdit(null)}>
-																<RxCross2	 />
-															</IconWithSVG>
-									} />
+									<InputField
+										ref={editInputRef}
+										name="edit"
+										defaultValue={msg.content}
+										onKeyDown={(e) => {
+											if (e.key === "Enter") {
+												e.preventDefault();
+												e.currentTarget.form?.requestSubmit();
+											}
+										}}
+										place="right"
+										icon={
+											<IconWithSVG className="icon-small" onClick={() => setMsgToEdit(null)}>
+												<RxCross2 />
+											</IconWithSVG>
+										}
+									/>
 								</form>
 							))}
 
@@ -239,14 +251,14 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 			<MessageDropdownMenu msg={msg} onDelete={onDelete}></MessageDropdownMenu>
 		</div>
 	);
-}
+};
 
-export default MessageCard
+export default MessageCard;
 
 const ReactionsRow = ({ msg, isFirstGroup }: { msg: MessageType; isFirstGroup: boolean }) => {
 	const { messages, setMessages, user, roomId } = useChatProvider();
 	const [usernamesMap, setUsernamesMap] = useState<Record<string, string>>({});
-	const toast = useToast()
+	const toast = useToast();
 
 	const handleRemoveReaction = async (msg_id: string, emoji: string) => {
 		const originalMsg = [...messages];
@@ -324,7 +336,6 @@ const ReactionsRow = ({ msg, isFirstGroup }: { msg: MessageType; isFirstGroup: b
 		</div>
 	);
 };
-
 
 const ImgCard = ({ src }: { src: string }) => {
 	const [loaded, setLoaded] = useState(false);
