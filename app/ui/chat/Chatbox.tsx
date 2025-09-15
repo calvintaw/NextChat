@@ -117,7 +117,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 				if (index === -1) return prev;
 
 				const updated = [...prev];
-				updated[index] = { ...updated[index], content };
+				updated[index] = { ...updated[index], content, edited: true };
 				return updated;
 			});
 		};
@@ -207,7 +207,12 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 						// className="flex-1 min-h-0 flex flex-col overflow-y-auto py-4 pb-10"
 					>
 						{type === "dm" && recipient && (
-							<DirectMessageCard isBlocked={isBlocked} roomId={roomId} currentUserId={user.id} user={recipient as User} />
+							<DirectMessageCard
+								isBlocked={isBlocked}
+								roomId={roomId}
+								currentUserId={user.id}
+								user={recipient as User}
+							/>
 						)}
 
 						{type === "server" && isServerRoom(roomId) && recipient && (

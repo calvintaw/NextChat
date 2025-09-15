@@ -4,9 +4,9 @@ import * as z from "zod";
 
 export const sql = postgres(process.env.POSTGRES_URL!, {
 	ssl: "require",
-	connect_timeout: 10,
-	idle_timeout: 600,
-	hostname: new URL(process.env.POSTGRES_URL!).hostname
+	connect_timeout: 60,
+	idle_timeout: 300,
+	prepare: false,
 });
 
 export type NewsArticle = {
@@ -20,7 +20,6 @@ export type NewsArticle = {
 	content: string | null;
 };
 
-
 export type NewsApiResponse = {
 	status: string;
 	totalResults: number;
@@ -28,7 +27,6 @@ export type NewsApiResponse = {
 	message?: string;
 	code?: string;
 };
-
 
 export const PostgresError = postgres.PostgresError;
 
@@ -92,7 +90,6 @@ export const LoginFormSchema = z
 	});
 
 export type LoginFormUser = z.infer<typeof LoginFormSchema>;
-
 
 export type FormState = {
 	errors: {
@@ -161,7 +158,6 @@ export type Room = {
 	profile?: string;
 };
 
-
 export type NewsApiParams = {
 	q?: string;
 	searchIn?: "title" | "description" | "content" | string;
@@ -175,7 +171,3 @@ export type NewsApiParams = {
 	pageSize?: number;
 	page?: number;
 };
-
-
-
-
