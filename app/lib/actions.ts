@@ -689,7 +689,7 @@ export async function createDM(
 export async function requestFriendship(
 	prevState: { success: boolean; message: string },
 	formData: FormData
-): Promise<{ success: boolean; message: string; target_id?: string }> {
+): Promise<{ success: boolean; message: string; targetUser?: User }> {
 	return withCurrentUser(async (currentUser: User) => {
 		try {
 			const username = z.string().min(1).parse(formData.get("username"));
@@ -702,8 +702,14 @@ export async function requestFriendship(
 				};
 			}
 
-			const [{ id }] = await sql`SELECT id from users WHERE username = ${username} LIMIT 1`;
-			const [user1_id, user2_id] = [id, currentUser.id].sort((a, b) => a.localeCompare(b));
+			const [targetUser] = await sql`SELECT 
+			id,
+			image,
+			username,
+			display_name as "displayName",
+			email
+			from users WHERE username = ${username} LIMIT 1`;
+			const [user1_id, user2_id] = [targetUser.id, currentUser.id].sort((a, b) => a.localeCompare(b));
 
 			await sql.begin(async (tx) => {
 				await tx`
@@ -713,12 +719,12 @@ export async function requestFriendship(
 			});
 
 			console.log(`Success! Your friend requests to ${username} was sent.`);
-			socket.emit("refresh-contacts-page", currentUser.id, id);
+			socket.emit("refresh-contacts-page", currentUser.id, targetUser.id);
 
 			return {
 				success: true,
 				message: `Success! Your friend requests to ${username} was sent.`,
-				target_id: id,
+				targetUser,
 			};
 		} catch (error) {
 			if (error instanceof PostgresError && error.code === "23505") {
@@ -860,7 +866,7 @@ export async function acceptFriendshipRequest(targetUser: User): Promise<{ succe
 			});
 
 			console.log(`Success! Accepted friend request from ${targetUser.username}.`);
-			socket.emit("refresh-contacts-page", currentUser.id, targetUser);
+			socket.emit("refresh-contacts-page", currentUser.id, targetUser.id);
 
 			return {
 				success: true,

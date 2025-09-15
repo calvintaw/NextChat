@@ -52,16 +52,17 @@ type AllContactsTabProps = {
 };
 
 const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTabsProps) => {
-	const router = useRouter();
 	const toast = useToast();
 
 	const [request, formAction, isPending] = useActionState(
 		async (prevState: { success: boolean; message: string }, formData: FormData) => {
 			const result = await requestFriendship(prevState, formData);
-
 			if (result.success) {
+				setFriendRequests((prev) => ({
+					incoming: [...prev.incoming],
+					sent: [...prev.sent, { ...result.targetUser! }],
+				}));
 				toast({ title: "Success!", mode: "positive", subtitle: "Friend request sent successfully." });
-				router.refresh();
 			} else {
 				toast({
 					title: "Error!",
@@ -82,13 +83,13 @@ const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTa
 
 	useEffect(() => {
 		async function refrechContactsPage() {
-			console.log("refetching contacts");
+			console.log("revcieved socket! refresh-contacts-page");
+			// console.log("refetching contacts");
 			const [newContacts, newRequests] = await Promise.all([getContacts(user.id), getFriendRequests(user.id)]);
-			console.log("newContacts: ", newContacts);
+			// console.log("newContacts: ", newContacts);
 			setContacts(newContacts);
 			setFriendRequests(newRequests);
 		}
-
 		socket.on(`refresh-contacts-page`, refrechContactsPage);
 		return () => {
 			socket.off(`refresh-contacts-page`, refrechContactsPage);
@@ -244,7 +245,6 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
 				// router.refresh();
-				socket.emit("refresh-contacts-page", user.id, friend.id);
 				// local ui instant updates
 
 				setFriendRequests((prev) => ({
@@ -273,21 +273,11 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 				// router.refresh();
 				// local ui instant updates
 
-				setFriendRequests((prev) => {
-					if (type === "sent") {
-						return {
-							...prev,
-							sent: prev.sent.filter((req) => req.id !== friend.id),
-						};
-					}
+				setFriendRequests((prev) => ({
+					...prev,
+					[type]: prev[type].filter((req) => req.id !== friend.id),
+				}));
 
-					return {
-						...prev,
-						incoming: prev.incoming.filter((req) => req.id !== friend.id),
-					};
-				});
-
-				socket.emit("refresh-contacts-page", user.id, friend.id);
 				toast({ title: "Success!", mode: "positive", subtitle: result.message });
 			}
 		} catch (err) {

@@ -13,15 +13,12 @@ import { getDMRoom } from "@/app/lib/utilities";
 import { useFriendsProvider } from "@/app/lib/friendsContext";
 import { useToast } from "@/app/lib/hooks/useToast";
 import { useRouter } from "next/navigation";
+import clsx from "clsx";
 
 type MinimalUserType = { id: string; username: string };
 
 export const ContactPreviewContainer = ({ user, contacts }: { user: User; contacts: ContactType[] }) => {
 	const [localContacts, setLocalContacts] = useState<ContactType[]>(contacts);
-
-	useEffect(() => {
-		setLocalContacts(contacts);
-	}, [contacts]);
 
 	useEffect(() => {
 		function handleStatusChange(userId: string, online: boolean) {
@@ -45,30 +42,30 @@ export const ContactPreviewContainer = ({ user, contacts }: { user: User; contac
 	}, []);
 
 	const toast = useToast();
-	const router = useRouter();
-
 	const [error, setError] = useState("");
-	const handleRemove = async (friend: MinimalUserType) => {
-		// local ui instant updates
+	const [pendingDeletes, setPendingDeletes] = useState<Set<string>>(new Set());
 
-		const originalContacts = [...localContacts]
-		setLocalContacts((prev) => prev.filter((req) => req.id !== friend.id));
+	const handleRemove = async (friend: MinimalUserType) => {
+		setPendingDeletes((prev) => new Set(prev).add(friend.id));
 
 		try {
 			const result = await removeFriendshipRequest(friend);
 			if (!result.success) {
-				setLocalContacts(originalContacts); // rollback
 				setError(result.message);
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
-				socket.emit("refresh-contacts-page", user.id, friend.id);
-				// router.refresh();
+				setLocalContacts((prev) => prev.filter((req) => req.id !== friend.id));
 				toast({ title: "Success!", mode: "positive", subtitle: result.message });
 			}
 		} catch (err) {
-			setLocalContacts(originalContacts); // rollback
 			setError("Failed to remove friend request");
 			toast({ title: "Error!", mode: "negative", subtitle: "Failed to remove friend request." });
+		} finally {
+			setPendingDeletes((prev) => {
+				const newSet = new Set(prev);
+				newSet.delete(friend.id);
+				return newSet;
+			});
 		}
 	};
 
@@ -76,7 +73,13 @@ export const ContactPreviewContainer = ({ user, contacts }: { user: User; contac
 		<section className="flex flex-col flex-1">
 			{error && <p className="text-sm text-error my-2">{error}</p>}
 			{localContacts.map((contact) => (
-				<ContactPreview user={user} handleRemove={handleRemove} contact={contact} key={contact.id} />
+				<ContactPreview
+					isPending={pendingDeletes.has(contact.id)}
+					user={user}
+					handleRemove={handleRemove}
+					contact={contact}
+					key={contact.id}
+				/>
 			))}
 		</section>
 	);
@@ -86,9 +89,11 @@ export const ContactPreview = ({
 	handleRemove,
 	user,
 	contact,
+	isPending,
 }: {
 	handleRemove: (friend: MinimalUserType) => void;
 	user: User;
+	isPending: boolean;
 	contact: ContactType;
 }) => {
 	const { friends: contacts, setFriends: setContacts } = useFriendsProvider();
@@ -136,7 +141,7 @@ export const ContactPreview = ({
 
 	return (
 		<Link
-			className="cursor-pointer group/contact no-underline"
+			className={clsx("group/contact no-underline cursor-pointer")}
 			href={`/chat/${getDMRoom(user.id, contact.id)}`}
 			onClick={handleClick}
 		>
@@ -169,6 +174,8 @@ export const ContactPreview = ({
 					</IconWithSVG>
 
 					<IconWithSVG
+						title={isPending ? "Syncing with server" : ""}
+						disabled={isPending}
 						onClick={(e) => {
 							e.preventDefault();
 							e.stopPropagation();
