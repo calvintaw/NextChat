@@ -3,18 +3,15 @@ import { getToken } from "next-auth/jwt";
 
 const freeRoutes = ["/login", "/register", "/terms_and_services"];
 
-const isProd = process.env.NODE_ENV === "production";
-
 export async function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl;
-	const cookieName = isProd ? "__Secure-authjs.session-token" : "authjs.session-token";
 
 	// console.log("Middleware triggered for path:", pathname);
 	// console.log("Environment:", isProd ? "production" : "development");
 	// console.log("Using cookie name:", cookieName);
 
 	// Check authentication
-	const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET, raw: true, cookieName });
+	const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
 	const isAuthenticated = !!token;
 
 	// console.log("Token found:", !!token);
@@ -45,7 +42,7 @@ export async function middleware(request: NextRequest) {
 	response = NextResponse.next();
 	// console.log("Proceeding to next middleware or route handler");
 
-	// Set default theme cookie if missing
+	// Set default theme cookie if missing (For some strange reason, this does not work and I can't figure out why)
 	if (!request.cookies.has("theme")) {
 		response.cookies.set("theme", "dark", {
 			path: "/",

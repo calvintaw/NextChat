@@ -40,7 +40,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 	// fetching msgs at startup and add listeners for typing event
 	useEffect(() => {
-		if (!firstRunRef.current || isBlocked) return; // firstRunRef purpose: to solve some msgs appearing twice sometimes on first render i guess
+		if (!firstRunRef.current || isBlocked) return; // firstRunRef purpose: to solve some msgs appearing twice sometimes on first render (edit: I don't know if these issues exist anymore as I have not tested this part)
 
 		// test msgs
 
