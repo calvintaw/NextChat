@@ -1,0 +1,134 @@
+```
+└── 📁app
+  └── 📁(auth)
+      └── 📁login
+          ├── page.tsx
+      └── 📁register
+          ├── page.tsx
+      └── 📁terms_and_services
+          ├── page.tsx
+      ├── layout.tsx
+  └── 📁(root)
+      └── 📁chat
+          └── 📁[room_id]
+              ├── loading.tsx
+              ├── page.tsx
+          └── 📁server
+              └── 📁[room_id]
+                  ├── page.tsx
+      └── 📁dashboard
+          ├── page.tsx
+      └── 📁discover
+          ├── page.tsx
+      └── 📁news
+          ├── page.tsx
+      ├── layout.tsx
+      ├── page.tsx
+  └── 📁api
+      └── 📁auth
+          └── 📁[...nextauth]
+              ├── route.ts
+      └── 📁seed
+          ├── route.ts
+      └── 📁theme
+          ├── route.ts
+  └── 📁lib
+      └── 📁hooks
+          ├── useDarkMode.jsx
+          ├── useDebounce.tsx
+          ├── useEventListener.jsx
+          ├── useMediaQuery.jsx
+          ├── useMsgLimiter.tsx
+          ├── useStorage.jsx
+          ├── useToast.tsx
+          ├── useToggle.jsx
+      ├── actions.ts
+      ├── definitions.ts
+      ├── friendsContext.tsx
+      ├── news.ts
+      ├── passwordRules.js
+      ├── PathContext.tsx
+      ├── seedUsers.ts
+      ├── socket.ts
+      ├── supabase.ts
+      ├── utilities.ts
+  └── 📁ui
+      └── 📁chat
+          └── 📁components
+              ├── AddReactionBtn.tsx
+              ├── AttachmentDropdown.tsx
+              ├── ChatHeaderForDM.tsx
+              ├── ChatHeaderForServer.tsx
+              ├── ChatInputBox.tsx
+              ├── ChatMessages.tsx
+              ├── ChatToolBar.tsx
+              ├── ImgUploadDialog.tsx
+              ├── MessageCard.tsx
+              ├── MessageDropdown.tsx
+              ├── Server_edit_form.tsx
+              ├── UploadButtons.tsx
+          ├── Chatbox.tsx
+          ├── ChatBoxWrapper.tsx
+      └── 📁contact
+          ├── ContactCard.tsx
+          ├── ContactsPanel.tsx
+          ├── ContactsTabs.tsx
+      └── 📁form
+          ├── AuthForm.tsx
+          ├── CreateServerForm.tsx
+          ├── InputField.tsx
+          ├── Pagination.tsx
+          ├── serverList.tsx
+      └── 📁general
+          ├── Avatar.tsx
+          ├── Buttons.tsx
+          ├── imageForm.jsx
+          ├── PathBanner.tsx
+          ├── Search.tsx
+      └── 📁news
+          ├── NewsCard.tsx
+          ├── NewsContainer.tsx
+      └── 📁sidebar
+          └── 📁components
+              ├── ChatPanel.tsx
+              ├── ChatPreview.tsx
+              ├── NavigationBar.tsx
+              ├── UserPanel.tsx
+          ├── Sidebar.tsx
+      ├── app_folder_structure.md
+      ├── DashboardPage.tsx
+      ├── OnlineIndicator.tsx
+      ├── Toast.tsx
+  ├── globals.css
+  ├── store.ts
+  ├── types.d.ts
+└── 📁public
+  └── 📁fonts
+      ├── Roboto-Bold.ttf
+      ├── Roboto-Regular.ttf
+  ├── circle-half.svg
+  ├── corner.svg
+  ├── marketing_1.png
+  ├── marketing_2.png
+  ├── marketing_3.png
+  ├── marketing_4.png
+  ├── marketing_bot.png
+  ├── marketing_chat.png
+  ├── marketing_connect.png
+  ├── marketing_phone.png
+├── .env.local
+├── .gitignore
+├── auth.config.ts
+├── auth.ts
+├── eslint.config.mjs
+├── middleware.ts
+├── next-auth.d.ts
+├── next-env.d.ts
+├── next.config.ts
+├── package.json
+├── pnpm-lock.yaml
+├── pnpm-workspace.yaml
+├── postcss.config.mjs
+├── README.md
+└── tsconfig.json
+```

@@ -17,6 +17,8 @@ export default function useDarkMode() {
 			if (typeof window === "undefined") return;
 			document.documentElement.classList.toggle("dark", darkMode);
 
+
+			
 			fetch("/api/theme", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
