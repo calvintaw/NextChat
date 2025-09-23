@@ -3,15 +3,18 @@ import { getToken } from "next-auth/jwt";
 
 const freeRoutes = ["/login", "/register", "/terms_and_services"];
 
+const isProd = process.env.NODE_ENV === "production";
+
 export async function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl;
+	const cookieName = isProd ? "__Secure-authjs.session-token" : "authjs.session-token";
 
 	// console.log("Middleware triggered for path:", pathname);
 	// console.log("Environment:", isProd ? "production" : "development");
 	// console.log("Using cookie name:", cookieName);
 
 	// Check authentication
-	const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+	const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET, raw: true, cookieName });
 	const isAuthenticated = !!token;
 
 	// console.log("Token found:", !!token);

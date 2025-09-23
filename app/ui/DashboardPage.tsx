@@ -89,7 +89,7 @@ const DashboardPage = ({ initialUser }: { initialUser: User }) => {
 
 	return (
 		<>
-			<div className="bg-contrast flex-1 gap-4 flex flex-col pt-5 px-2 sm:px-4 max-w-89 border">
+			<div className="bg-contrast flex-1 gap-4 flex flex-col pt-5 px-2 sm:px-4 max-w-89">
 				<div className="flex justify-center items-center gap-4 ">
 					<Avatar
 						src={user.image}

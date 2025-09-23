@@ -53,10 +53,17 @@ export default function LoginPage() {
 
 function LoginForm() {
 	const [errorMessage, formAction, isPending] = useActionState(authenticate, "");
+	const formRef = useRef<HTMLFormElement | null>(null);
+
+	useEffect(() => {
+		if (errorMessage && formRef.current) {
+			formRef.current.reset();
+		}
+	}, [errorMessage]);
 
 	return (
 		<AuthFormWrapper className="bg-background ">
-			<form action={formAction} className="form ">
+			<form ref={formRef} action={formAction} className="form ">
 				<div role="heading" className="flex items-center gap-2">
 					<IoLogoPolymer className="text-5xl"></IoLogoPolymer>
 					<h2 className="text-3xl font-semibold">Welcome back!</h2>
@@ -72,15 +79,19 @@ function LoginForm() {
 						placeholder="Enter your email or username"
 					/>
 
-				<PasswordField hideRules disabled={isPending} name="password"></PasswordField>
+					<PasswordField hideRules disabled={isPending} name="password"></PasswordField>
 				</div>
 
 				{errorMessage && <span className="text-sm text-red-500">{errorMessage}</span>}
 
 				<TermsAndServices />
 
-				<Button disabled={isPending} type="submit" className="mt-8 mb-4 py-2 bg-primary hover:bg-primary/80 w-full btn-with-icon justify-center">
-					{isPending? "Logging in": "Log in"}
+				<Button
+					disabled={isPending}
+					type="submit"
+					className="mt-8 mb-4 py-2 bg-primary hover:bg-primary/80 w-full btn-with-icon justify-center"
+				>
+					{isPending ? "Logging in" : "Log in"}
 					{isPending && <ImSpinner9 className="animate-spin"></ImSpinner9>}
 				</Button>
 

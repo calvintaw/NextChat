@@ -12,9 +12,6 @@ import { JWT } from "next-auth/jwt";
 // test email and credentials
 //
 
-
-
-
 type DBUser = {
 	id: string;
 	image: string;
@@ -28,7 +25,7 @@ type DBUser = {
 type AuthUser = Omit<DBUser, "password">;
 const isProd = process.env.NODE_ENV === "production";
 
-async function getUser(email: string | null, username: string|null): Promise<DBUser | undefined> {
+async function getUser(email: string | null, username: string | null): Promise<DBUser | undefined> {
 	try {
 		if (!email?.trim() && !username?.trim()) {
 			console.warn("getUser: No email or username provided");
@@ -87,10 +84,7 @@ export const config = {
 				}
 
 				const passwordsMatch = await bcrypt.compare(password, user.password);
-				if (!passwordsMatch) {
-					console.log("Password does not match");
-					return null;
-				}
+				if (!passwordsMatch) return null;
 
 				console.log("User authenticated:", user);
 				return {
