@@ -24,6 +24,8 @@ import { newsData } from "./news";
 import { socket } from "./socket";
 import console, { error } from "console";
 
+// Utility for easy access to the currently authenticated user.
+// Functions using this tool could be refactored to not depend on it if needed.
 async function withCurrentUser(callback: Function) {
 	const session = await auth();
 	const userId = session?.user?.id;
@@ -620,8 +622,6 @@ export async function getFriendRequests(userId: string) {
 		throw new Error("Failed to fetch friend requests.");
 	}
 }
-
-/// DELETE DM ROOM
 
 export async function deleteDM(targetUser: MinimalUserType): Promise<{ success: boolean; message: string }> {
 	return withCurrentUser(async (currentUser: User) => {

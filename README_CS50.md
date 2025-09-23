@@ -8,14 +8,9 @@
 
 - [Features](#features)
 - [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
-- [Environment Variables](#environment-variables)
-- [Project Structure](#project-structure)
-- [Screenshots](#screenshots)
-- [Contributing](#contributing)
-- [License](#license)
 - [Folder Structure and File Descriptions](#structure)
-- [Contact](#contact)
+- [Screenshots](#screenshots)
+- [Flaws / Design Decisions](#decisions)
 
 ---
 
@@ -155,14 +150,33 @@ Configuration and environment files:
 
 <a id="flaws"></a>
 
-## Flaws / Bugs with this project
+## Flaws / Design Decisions
 
-- There’s no proper way to verify if the provided email address is legitimate.
-- No login rate limiting is implemented.
-- The website always defaults to the light theme (it’s supposed to be dark by default, but I couldn’t figure out why this bug occurs).
-- There may be database update or UI display issues in edge cases, such as when User A accepts a friend request at the same time User B rejects it.
-- When a user spams messages quickly, you may see mismatches between what the sender and receiver see, or sometimes the sender may see duplicate messages. This is either due to WebSocket not handling all messages properly, or a bug in how local messages are inserted (which is done to give the user an instant feedback feel).
-- When editing a multi-line message, all lines collapse into a single line (this could be fixed by using a textarea, but I haven’t implemented it yet).
-- The news feed page does not show actual news; instead, it just displays a list of old news stored on the server because I couldn’t find a suitable free API.
-- The Discover Servers page lacks a polished UI.
-- Uploaded media files are not properly structured or stored. For example, when a user uploads a profile picture, it is not stored separately, and if they upload another, the old one is not deleted. This results in improper media management.
+NextChat grew into a bigger project than I originally anticipated—it ended up taking over four months, which was way longer than I expected. Along the way, I made a lot of decisions that were either for convenience, due to time constraints, or just because I didn’t know a better way at the time. As a result, there are a bunch of flaws and design trade-offs worth noting.
+
+### Technical Decisions
+
+* **Supabase + postgres.js**: I picked Supabase mainly because it’s easy to set up. But instead of using Supabase’s own query functions, I ended up using `postgres.js` for database queries. The reason? I didn’t want to constantly be looking up Supabase documentation just to do basic stuff like `SELECT` or `INSERT`. This makes writing queries faster and more straightforward for me, even if it’s not “idiomatic” Supabase.
+* **withCurrentUser utility**: This function started as a safety measure—it made sure the authenticated user ID came from the server so that fraud or spoofing would be hard. Over time, it became more of a convenience helper; some functions still depend on it simply because refactoring would take extra work. It’s kind of a “removable crutch” at this point.
+* **DM Rooms**: One-to-one chat rooms are generated deterministically using both users’ IDs, sorted alphabetically with `localeCompare`, plus a prefix (`/chat/[room_id]/`). It’s simple and works, but it also means user IDs are exposed in URLs. Originally, this was to make linking chats easier, but now I realize there might be some edge-case exploits if someone is clever. I didn’t have time to rethink it.
+* **News feed**: Locally, the app uses a live API, but in production it just serves static data. I couldn’t find a free API that worked reliably, so the feed ends up being old news. Not ideal, but it was better than nothing.
+* **Media storage**: Profile pictures, chat images, and server images all go directly into the Supabase storage bucket without much organization. There’s no folder hierarchy or deletion system. I did this mostly because I had no experience with proper media handling, and the project had already taken way too long.
+
+### Known Flaws
+
+* There’s no way to verify that a user’s email is legitimate, which is obviously a problem if this were a real app.
+* Login rate limiting isn’t implemented, so technically someone could brute-force credentials.
+* The site always defaults to light mode. I originally wanted it to default to dark, but I couldn’t figure out why the bug happens—and to be honest, I don’t even know if it still happens.
+* Database and UI inconsistencies can appear in edge cases. For example, if User A accepts a friend request at the same time User B rejects it, the results can be weird.
+* Rapid message spam can cause mismatched messages, duplicates, or strange display issues. This comes from a combination of WebSocket handling and how messages are inserted locally for instant feedback.
+* Multi-line messages collapse into a single line when edited. I know a textarea would fix this, but I didn’t implement it.
+* As mentioned, the news feed doesn’t show actual news in production because of API limitations.
+* The Discover Servers page isn’t polished—UI-wise it’s still rough around the edges.
+* Media management is messy: if you upload a new profile pic, the old one doesn’t get deleted or moved, so the app main storage bucket just accumulates random files.
+
+### Security Considerations
+
+* Exposing user IDs in chat room URLs was a design choice to make linking and room creation simpler. The downside is that some actions—like editing messages or verifying DM access rely on these IDs. I think it’s probably safe, but I can’t guarantee there’s no way to exploit it. A more secure approach would use randomized room IDs or a mapping table.
+* Overall, many of the design decisions were made for **speed and simplicity** rather than security or scalability. If I were doing this in production for actual product, a lot of things would need to change.
+
+---
