@@ -155,7 +155,7 @@ export const ContactPreview = ({
 						size="size-8.5"
 						displayName={contact.displayName}
 						statusIndicator={true}
-						status={contact.online}
+						status={contact.username === "system" ? true : contact.online}
 					/>
 				</div>
 
