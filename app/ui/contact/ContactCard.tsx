@@ -101,7 +101,7 @@ export const ContactPreview = ({
 		contact.username === "system"
 			? `system-room:${[user.id, contact.id].sort((a, b) => a.localeCompare(b)).join(":")}`
 			: getDMRoom(user.id, contact.id);
-	
+
 	const handleClick = async () => {
 		// Check if DM already exists in state
 		const dmExists = contacts.some((item) => item.room_id === room_id);
@@ -159,7 +159,9 @@ export const ContactPreview = ({
 				{/* Contact name + status */}
 				<div className="text-sm h-full flex flex-col justify-center flex-1 font-medium text-text truncate">
 					{contact.displayName}
-					<span className="text-sm text-muted">{contact.online ? "Online" : "Offline"}</span>
+					<span className="text-sm text-muted">
+						{contact.online || contact.username === "system" ? "Online" : "Offline"}
+					</span>
 				</div>
 
 				<div className="flex h-full gap-2 items-center">
