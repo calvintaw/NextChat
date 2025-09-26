@@ -141,7 +141,9 @@ export const ContactPreview = ({
 	return (
 		<Link
 			className={clsx("group/contact no-underline cursor-pointer")}
-			href={`/chat/${getDMRoom(user.id, contact.id)}`}
+			href={`/chat/${
+				contact.username === "system" ? `system-room:${user.id}:${contact.id}` : getDMRoom(user.id, contact.id)
+			}`}
 			onClick={handleClick}
 		>
 			<div className="rounded-lg h-15 px-2.5 hover:bg-accent/25 flex items-start gap-2.5">
