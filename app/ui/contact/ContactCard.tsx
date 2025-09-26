@@ -97,7 +97,6 @@ export const ContactPreview = ({
 	contact: ContactType;
 }) => {
 	const { friends: contacts, setFriends: setContacts } = useFriendsProvider();
-	const router = useRouter();
 	const handleClick = async () => {
 		const room_id = getDMRoom(user.id, contact.id);
 
@@ -130,7 +129,7 @@ export const ContactPreview = ({
 						displayName: contact.displayName,
 						email: contact.email,
 						online: false,
-						room_id,
+						room_id: contact.username === "system" ? `system-room:${user.id}:${contact.id}` : room_id,
 					},
 				];
 			});

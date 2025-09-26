@@ -490,8 +490,8 @@ export async function registerUser(formData: FormData): Promise<FormState> {
 			const result = await getUserIdByUsername("system");
 			if (!result.success) return;
 			const systemUserId = result.id!;
-			const roomId = `system-room-${id}`;
 			const [user1_id, user2_id] = [id, systemUserId].sort((a, b) => a.localeCompare(b));
+			const roomId = `system-room:${user1_id}:${user2_id}`;
 
 			await sql`
 				INSERT INTO friends (user1_id, user2_id, request_sender_id, status)
