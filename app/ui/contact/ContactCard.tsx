@@ -97,7 +97,7 @@ export const ContactPreview = ({
 	contact: ContactType;
 }) => {
 	const { friends: contacts, setFriends: setContacts } = useFriendsProvider();
-	const room_id = contact.username === "system" ? `system-room:${contact.id}` : getDMRoom(user.id, contact.id);
+	const room_id = contact.username === "system" ? `system-room-${contact.id}` : getDMRoom(user.id, contact.id);
 
 	const handleClick = async () => {
 		// Check if DM already exists in state

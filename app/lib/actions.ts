@@ -490,7 +490,7 @@ export async function registerUser(formData: FormData): Promise<FormState> {
 			const result = await getUserIdByUsername("system");
 			if (!result.success) return;
 			const systemUserId = result.id!;
-			const roomId = `system-room:${systemUserId}`;
+			const roomId = `system-room-${systemUserId}`;
 			const [user1_id, user2_id] = [id, systemUserId].sort((a, b) => a.localeCompare(b));
 
 			await sql`
