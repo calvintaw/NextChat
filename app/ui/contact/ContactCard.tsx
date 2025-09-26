@@ -97,9 +97,12 @@ export const ContactPreview = ({
 	contact: ContactType;
 }) => {
 	const { friends: contacts, setFriends: setContacts } = useFriendsProvider();
+	const room_id =
+		contact.username === "system"
+			? `system-room:${[user.id, contact.id].sort((a, b) => a.localeCompare(b)).join(":")}`
+			: getDMRoom(user.id, contact.id);
+	
 	const handleClick = async () => {
-		const room_id = getDMRoom(user.id, contact.id);
-
 		// Check if DM already exists in state
 		const dmExists = contacts.some((item) => item.room_id === room_id);
 		if (dmExists) {
@@ -129,7 +132,7 @@ export const ContactPreview = ({
 						displayName: contact.displayName,
 						email: contact.email,
 						online: false,
-						room_id: contact.username === "system" ? `system-room:${user.id}:${contact.id}` : room_id,
+						room_id,
 					},
 				];
 			});
@@ -139,13 +142,7 @@ export const ContactPreview = ({
 	};
 
 	return (
-		<Link
-			className={clsx("group/contact no-underline cursor-pointer")}
-			href={`/chat/${
-				contact.username === "system" ? `system-room:${user.id}:${contact.id}` : getDMRoom(user.id, contact.id)
-			}`}
-			onClick={handleClick}
-		>
+		<Link className={clsx("group/contact no-underline cursor-pointer")} href={`/chat/${room_id}`} onClick={handleClick}>
 			<div className="rounded-lg h-15 px-2.5 hover:bg-accent/25 flex items-start gap-2.5">
 				{/* Avatar */}
 				<div className="h-full flex flex-row py-2.5">
