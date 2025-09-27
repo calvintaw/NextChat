@@ -96,7 +96,7 @@ const ChatInputBox = ({
 	const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 		if (e.key === "Enter" && !e.shiftKey && textRef.current) {
 			e.preventDefault(); // prevents new line from being written
-
+			if (textRef.current.value.trim() === "") return;
 			if (!canSendMessage()) return;
 
 			sendMessage(textRef.current?.value);

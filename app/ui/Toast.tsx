@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import * as Toast from "@radix-ui/react-toast";
 import { useAtom } from "jotai";
 import { useEffect, useRef } from "react";
@@ -14,7 +14,7 @@ const Toaster = () => {
 			{list.map((props) => (
 				<SingleToast {...props} key={props.id} />
 			))}
-			<Toast.Viewport className="fixed bottom-0 right-0 flex flex-col p-8 gap-3 w-96  max-w-screen m-0 list-none !z-[999] outline-none " />
+			<Toast.Viewport className="fixed bottom-0 right-0 flex flex-col p-8 gap-3 min-w-85 max-w-screen m-0 list-none !z-[999] outline-none " />
 		</Toast.Provider>
 	);
 };
@@ -65,7 +65,7 @@ const SingleToast = ({
 
 	return (
 		<Toast.Root
-			className={`${modes[mode].borderColor} border-1 border-accent/50 bg-white dark:bg-surface rounded-md shadow-foreground/20 !shadow-md px-3.75 py-3 grid [grid-template-areas:_'title_action'_'description_action'] grid-cols-[auto_max-content] gap-x-3.75 items-center `}
+			className={`${modes[mode].borderColor} border-1 border-accent/50 bg-white dark:bg-surface rounded-md shadow-foreground/20 dark:shadow-foreground/13 !shadow-md px-3.75 py-3 grid [grid-template-areas:_'title_action'_'description_action'] grid-cols-[auto_max-content] gap-x-3.75 items-center `}
 			duration={Infinity}
 		>
 			<Toast.Title className={`font-bold ${modes[mode].textColor}`}>{title}</Toast.Title>
@@ -81,7 +81,7 @@ const SingleToast = ({
 						hover:bg-accent					
 						"
 					>
-						<RxCross2 className="text-xl"/>
+						<RxCross2 className="text-xl" />
 					</IconWithSVG>
 				</Toast.Close>
 			</Toast.Action>

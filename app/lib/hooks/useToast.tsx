@@ -4,7 +4,7 @@ import { useAtom } from "jotai";
 export const useToast = () => {
 	const [_, setToast] = useAtom(toastAtom);
 
-	return ({ timer = 8000, ...toast }: Toast) => {
+	return ({ timer = 5000, ...toast }: Toast) => {
 		const id = Date.now() + Math.random();
 
 		setToast((state) => {
@@ -12,5 +12,3 @@ export const useToast = () => {
 		});
 	};
 };
-
-
