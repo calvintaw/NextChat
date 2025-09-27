@@ -21,12 +21,8 @@ export default function ProgressBar() {
 			// Only trigger for in-app navigation
 			if (anchor && anchor.href && !anchor.target && anchor.getAttribute("href")?.startsWith("/")) {
 				NProgress.start();
-
-				// Increment to 5% after 50ms
-				timeouts.current.push(window.setTimeout(() => NProgress.set(0.5), 50));
-
-				// Increment to 75% after 200ms
-				timeouts.current.push(window.setTimeout(() => NProgress.set(0.75), 200));
+				NProgress.set(0.5);
+				NProgress.set(0.75);
 			}
 		};
 
