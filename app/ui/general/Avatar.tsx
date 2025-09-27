@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { getBackgroundColorByInitial } from "@/app/lib/utilities";
 import clsx from "clsx";
@@ -14,6 +14,7 @@ type AvatarProps = {
 	fontSize?: string;
 	statusIndicator?: boolean;
 	radius?: string;
+	parentClassName?: string;
 } & Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src" | "alt">; // Omit conflicting src type
 
 export const Avatar = ({
@@ -22,17 +23,17 @@ export const Avatar = ({
 	radius = "rounded-full",
 	displayName,
 	id = "",
-	border="",
+	border = "",
 	size = "size-9.5",
 	statusIndicator = true,
 	status = false,
+	parentClassName = "",
 	...rest
 }: AvatarProps) => {
 	const hasValidSrc = typeof src === "string" && src.trim() !== "";
 
-		const onlineStatusContainer = `absolute size-4 -bottom-0.5 -right-0.5 flex items-center justify-center bg-surface ${radius}`;
-		const onlineStatusBulb = ` size-2.5 ${radius}`;
-
+	const onlineStatusContainer = `absolute size-4 -bottom-0.5 -right-0.5 flex items-center justify-center bg-surface ${radius}`;
+	const onlineStatusBulb = ` size-2.5 ${radius}`;
 
 	let fallback = "";
 	if (displayName) {
@@ -46,21 +47,20 @@ export const Avatar = ({
 		setLoaded(true);
 	};
 
-		useEffect(() => {
-			if (imgRef.current) {
-				if (imgRef.current.complete) {
-					handleImgLoad();
-				} else {
-					imgRef.current.onload = handleImgLoad;
-				}
+	useEffect(() => {
+		if (imgRef.current) {
+			if (imgRef.current.complete) {
+				handleImgLoad();
+			} else {
+				imgRef.current.onload = handleImgLoad;
 			}
-		}, [src]);
-	
+		}
+	}, [src]);
 
 	return (
 		<>
 			{hasValidSrc && (
-				<div className={clsx("relative", size)}>
+				<div className={clsx("relative", size, parentClassName)}>
 					{!loaded && (
 						<div
 							className={clsx(
@@ -72,10 +72,8 @@ export const Avatar = ({
 								},
 								radius,
 								size
-							
 							)}
 						></div>
-		
 					)}
 
 					<img
@@ -104,7 +102,7 @@ export const Avatar = ({
 			)}
 
 			{!hasValidSrc && (
-				<div className={clsx("relative", size)}>
+				<div className={clsx("relative", size, parentClassName)}>
 					<div
 						role="img"
 						className={clsx(
