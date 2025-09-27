@@ -19,10 +19,10 @@ const Toaster = () => {
 	);
 };
 
-const modes: { [type: string]: { textColor: string; borderColor: string } } = {
-	positive: { textColor: "text-success", borderColor: "border-success" },
-	negative: { textColor: "text-error", borderColor: "border-error" },
-	info: { textColor: "text-primary", borderColor: "border-primary" },
+const modes: { [type: string]: { textColor: string; borderColor: string; bgColor: string } } = {
+	positive: { textColor: "text-success", borderColor: "border-success", bgColor: "bg-success/25" },
+	negative: { textColor: "text-error", borderColor: "border-error", bgColor: "bg-error/25" },
+	info: { textColor: "text-primary", borderColor: "border-primary", bgColor: "bg-primary/25" },
 };
 
 const SingleToast = ({
@@ -65,7 +65,7 @@ const SingleToast = ({
 
 	return (
 		<Toast.Root
-			className={`${modes[mode].borderColor} border-1 border-accent/50 bg-white dark:bg-surface rounded-md shadow-foreground/20 dark:shadow-foreground/13 !shadow-md px-3.75 py-3 grid [grid-template-areas:_'title_action'_'description_action'] grid-cols-[auto_max-content] gap-x-3.75 items-center `}
+			className={`${modes[mode].borderColor} relative border-1 border-accent/50  rounded-md shadow-foreground/20 dark:!shadow-foreground/10 !shadow-md px-3.75 py-3 grid [grid-template-areas:_'title_action'_'description_action'] grid-cols-[auto_max-content] gap-x-3.75 items-center bg-white dark:bg-surface`}
 			duration={Infinity}
 		>
 			<Toast.Title className={`font-bold ${modes[mode].textColor}`}>{title}</Toast.Title>

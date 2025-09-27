@@ -286,7 +286,6 @@ import { useToast } from "@/app/lib/hooks/useToast";
 import { DirectMessageCard } from "./components/ChatHeaderForDM";
 import { ServerCardHeader } from "./components/ChatHeaderForServer";
 import { useLocalStorage } from "@/app/lib/hooks/useStorage";
-import { useLocalStorage } from "@/app/lib/hooks/useStorage";
 
 export const ServerList = ({ servers }: { servers: Room[] }) => {
 	if (!servers || servers.length === 0) {
