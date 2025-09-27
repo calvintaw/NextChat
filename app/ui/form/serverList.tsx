@@ -11,25 +11,20 @@ import { IconWithSVG } from "../general/Buttons";
 import InputField from "./InputField";
 import src from "react-textarea-autosize";
 type FilterType = "all" | "public" | "private";
+import { HiServerStack } from "react-icons/hi2";
 
-
-export const ServerList = ({ user, servers }: { user: User, servers: Room[] }) => {
+export const ServerList = ({ user, servers }: { user: User; servers: Room[] }) => {
 	const [search, setSearch] = useState("");
 	const formRef = useRef<HTMLFormElement>(null);
 
 	const [filterType, setFilterType] = useState<FilterType>("all");
 	const filteredServers = servers.filter((s) => s.name.toLowerCase().includes(search.toLowerCase()));
 
-
 	return (
 		<section className="p-4 flex flex-col gap-4">
 			<div className="flex flex-col md:flex-row justify-between items-center gap-4">
 				<h1 className="text-2xl font-sans font-semibold">Featured Servers</h1>
-				<form
-					ref={formRef}
-					className="md:w-fit relative flex gap-2"
-					onSubmit={(e) => e.preventDefault()}
-				>
+				<form ref={formRef} className="md:w-fit relative flex gap-2" onSubmit={(e) => e.preventDefault()}>
 					<InputField
 						name="search"
 						type="text"
@@ -70,51 +65,47 @@ export const ServerList = ({ user, servers }: { user: User, servers: Room[] }) =
 				</form>
 			</div>
 
-			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-				{filteredServers.map((server) => {
-					// TODO: add these to db schema
-					server.online_members = 1000;
+			{filteredServers.length !== 0 && (
+				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+					{filteredServers.map((server) => {
+						// TODO: add these to db schema
+						server.online_members = 1000;
 
-
-						
-					
-
-					return <Card key={server.id} server={server} user={user}></Card>;
-				})}
-			</div>
+						return <Card key={server.id} server={server} user={user}></Card>;
+					})}
+				</div>
+			)}
+			{filteredServers.length === 0 && (
+				<div className="flex-1 flex items-center justify-center">
+					<div className="flex flex-col items-center justify-center">
+						<HiServerStack className="text-6xl text-muted mb-4" />
+						<p className="text-muted text-lg font-medium">
+							No servers available. {`API provider doesn't allow prod usage`}
+						</p>
+					</div>
+				</div>
+			)}
 		</section>
 	);
 };
 
+const Card = ({ server, user }: any) => {
+	const [loaded, setLoaded] = useState(false);
+	const imgRef = useRef<HTMLImageElement>(null);
 
+	const handleImgLoad = () => {
+		setLoaded(true);
+	};
 
-
-
-
-
-
-
-
-
-
-
-const Card = ({ server, user}: any) => {
-							const [loaded, setLoaded] = useState(false);
-						const imgRef = useRef<HTMLImageElement>(null);
-					
-						const handleImgLoad = () => {
-							setLoaded(true);
-						};
-					
-							useEffect(() => {
-								if (imgRef.current) {
-									if (imgRef.current.complete) {
-										handleImgLoad();
-									} else {
-										imgRef.current.onload = handleImgLoad;
-									}
-								}
-							}, [src]);
+	useEffect(() => {
+		if (imgRef.current) {
+			if (imgRef.current.complete) {
+				handleImgLoad();
+			} else {
+				imgRef.current.onload = handleImgLoad;
+			}
+		}
+	}, [src]);
 	return (
 		<div
 			className="bg-background p-0 rounded-xl overflow-hidden min-w-63 shadow-md flex flex-col border-2 border-border group hover:border-foreground/40 not-dark:hover:border-foreground/80 cursor-pointer 
@@ -190,7 +181,7 @@ const Card = ({ server, user}: any) => {
 							<p>{formatNumber(server?.total_members)} Members</p>
 						</div>
 					</div>
-					
+
 					<Link
 						onClick={() => joinServer(server.id)}
 						href={server.type === "dm" ? `/chat/${server.id}` : `/chat/server/${server.id}`}
@@ -206,4 +197,4 @@ const Card = ({ server, user}: any) => {
 			</div>
 		</div>
 	);
-}
+};
