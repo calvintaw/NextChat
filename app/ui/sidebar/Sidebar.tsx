@@ -15,6 +15,7 @@ const Sidebar = async ({ className }: { className?: string }) => {
 	return (
 		<>
 			<nav
+				
 				id="sidebar"
 				className={`relative max-w-86  h-full flex flex-row items-start w-min ${className} 
 				border-contrast lg:border-r bg-background`}

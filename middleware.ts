@@ -46,12 +46,14 @@ export async function middleware(request: NextRequest) {
 	// console.log("Proceeding to next middleware or route handler");
 
 	// Set default theme cookie if missing (For some strange reason, this does not work and I can't figure out why)
+
 	if (!request.cookies.has("theme")) {
 		response.cookies.set("theme", "dark", {
 			path: "/",
 			maxAge: 60 * 60 * 24 * 30, // 30 days
 		});
 	}
+
 	// } else {
 	// console.log("Theme cookie exists:", request.cookies.get("theme")?.value);
 	// }

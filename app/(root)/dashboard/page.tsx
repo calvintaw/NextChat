@@ -4,6 +4,7 @@ import { SessionProvider } from "next-auth/react";
 import { BiSolidError } from "react-icons/bi";
 
 export default async function Page() {
+	
 	const session = await auth();
 
 	const errorState = (

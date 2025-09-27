@@ -77,6 +77,7 @@ function LoginForm() {
 						type="email"
 						icon={<RiMailLine />}
 						placeholder="Enter your email or username"
+						required
 					/>
 
 					<PasswordField hideRules disabled={isPending} name="password"></PasswordField>

@@ -9,7 +9,7 @@ export const PathBanner = () => {
 
 	const pathDisplayNameMap: { [key: string]: string } = {
 		"/discover": "🔍 Discover",
-		"/": "📊 Main Dashboard",
+		"/": "🖥️ Main Dashboard",
 		"/news": "📰 Top News",
 		"/dashboard": "👤 Profile",
 	};

@@ -16,7 +16,6 @@ import {
 	NewsApiResponse,
 	NewsApiParams,
 	Room,
-	MessageType,
 } from "./definitions";
 import bcrypt from "bcryptjs";
 import z from "zod";
@@ -24,6 +23,7 @@ import { getDMRoom } from "./utilities";
 import { newsData } from "./news";
 import { socket } from "./socket";
 import console, { error } from "console";
+import { cookies } from "next/headers";
 
 // Utility for easy access to the currently authenticated user.
 // Functions using this tool could be refactored to not depend on it if needed.
@@ -550,6 +550,13 @@ export async function registerUser(formData: FormData): Promise<FormState> {
 		password,
 		username,
 		redirect: false,
+	});
+
+	await (
+		await cookies()
+	).set("theme", "dark", {
+		path: "/",
+		maxAge: 60 * 60 * 24 * 30, // 30 days
 	});
 
 	return {

@@ -24,7 +24,7 @@ const Page = () => {
 		if (data.message.trim() !== "") {
 			setData(data);
 		} else {
-			router.push("/dashboard");	
+			router.push("/dashboard");
 		}
 	};
 
@@ -39,7 +39,6 @@ const Page = () => {
 						const formData = new FormData(e.currentTarget);
 						await handleFormSubmit(formData);
 						setIsPending(false);
-
 					}}
 					className="form gap-1.5"
 				>
@@ -68,6 +67,7 @@ const Page = () => {
 							name="email"
 							type="email"
 							icon={<RiMailLine />}
+							required
 							placeholder="Enter your email"
 						/>
 

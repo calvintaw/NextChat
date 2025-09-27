@@ -42,14 +42,7 @@ export default function InputField({
 				{label && <span className={`text-text font-semibold ${labelClassName}`}>{label}</span>}
 				<div className={clsx("form-input_custom", success && "border-success", !icon && "pl-0", parentClassName)}>
 					{place === "left" && icon && <div className="text-muted flex items-center justify-center">{icon}</div>}
-					<input
-						id={name}
-						name={name}
-						placeholder={placeholder}
-						className={className}
-						ref={ref}
-						{...props}
-					/>
+					<input id={name} name={name} placeholder={placeholder} className={className} ref={ref} {...props} />
 					{place === "right" && icon && <div className="text-muted flex items-center justify-center">{icon}</div>}
 				</div>
 				{errors?.length !== 0 &&
@@ -64,7 +57,6 @@ export default function InputField({
 		</fieldset>
 	);
 }
-
 
 const RULES = [
 	{ regex: /[a-z]/, label: "Includes a lowercase letter" },
@@ -99,7 +91,7 @@ export function PasswordField({
 				<div className={clsx("form-input_custom", parentClassName)}>
 					<RiLockLine className="text-lg text-muted" />
 					<input
-						autoComplete="off"
+						required
 						id={name}
 						name={name}
 						value={value}
