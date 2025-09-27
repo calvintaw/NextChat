@@ -21,7 +21,7 @@ export const ServerList = ({ user, servers }: { user: User; servers: Room[] }) =
 	const filteredServers = servers.filter((s) => s.name.toLowerCase().includes(search.toLowerCase()));
 
 	return (
-		<section className="p-4 flex flex-col gap-4">
+		<section className="p-4 flex flex-col gap-4 flex-1">
 			<div className="flex flex-col md:flex-row justify-between items-center gap-4">
 				<h1 className="text-2xl font-sans font-semibold">Featured Servers</h1>
 				<form ref={formRef} className="md:w-fit relative flex gap-2" onSubmit={(e) => e.preventDefault()}>
