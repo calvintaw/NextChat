@@ -54,12 +54,6 @@ type AllContactsTabProps = {
 const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTabsProps) => {
 	const toast = useToast();
 
-	useEffect(() => {
-		toast({ title: "Success!", mode: "positive", subtitle: "test", infinite: true });
-		toast({ title: "negative!", mode: "negative", subtitle: "test", infinite: true });
-		toast({ title: "info!", mode: "info", subtitle: "test", infinite: true });
-	}, []);
-
 	const [request, formAction, isPending] = useActionState(
 		async (prevState: { success: boolean; message: string }, formData: FormData) => {
 			const result = await requestFriendship(prevState, formData);
