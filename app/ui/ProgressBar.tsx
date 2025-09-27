@@ -8,6 +8,15 @@ export default function ProgressBar() {
 	const pathname = usePathname();
 	const timeouts = useRef<number[]>([]); // store timeout IDs
 
+	const normalizePath = (url: string) => {
+		try {
+			const u = new URL(url, window.location.origin);
+			return u.pathname.replace(/\/+$/, ""); // remove trailing slash
+		} catch {
+			return url;
+		}
+	};
+
 	useEffect(() => {
 		NProgress.configure({
 			showSpinner: false,
@@ -18,8 +27,25 @@ export default function ProgressBar() {
 			const target = e.target as HTMLElement | null;
 			const anchor = target?.closest("a");
 
+			// Stop NProgress after 200ms
+			// const timeoutId = window.setTimeout(() => {
+			// 	NProgress.done();
+			// }, 5000);
+
+			// timeouts.current.push(timeoutId);
+
 			// Only trigger for in-app navigation
 			if (anchor && anchor.href && !anchor.target && anchor.getAttribute("href")?.startsWith("/")) {
+				const anchorUrl = new URL(anchor.href);
+
+				const clickedPath = normalizePath(anchor.href);
+				const currentPath = normalizePath(window.location.pathname);
+
+				if (anchorUrl.pathname === pathname || clickedPath === currentPath) {
+					console.log("Already on the same page, skipping NProgress");
+					return;
+				}
+
 				NProgress.start();
 				NProgress.set(0.5);
 				NProgress.set(0.75);
@@ -39,6 +65,7 @@ export default function ProgressBar() {
 	// When pathname changes → navigation finished → stop NProgress
 	useEffect(() => {
 		if (!pathname) return;
+		console.log("pathname:", pathname);
 		NProgress.done();
 	}, [pathname]);
 
