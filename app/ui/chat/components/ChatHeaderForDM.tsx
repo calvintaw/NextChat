@@ -89,26 +89,28 @@ export function DirectMessageCard({
 				{roomId.startsWith("system-room") && <span className="text-text font-medium">Our AI Chatbot</span>}
 				{!roomId.startsWith("system-room") && <span className="text-text font-medium">{user.username}</span>}.
 			</div>
-			<div className="flex items-center gap-2">
-				<button
-					className={clsx("btn", isBlocked ? "btn-inverted" : "btn-secondary")}
-					onClick={() => {
-						if (isBlocked) {
-							unblockFriendship(currentUserId, user.id);
-						} else {
-							blockFriendship(currentUserId, user.id);
-						}
-					}}
-				>
-					{isBlocked ? "Unblock" : "Block"}
-				</button>
-				<button
-					className="btn btn-secondary"
-					onClick={() => removeFriendshipRequest({ username: user.username, id: user.id })}
-				>
-					Unfriend
-				</button>
-			</div>
+			{!roomId.startsWith("system-room") && (
+				<div className="flex items-center gap-2">
+					<button
+						className={clsx("btn", isBlocked ? "btn-inverted" : "btn-secondary")}
+						onClick={() => {
+							if (isBlocked) {
+								unblockFriendship(currentUserId, user.id);
+							} else {
+								blockFriendship(currentUserId, user.id);
+							}
+						}}
+					>
+						{isBlocked ? "Unblock" : "Block"}
+					</button>
+					<button
+						className="btn btn-secondary"
+						onClick={() => removeFriendshipRequest({ username: user.username, id: user.id })}
+					>
+						Unfriend
+					</button>
+				</div>
+			)}
 
 			{!roomId.startsWith("system-room") &&
 				(isPending ? (

@@ -93,7 +93,7 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 				</div>
 				<div className="flex items-center gap-1 text-sm font-extralight font-chunk">
 					<Avatar
-						size="size-5"
+						size="size-4.5"
 						id={msg.replyTo}
 						src={reply_img_url}
 						statusIndicator={false}

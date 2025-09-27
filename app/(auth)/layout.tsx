@@ -5,11 +5,12 @@ import { cookies } from "next/headers";
 import { Suspense } from "react";
 import Loading from "../(root)/chat/[room_id]/loading";
 import "@/app/lib/passwordRules.js";
+import ProgressBar from "../ui/ProgressBar";
 
 const roboto = localFont({
 	src: [
 		{
-			path: "../../public/fonts/Roboto-Regular.ttf", 
+			path: "../../public/fonts/Roboto-Regular.ttf",
 			weight: "400",
 			style: "normal",
 		},
@@ -38,6 +39,7 @@ export default async function RootLayout({
 	return (
 		<html lang="en" className={theme}>
 			<body className={`${roboto.className}  antialiased flex flex-row h-screen w-screen`}>
+				<ProgressBar></ProgressBar>
 				<Suspense fallback={<Loading />}>{children}</Suspense>
 			</body>
 		</html>

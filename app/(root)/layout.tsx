@@ -10,6 +10,7 @@ import FriendsProvider from "../lib/friendsContext";
 import "@/app/lib/passwordRules.js";
 import Toaster from "../ui/Toast";
 import PathProvider from "../lib/PathContext";
+import ProgressBar from "@/app/ui/ProgressBar";
 
 const roboto = localFont({
 	src: [
@@ -44,6 +45,7 @@ export default async function RootLayout({
 	return (
 		<html lang="en" className={theme}>
 			<body className={`font-sans ${roboto.className} antialiased flex flex-col h-screen w-screen scroll-smooth`}>
+				<ProgressBar></ProgressBar>
 				<PathProvider>
 					<PathBanner />
 					<main className="flex w-full h-full">

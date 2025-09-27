@@ -37,6 +37,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	}, [type, recipient, user.id]);
 
 	const firstRunRef = useRef(true);
+	// const [offset, setOffset, removeOffset] = useLocalStorage("msg_offset"); // need to implement the rest
 
 	// fetching msgs at startup and add listeners for typing event
 	useEffect(() => {
@@ -61,6 +62,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		//==============
 
 		const fetchMessages = async () => {
+
 			const recent = await getRecentMessages(roomId);
 			setMessages((prev) => [...prev, ...recent]);
 			setInitialLoading(false);
@@ -282,6 +284,7 @@ import Loading from "@/app/(root)/chat/[room_id]/loading";
 import { useToast } from "@/app/lib/hooks/useToast";
 import { DirectMessageCard } from "./components/ChatHeaderForDM";
 import { ServerCardHeader } from "./components/ChatHeaderForServer";
+import { useLocalStorage } from "@/app/lib/hooks/useStorage";
 
 export const ServerList = ({ servers }: { servers: Room[] }) => {
 	if (!servers || servers.length === 0) {

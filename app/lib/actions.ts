@@ -16,6 +16,7 @@ import {
 	NewsApiResponse,
 	NewsApiParams,
 	Room,
+	MessageType,
 } from "./definitions";
 import bcrypt from "bcryptjs";
 import z from "zod";
@@ -134,22 +135,22 @@ export async function getContacts(currentUserId: string): Promise<ContactType[]>
 
 export async function getRecentMessages(room_id: string) {
 	return (await sql`
-			SELECT 
-				m.id,
-				users.image as "sender_image",
-				m.sender_id, 
-				users.display_name as "sender_display_name", 
-				m.content, 
-				m.created_at AS "createdAt",
-				m.type,
-				m.edited,
-				m.reactions,
-				m.replyTo as "replyTo"
-			FROM messages m
-			JOIN users ON m.sender_id = users.id
-			WHERE m.room_id = ${room_id}
-			ORDER BY m.created_at ASC
-		`) as MessageType[];
+    SELECT 
+      m.id,
+      users.image AS "sender_image",
+      m.sender_id, 
+      users.display_name AS "sender_display_name", 
+      m.content, 
+      m.created_at AS "createdAt",
+      m.type,
+      m.edited,
+      m.reactions,
+      m.replyTo AS "replyTo"
+    FROM messages m
+    JOIN users ON m.sender_id = users.id
+    WHERE m.room_id = ${room_id}
+    ORDER BY m.created_at ASC
+  `) as MessageType[];
 }
 
 export async function getServer(id: string): Promise<Room[]> {
@@ -490,8 +491,8 @@ export async function registerUser(formData: FormData): Promise<FormState> {
 			const result = await getUserIdByUsername("system");
 			if (!result.success) return;
 			const systemUserId = result.id!;
-			const roomId = `system-room-${systemUserId}`;
 			const [user1_id, user2_id] = [id, systemUserId].sort((a, b) => a.localeCompare(b));
+			const roomId = `system-room-${systemUserId}:${id}`;
 
 			await sql`
 				INSERT INTO friends (user1_id, user2_id, request_sender_id, status)
