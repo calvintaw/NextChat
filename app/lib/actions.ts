@@ -133,7 +133,15 @@ export async function getContacts(currentUserId: string): Promise<ContactType[]>
 		`;
 }
 
-export async function getRecentMessages(room_id: string) {
+interface GetMessagesOptions {
+	sortOrder?: "ASC" | "DESC"; // defaults to ASC
+	offset?: number; // defaults to 0
+	limit?: number; // optional, number of messages to fetch
+}
+
+export async function getRecentMessages(room_id: string, options: GetMessagesOptions = {}) {
+	const { sortOrder = "ASC", offset = 0, limit } = options;
+
 	return (await sql`
     SELECT 
       m.id,
