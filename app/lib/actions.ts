@@ -132,24 +132,34 @@ export async function getContacts(currentUserId: string): Promise<ContactType[]>
 		`;
 }
 
-export async function getRecentMessages(room_id: string) {
+interface GetMessagesOptions {
+	sortOrder?: "ASC" | "DESC"; // defaults to ASC
+	offset?: number; // defaults to 0
+	limit?: number; // optional, number of messages to fetch
+}
+
+export async function getRecentMessages(room_id: string, options: GetMessagesOptions = {}) {
+	const { sortOrder = "ASC", offset = 0, limit } = options;
+
 	return (await sql`
-			SELECT 
-				m.id,
-				users.image as "sender_image",
-				m.sender_id, 
-				users.display_name as "sender_display_name", 
-				m.content, 
-				m.created_at AS "createdAt",
-				m.type,
-				m.edited,
-				m.reactions,
-				m.replyTo as "replyTo"
-			FROM messages m
-			JOIN users ON m.sender_id = users.id
-			WHERE m.room_id = ${room_id}
-			ORDER BY m.created_at ASC
-		`) as MessageType[];
+    SELECT 
+      m.id,
+      users.image AS "sender_image",
+      m.sender_id, 
+      users.display_name AS "sender_display_name", 
+      m.content, 
+      m.created_at AS "createdAt",
+      m.type,
+      m.edited,
+      m.reactions,
+      m.replyTo AS "replyTo"
+    FROM messages m
+    JOIN users ON m.sender_id = users.id
+    WHERE m.room_id = ${room_id}
+    ORDER BY m.created_at ${sortOrder}
+    OFFSET ${offset}
+    ${limit ? sql`LIMIT ${limit}` : sql``}
+  `) as MessageType[];
 }
 
 export async function getServer(id: string): Promise<Room[]> {

@@ -8,10 +8,10 @@ export const PathBanner = () => {
 	const { path } = usePathProvider();
 
 	const pathDisplayNameMap: { [key: string]: string } = {
-		"/discover": "Discover",
-		"/": "Main Dashboard",
-		"/news": "Top News",
-		"/dashboard": "Profile",
+		"/discover": "🔍 Discover",
+		"/": "📊 Main Dashboard",
+		"/news": "📰 Top News",
+		"/dashboard": "👤 Profile",
 	};
 
 	const getBannerTitle = (pathname: string): string => {

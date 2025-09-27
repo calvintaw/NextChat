@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/forms";
+@import "nprogress/nprogress.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
