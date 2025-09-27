@@ -79,9 +79,7 @@ export const ServerList = ({ user, servers }: { user: User; servers: Room[] }) =
 				<div className="flex-1 flex items-center justify-center">
 					<div className="flex flex-col items-center justify-center">
 						<HiServerStack className="text-6xl text-muted mb-4" />
-						<p className="text-muted text-lg font-medium">
-							No servers available. {`API provider doesn't allow prod usage`}
-						</p>
+						<p className="text-muted text-lg font-medium">No servers available.</p>
 					</div>
 				</div>
 			)}
