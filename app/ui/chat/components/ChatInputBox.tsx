@@ -13,6 +13,7 @@ import { IconWithSVG } from "../../general/Buttons";
 import { useMessageLimiter } from "@/app/lib/hooks/useMsgLimiter";
 import { v4 as uuidv4 } from "uuid";
 import { time } from "console";
+import useEventListener from "@/app/lib/hooks/useEventListener";
 
 type ChatInputBoxProps = {
 	activePersons: string[];
@@ -35,6 +36,7 @@ const ChatInputBox = ({
 }: ChatInputBoxProps) => {
 	const { input, setInput, replyToMsg, setReplyToMsg, textRef } = useChatProvider();
 	const [style, setStyle] = useState("!max-h-10");
+	const [isFocused, setIsFocused] = useState(false);
 
 	useEffect(() => {
 		setStyle("min-h-10");
@@ -106,6 +108,13 @@ const ChatInputBox = ({
 		}
 	};
 
+	useEventListener("keydown", (event: KeyboardEvent) => {
+		if (event.ctrlKey && event.key === "/" && textRef.current) {
+			console.log("Ctrl + / was pressed!");
+			textRef.current.focus();
+		}
+	});
+
 	useEffect(() => {
 		if (replyToMsg) textRef.current?.focus();
 	}, [replyToMsg]);
@@ -127,6 +136,18 @@ const ChatInputBox = ({
 					)}
 				>
 					<AttachmentDropdown handleFileUpload={handleFileUpload} />
+					{!isFocused && (
+						<div
+							className="max-[500px]:hidden absolute border top-1/2 -translate-y-1/2 right-15
+							text-sm bg-black/25  not-dark:text-black text-white rounded-md p-1.5 py-1 border-background
+							z-[1]
+							opacity-50
+							"
+						>
+							Press Ctrl + / to type
+						</div>
+					)}
+
 					<TextareaAutosize
 						ref={textRef}
 						name="query"
@@ -134,8 +155,10 @@ const ChatInputBox = ({
 						maxRows={8}
 						placeholder="Write a message"
 						onKeyDown={handleKeyPress}
+						onFocus={() => setIsFocused(true)}
+						onBlur={() => setIsFocused(false)}
 						className={clsx(
-							"w-full resize-none bg-transparent text-text placeholder-muted border-none outline-none focus:outline-none focus:ring-0",
+							"w-full resize-none bg-transparent text-text placeholder-muted border-none outline-none focus:outline-none focus:ring-0 relative",
 							style
 						)}
 					/>

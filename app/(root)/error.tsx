@@ -31,7 +31,7 @@ export default function ErrorPage({ className = "" }: { className?: string }) {
 				href="/"
 				className="
         no-underline
-				flex items-center px-3 py-1 gap-2 btn bg-primary rounded-lg shadow hover:bg-primary/90 transition
+				flex items-center px-3 py-1 gap-2 btn bg-primary rounded-lg shadow text-text hover:bg-primary/90 transition
         "
 			>
 				<MdArrowBack className="text-xl " />
