@@ -23,6 +23,7 @@ type ChatInputBoxProps = {
 	setMessages: React.Dispatch<React.SetStateAction<MessageType[]>>;
 	tempIdsRef: React.MutableRefObject<Set<string>>;
 	isBlocked: boolean;
+	initialLoading: boolean;
 };
 
 const ChatInputBox = ({
@@ -31,6 +32,7 @@ const ChatInputBox = ({
 	user,
 	handleFileUpload,
 	setMessages,
+	initialLoading,
 	tempIdsRef,
 	isBlocked,
 }: ChatInputBoxProps) => {
@@ -120,7 +122,7 @@ const ChatInputBox = ({
 	}, [replyToMsg]);
 
 	return (
-		<div className={clsx(isBlocked && "cursor-not-allowed")}>
+		<div className={clsx(isBlocked && "cursor-not-allowed", initialLoading && "pointer-events-none")}>
 			<div
 				className={clsx("p-4 relative mb-3 ", isBlocked && "opacity-75 pointer-events-none")}
 				data-tooltip-id={"typing-indicator"}

@@ -36,30 +36,12 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		}
 	}, [type, recipient, user.id]);
 
-	const firstRunRef = useRef(true);
+	// const msgReceivedSound = useRef<HTMLAudioElement>(new Audio("/msg-noti.mp3")); // does not fit the vibe
 	// const [offset, setOffset, removeOffset] = useLocalStorage("msg_offset"); // need to implement the rest
 
 	// fetching msgs at startup and add listeners for typing event
 	useEffect(() => {
-		if (!firstRunRef.current || isBlocked) return; // firstRunRef purpose: to solve some msgs appearing twice sometimes on first render (edit: I don't know if these issues exist anymore as I have not tested this part)
-
-		// test msgs
-
-		// const chatMessages: MessageType[] = Array.from({ length: 30 }, (_, i) => ({
-		// 	id: (i + 1).toString(),
-		// 	sender_id: `user-${(i % 5) + 1}`,
-		// 	sender_display_name: `User ${(i % 5) + 1}`,
-		// 	sender_image: `https://i.pravatar.cc/150?img=${(i % 5) + 1}`,
-		// 	content: `This is message number ${i + 1}`,
-		// 	createdAt: new Date(Date.now() - i * 60000).toISOString(),
-		// 	type: "text",
-		// 	edited: false,
-		// 	reactions: {},
-		// 	replyTo: null,
-		// }));
-		// setMessages(chatMessages);
-
-		//==============
+		if (isBlocked) return;
 
 		const fetchMessages = async () => {
 			const recent = await getRecentMessages(roomId);
@@ -78,8 +60,6 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		socket.on("typing started", handleTypingStart);
 		socket.on("typing stopped", handleTypingStop);
 
-		firstRunRef.current = false;
-
 		return () => {
 			socket.off("typing started", handleTypingStart);
 			socket.off("typing stopped", handleTypingStop);
@@ -92,7 +72,13 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 		const handleIncomingMsg = (msg: MessageType) => {
 			setMessages((prev) => {
-				if (msg.sender_id !== user.id) return [...prev, msg];
+				if (msg.sender_id !== user.id) {
+					// msgReceivedSound.current.volume = 0.25;
+					// msgReceivedSound.current.currentTime = 0;
+					// msgReceivedSound.current.play().catch((err) => console.error(err));
+
+					return [...prev, msg];
+				}
 
 				const index = prev.findIndex((item) => item.tempId && tempIdsRef.current.has(item.tempId));
 				if (index === -1) return [...prev, msg];
@@ -101,19 +87,6 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 				if (msg.tempId) tempIdsRef.current.delete(msg.tempId);
 				updated[index] = { ...msg, tempId: undefined };
-				// {
-				// 		id: msg.id,
-				// 		sender_id: msg.sender_id,
-				// 		sender_display_name: msg.sender_display_name;
-				// 		sender_image: msg.sender_image,
-				// 		content: msg.content,
-				// 		createdAt: msg.createdAt,
-				// 		type:msg.type,
-				// 		edited: msg.edited,
-				// 		reactions: msg.reactions,
-				// 	replyTo: msg.replyTo,
-				// 	tempId: null;
-				// };
 
 				return updated;
 			});
@@ -242,6 +215,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 					</div>
 
 					<ChatInputBox
+						initialLoading={initialLoading}
 						isBlocked={isBlocked}
 						tempIdsRef={tempIdsRef}
 						setMessages={setMessages}

@@ -136,7 +136,7 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 			data-content={msg.content.slice(0, 200)}
 			id={msg.id}
 			className={clsx(
-				"flex flex-col w-full dark:hover:bg-background/75 hover:bg-accent/75 px-2 pl-3 py-2 relative",
+				"flex flex-col w-full dark:hover:bg-background/75 hover:bg-accent/75 px-2 pl-3 py-2 relative ",
 				msgToEdit === msg.id ? "dark:bg-background/75 bg-accent" : "group",
 
 				replyToMsg &&
