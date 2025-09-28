@@ -62,6 +62,7 @@ export function DirectMessageCard({
 		fetchCommonServers();
 	}, [user.id]);
 
+	
 	return (
 		<div className="bg-contrast text-white p-6 px-4 pb-2 rounded-lg max-w-full">
 			<div className="flex items-center justify-between mb-4">

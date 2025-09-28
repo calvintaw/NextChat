@@ -50,6 +50,14 @@ export async function getUser(user_id: string): Promise<User | null> {
 	return result[0] ?? null;
 }
 
+// one time use fn for displaying individual user info
+export async function getUserByUsername(username: string): Promise<User | null> {
+	const result = await sql<User[]>`
+		SELECT id, username, display_name as "displayName", email, created_at as "createdAt", image, bio, readme FROM users WHERE username = ${username} LIMIT 1
+	`;
+	return result[0] ?? null;
+}
+
 export async function checkIfBlocked(user: User, friend: User): Promise<boolean> {
 	const [user1_id, user2_id] = [user.id, friend.id].sort((a, b) => a.localeCompare(b));
 	const result = await sql<{ status: string }[]>`
@@ -264,7 +272,7 @@ export async function editProfile(user: User, formData: FormData) {
 				returning id, username, display_name as "displayName", email, created_at as "createdAt", image, bio
 			`;
 		// returning data from db is uncessary (could be refactored to only use form field values on client side but too much work)
-		
+
 		if (rows.length === 0) {
 			throw new Error("No Data Returned");
 		}
@@ -1116,7 +1124,6 @@ export async function updateReadmeByUsername(readme: string) {
 		}
 	});
 }
-
 
 export async function getBioByUsername(username: string) {
 	const result = await sql<User[]>`

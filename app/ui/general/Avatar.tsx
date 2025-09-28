@@ -4,6 +4,7 @@ import { getBackgroundColorByInitial } from "@/app/lib/utilities";
 import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 import { RiLoader3Line } from "react-icons/ri";
+import { Tooltip } from "react-tooltip";
 
 type AvatarProps = {
 	src: string;
@@ -61,7 +62,11 @@ export const Avatar = ({
 	return (
 		<>
 			{hasValidSrc && (
-				<div className={clsx("relative", size, parentClassName)}>
+				<div
+					data-tooltip-id="avatar-tooltip"
+					data-tooltip-content={`View ${displayName}'s profile`}
+					className={clsx("relative", size, parentClassName)}
+				>
 					{!loaded && (
 						<div
 							className={clsx(
@@ -108,7 +113,11 @@ export const Avatar = ({
 			)}
 
 			{!hasValidSrc && (
-				<div className={clsx("relative", size, parentClassName)}>
+				<div
+					data-tooltip-id="avatar-tooltip"
+					data-tooltip-content={`View ${displayName}'s profile`}
+					className={clsx("relative", size, parentClassName)}
+				>
 					<div
 						role="img"
 						className={clsx(
@@ -128,6 +137,7 @@ export const Avatar = ({
 					)}
 				</div>
 			)}
+
 		</>
 	);
 };
