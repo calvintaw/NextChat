@@ -3,6 +3,8 @@
 import { getBackgroundColorByInitial } from "@/app/lib/utilities";
 import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
+import { BiLoaderAlt } from "react-icons/bi";
+import { RiLoader3Line } from "react-icons/ri";
 
 type AvatarProps = {
 	src: string;
@@ -10,7 +12,7 @@ type AvatarProps = {
 	id?: string;
 	size?: string;
 	displayName: string;
-	status?: boolean;
+	status?: boolean | "loading";
 	fontSize?: string;
 	statusIndicator?: boolean;
 	radius?: string;
@@ -94,8 +96,13 @@ export const Avatar = ({
 						{...rest}
 					/>
 					{statusIndicator && (
-						<div className={onlineStatusContainer}>
-							<div className={clsx(onlineStatusBulb, status ? "bg-emerald-500" : "bg-red-400")} />
+						<div className={clsx(onlineStatusContainer, status === "loading" && "!bg-background")}>
+							{typeof status === "boolean" && (
+								<div className={clsx(onlineStatusBulb, status ? "bg-emerald-500" : "bg-red-400")} />
+							)}
+							{status === "loading" && (
+								<RiLoader3Line className="text-2xl animate-spin text-foreground"></RiLoader3Line>
+							)}
 						</div>
 					)}
 				</div>

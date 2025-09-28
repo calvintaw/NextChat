@@ -4,6 +4,11 @@ import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import NProgress from "nprogress";
 
+NProgress.configure({
+	showSpinner: false,
+	minimum: 0.15,
+});
+
 export default function ProgressBar() {
 	const pathname = usePathname();
 	const timeouts = useRef<number[]>([]); // store timeout IDs
@@ -18,16 +23,13 @@ export default function ProgressBar() {
 	};
 
 	useEffect(() => {
-		NProgress.configure({
-			showSpinner: false,
-			minimum: 0.15,
-		});
-
 		const handleClick = (e: MouseEvent) => {
 			const target = e.target as HTMLElement | null;
-			if (target && target.id === "remove-friend-btn-contact-card") {
+
+			if (target?.closest("#remove-friend-btn-contact-card")) {
 				return;
 			}
+
 			const anchor = target?.closest("a");
 
 			// Stop NProgress after 200ms

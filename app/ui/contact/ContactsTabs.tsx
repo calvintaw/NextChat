@@ -46,6 +46,7 @@ type RequestTabProps = {
 	user: User;
 	friendRequests: friendRequestsType;
 	setFriendRequests: React.Dispatch<React.SetStateAction<friendRequestsType>>;
+	setContacts: React.Dispatch<React.SetStateAction<ContactType[]>>;
 };
 
 type AllContactsTabProps = {
@@ -145,7 +146,12 @@ const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTa
 					</Tabs.Content>
 
 					<Tabs.Content value="request" asChild>
-						<RequestTab user={user} setFriendRequests={setFriendRequests} friendRequests={friendRequests} />
+						<RequestTab
+							setContacts={setContacts}
+							user={user}
+							setFriendRequests={setFriendRequests}
+							friendRequests={friendRequests}
+						/>
 					</Tabs.Content>
 
 					<Tabs.Content value="add" asChild>
@@ -223,11 +229,10 @@ import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/app/lib/hooks/useToast";
 
-const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps) => {
+const RequestTab = ({ user, friendRequests, setFriendRequests, setContacts }: RequestTabProps) => {
 	const [error, setError] = useState("");
 	const [isPending, setIsPendingIds] = useState(new Set<string>());
 	const toast = useToast();
-	const router = useRouter();
 
 	function handlePending(id: string, pending: boolean) {
 		if (pending) {
@@ -252,12 +257,14 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 			} else {
 				// local ui instant updates
 
-				router.refresh();
 				socket.emit("refresh-contacts-page", user.id, friend.id);
 				setFriendRequests((prev) => ({
 					...prev,
 					incoming: prev.incoming.filter((req) => req.id !== friend.id),
 				}));
+
+				const { createdAt, ...friendContact } = friend;
+				// setContacts((prev) => [...prev, {}]);
 
 				toast({ title: "Success!", mode: "positive", subtitle: result.message });
 			}
@@ -278,7 +285,6 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
 				// local ui instant updates
-				router.refresh();
 				socket.emit("refresh-contacts-page", user.id, friend.id);
 				setFriendRequests((prev) => ({
 					...prev,
@@ -344,7 +350,7 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 				{error && <p className="text-error text-sm my-2">{error}</p>}
 			</div>
 
-			<div className="flex flex-col p-2 px-0 pr-1 h-full overflow-y-scroll has-scroll-container fade-bg-bottom pb-[100px]">
+			<div className="flex flex-col p-2 px-0 pr-1 h-full overflow-y-auto has-scroll-container fade-bg-bottom pb-[100px]">
 				{friendRequests.incoming.length !== 0 && filter !== "sent" && (
 					<>
 						<div className="flex flex-col gap-2">
@@ -398,6 +404,8 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 											disabled={isPending.has(friend.id)}
 											onClick={() => {
 												// TODO: use toast noti to show users the result of their actions
+												// TODO: done!
+
 												handleRemove(friend, "incoming");
 											}}
 											data-tooltip-id={`tooltip-friendship`}

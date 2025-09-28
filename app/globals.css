@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/forms";
 @import "nprogress/nprogress.css";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -463,6 +464,10 @@ html {
 	.btn {
 		@apply font-normal shrink-0 relative text-nowrap w-fit h-fit rounded-md outline-none cursor-pointer px-2.5 py-1 text-base bg-surface
            hover:bg-secondary  text-text border-2 border-transparent;
+	}
+
+	.btn-secondary-border {
+		@apply border border-foreground/25 dark:border-foreground/15;
 	}
 
 	.btn-with-icon {
@@ -964,4 +969,3 @@ html {
 .register-section {
 	background: url("/auth_bg.svg");
 }
-

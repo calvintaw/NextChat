@@ -122,7 +122,7 @@ const NewsGrid = () => {
 	return (
 		<section
 			className={clsx(
-				"overflow-y-scroll has-scroll-container overflow-x-clip gap-4 p-4 w-full max-h-[calc(100vh-4rem)] mb-4 fade-bg-bottom dark:bg-[#0A101C]/65 bg-[#f7f7f9]/65",
+				"overflow-y-auto has-scroll-container overflow-x-clip gap-4 p-4 w-full max-h-[calc(100vh-4rem)] mb-4 fade-bg-bottom dark:bg-[#0A101C]/65 bg-[#f7f7f9]/65",
 				!isLoading && "pb-[150px]"
 			)}
 		>

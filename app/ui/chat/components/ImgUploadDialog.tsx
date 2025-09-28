@@ -51,7 +51,7 @@ const ImageUploadDialog = ({
 					<Dialog.Title className="text-xl font-semibold text-foreground">Send an Image</Dialog.Title>
 
 					<div className="flex flex-col justify-center my-5 gap-3">
-						<div className="flex gap-2 flex-wrap max-h-100 overflow-y-scroll img-upload-scrollbar rounded-md">
+						<div className="flex gap-2 flex-wrap max-h-100 overflow-y-auto img-upload-scrollbar rounded-md">
 							{uploaded.map((src, i) => (
 								<div key={`${src}-${i}`} className="flex-1 aspect-square min-h-30 max-h-56 relative group">
 									{getFileType(src) == "image" && (

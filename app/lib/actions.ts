@@ -182,6 +182,7 @@ export async function editProfile(user: User, formData: FormData) {
 	const parsedFormSchema = z.object({
 		displayName: z.string().trim().min(1).max(50).optional(),
 		username: z.string().trim().min(1).max(30).optional(),
+		bio: z.string().trim().max(160).optional(),
 		email: z.string().trim().email().optional(),
 		image: z.string().url("Profile image must be a valid URL").or(z.literal("")),
 	});
@@ -191,6 +192,7 @@ export async function editProfile(user: User, formData: FormData) {
 		username: formData.get("username")?.toString(),
 		email: formData.get("email")?.toString(),
 		image: formData.get("server_image")?.toString(),
+		bio: formData.get("bio")?.toString(),
 	};
 
 	const result = parsedFormSchema.safeParse(rawData);
@@ -204,9 +206,15 @@ export async function editProfile(user: User, formData: FormData) {
 		};
 	}
 
-	const { displayName = null, username = null, email = null, image } = result.data ?? {};
+	const { displayName = null, username = null, email = null, bio = null, image } = result.data ?? {};
 
-	if (displayName === user.displayName && username === user.username && email === user.email && image === user.image) {
+	if (
+		displayName === user.displayName &&
+		username === user.username &&
+		email === user.email &&
+		image === user.image &&
+		bio === user.bio
+	) {
 		return {
 			errors: {},
 			message: "No changes made to the profile.",
@@ -250,14 +258,18 @@ export async function editProfile(user: User, formData: FormData) {
 					display_name = ${displayName ?? user.displayName},
 					username = ${username ?? user.username},
 					email = ${email ?? user.email},
-					image = ${image}
+					image = ${image},
+					bio = ${bio}
 				WHERE id = ${user.id}
-				returning id, username, display_name as "displayName", email, created_at as "createdAt", image
+				returning id, username, display_name as "displayName", email, created_at as "createdAt", image, bio
 			`;
-
+		// returning data from db is uncessary (could be refactored to only use form field values on client side but too much work)
+		
 		if (rows.length === 0) {
 			throw new Error("No Data Returned");
 		}
+
+		console.log("Profile updated successfully", result.data);
 
 		return {
 			errors: {},
@@ -1077,4 +1089,24 @@ export async function getUserIdByUsername(username: string) {
 		return { success: false };
 	}
 	return { success: true, id: result[0].id };
+}
+
+export async function getReadmeByUsername(username: string) {
+	const result = await sql<User[]>`
+		SELECT readme from users where username = ${username} LIMIT 1
+	`;
+	if (result.length === 0) {
+		return { success: false };
+	}
+	return { success: true, readme: result[0].readme };
+}
+
+export async function getBioByUsername(username: string) {
+	const result = await sql<User[]>`
+		SELECT bio from users where username = ${username} LIMIT 1
+	`;
+	if (result.length === 0) {
+		return { success: false };
+	}
+	return { success: true, readme: result[0].bio };
 }

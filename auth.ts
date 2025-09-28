@@ -20,9 +20,9 @@ type DBUser = {
 	email: string;
 	createdAt: string;
 	password: string;
+	bio: string | null;
 };
 
-type AuthUser = Omit<DBUser, "password">;
 const isProd = process.env.NODE_ENV === "production";
 
 async function getUser(email: string | null, username: string | null): Promise<DBUser | undefined> {
@@ -40,7 +40,8 @@ async function getUser(email: string | null, username: string | null): Promise<D
 				username, 
 				display_name as "displayName", 
 				created_at as "createdAt",
-				image
+				image,
+				bio
 			from users
 			where 
 				(${email ? sql`email = ${email}` : sql`false`})
@@ -93,7 +94,9 @@ export const config = {
 					displayName: user.displayName,
 					email: user.email,
 					createdAt: user.createdAt,
+					// turned to string to transition to desired type in use by most components and functions
 					image: user.image ?? "",
+					bio: user.bio ?? "",
 				};
 			},
 		}),
@@ -118,6 +121,7 @@ export const config = {
 				token.email = session.email;
 				token.createdAt = session.createdAt;
 				token.image = session.image;
+				token.bio = session.bio;
 			}
 
 			if (user) {
@@ -127,6 +131,7 @@ export const config = {
 				token.email = user.email;
 				token.createdAt = user.createdAt;
 				token.image = user.image;
+				token.bio = user.bio;
 			}
 			return token;
 		},
@@ -140,6 +145,7 @@ export const config = {
 				email: token.email,
 				createdAt: token.createdAt,
 				image: token.image,
+				bio: token.bio,
 			};
 
 			return session;

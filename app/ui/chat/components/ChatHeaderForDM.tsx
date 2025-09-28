@@ -127,6 +127,9 @@ export function DirectMessageCard({
 				) : (
 					<ServerList servers={commonServers} />
 				))}
+			{roomId.startsWith("system-room") && (
+				<p>Due to difficulties in finding free apis and hosting own llms, the AI chatbot does not work 😢</p>
+			)}
 		</div>
 	);
 }

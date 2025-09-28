@@ -117,6 +117,8 @@ export type User = {
 	displayName: string;
 	email: string;
 	createdAt?: string;
+	readme?: string;
+	bio?: string;
 	password?: string;
 };
 

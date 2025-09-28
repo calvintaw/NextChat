@@ -43,15 +43,17 @@ export default async function RootLayout({
 	console.log("cookie STORE: ", theme);
 
 	return (
-		<html lang="en" className={theme}>
-			<body className={`font-sans ${roboto.className} antialiased flex flex-col h-screen w-screen scroll-smooth`}>
+		<html lang="en" className={theme + " h-full min-h-screen"}>
+			<body
+				className={`font-sans ${roboto.className} antialiased flex flex-col h-full min-h-screen w-full min-w-0 scroll-smooth`}
+			>
 				<ProgressBar></ProgressBar>
 				<PathProvider>
 					<PathBanner />
-					<main className="flex w-full h-full">
+					<main className="flex flex-1 min-h-0 min-w-0 w-full h-full">
 						<FriendsProvider>
 							<Sidebar />
-							<div className="flex flex-1 w-full h-full border-t border-contrast">
+							<div className="flex flex-1 min-h-0 min-w-0 w-full h-full border-t border-contrast ">
 								<Suspense fallback={<Loading className="!w-full !h-full" />}>{children}</Suspense>
 							</div>
 						</FriendsProvider>

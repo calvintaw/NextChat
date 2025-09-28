@@ -17,7 +17,9 @@ async function seedUsers() {
 			display_name VARCHAR(32) NOT NULL,
 			email TEXT NOT NULL UNIQUE,
 			password TEXT NOT NULL,
-			image TEXT NULL,
+			image TEXT,
+			bio VARCHAR(160),
+			readme TEXT,
 			created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 		);
 	`;
@@ -39,7 +41,7 @@ async function seedRooms() {
 }
 
 async function seedMessages() {
-		await sql`
+	await sql`
 		CREATE TABLE IF NOT EXISTS messages (
 			id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 			type TEXT DEFAULT 'text' CHECK (type IN ('text', 'image', 'video', 'system', 'file', 'reaction', 'reply')),
@@ -113,7 +115,6 @@ async function seedOnlineStatus() {
     );
   `;
 }
-
 
 async function enableRLSAndPolicies() {
 	// USERS
@@ -251,10 +252,18 @@ async function enableRLSAndPolicies() {
 	`;
 }
 
-
 export async function GET() {
-
 	try {
+		await sql`
+  ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS bio VARCHAR(160);
+`;
+
+		await sql`
+  ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS readme TEXT;
+`;
+
 		return Response.json({ message: "Database policies set successfully" });
 	} catch (error) {
 		console.error("Policy setup failed:", error);

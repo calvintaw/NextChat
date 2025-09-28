@@ -8,7 +8,7 @@ const ChatPanel = async ({ user }: { user: User }) => {
 		<section
 			id="chat-panel"
 			className="
-    min-w-[280px] flex-col flex-1 h-full max-h-[90vh]  pb-40 p-2 px-2.5 pr-0.5 overflow-y-scroll gap-1.5 
+    min-w-[280px] flex-col flex-1 h-full max-h-[90vh]  pb-40 p-2 px-2.5 pr-0.5 overflow-y-auto gap-1.5 
 		border
 		border-contrast
 		border-r-0
