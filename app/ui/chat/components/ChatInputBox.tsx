@@ -103,6 +103,7 @@ const ChatInputBox = ({
 			if (textRef.current.value.trim() === "") return;
 			if (!canSendMessage()) return;
 
+			socket.emit("join", user.id); // joining the same user id room as the socket server on renderer.com shutdown within 15min of inactivity so the msg would never reach anywhere.
 			sendMessage(textRef.current?.value);
 			textRef.current.value = "";
 			setInput("");
