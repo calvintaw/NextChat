@@ -960,3 +960,7 @@ html {
 	font-family: Arial !important;
 	word-break: break-word !important;
 }
+
+.register-section {
+	background: url("/auth_bg.svg");
+}

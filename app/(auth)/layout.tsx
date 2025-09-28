@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import Loading from "../(root)/chat/[room_id]/loading";
 import "@/app/lib/passwordRules.js";
 import ProgressBar from "../ui/ProgressBar";
+import Toaster from "../ui/Toast";
 
 const roboto = localFont({
 	src: [
@@ -41,6 +42,7 @@ export default async function RootLayout({
 			<body className={`${roboto.className}  antialiased flex flex-row h-screen w-screen`}>
 				<ProgressBar></ProgressBar>
 				<Suspense fallback={<Loading />}>{children}</Suspense>
+				<Toaster />
 			</body>
 		</html>
 	);

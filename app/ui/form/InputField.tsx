@@ -1,11 +1,11 @@
 "use client";
-import { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { RiLockLine } from "react-icons/ri";
 import clsx from "clsx";
-import useToggle from "../../lib/hooks/useToggle";
-import { error } from "console";
-import React from "react";
+import zxcvbn from "zxcvbn";
+import { useToast } from "@/app/lib/hooks/useToast";
+import { only } from "node:test";
 
 type InputFieldProps = {
 	label?: string | React.ReactNode;
@@ -66,6 +66,10 @@ const RULES = [
 	{ regex: /.{9,}/, label: "Longer than 8 characters" },
 ];
 
+type PasswordFieldProps = InputFieldProps & {
+	setIsAllowed?: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
 export function PasswordField({
 	name,
 	label,
@@ -74,15 +78,50 @@ export function PasswordField({
 	className,
 	parentClassName = "",
 	hideRules = false,
-}: InputFieldProps) {
+	setIsAllowed,
+}: PasswordFieldProps) {
 	const [showPass, setShowPass] = useState(false);
 	const [value, setValue] = useState("");
 	const [score, setScore] = useState(0);
+	const [zxcvbnScore, setZxcvbnScore] = useState<number | null>(null);
 
 	useEffect(() => {
 		const newScore = RULES.reduce((acc, rule) => (rule.regex.test(value) ? acc + 1 : acc), 0);
 		setScore(newScore);
+		if (value.trim() === "") {
+			setZxcvbnScore(null);
+			return;
+		}
+		const result = zxcvbn(value);
+		setZxcvbnScore(result.score); // 0 - 4
 	}, [value]);
+
+	const toast = useToast();
+
+	useEffect(() => {
+		const inputEl = document.getElementById(name);
+		if (!inputEl) return;
+
+		const form = inputEl.closest("form");
+		if (!form) return;
+
+		const handleSubmit = (e: Event) => {
+			const isValid = RULES.every((rule) => rule.regex.test(value));
+
+			if (!isValid || (zxcvbnScore && zxcvbnScore < 3)) {
+				e.preventDefault(); // stop form submission
+				toast({ title: "Warning!", mode: "negative", subtitle: "Please fix your password first!" });
+			}
+
+			if (isValid && setIsAllowed && zxcvbnScore && zxcvbnScore >= 3) {
+				setIsAllowed(true);
+			}
+		};
+
+		form.addEventListener("submit", handleSubmit);
+
+		return () => form.removeEventListener("submit", handleSubmit);
+	}, [value, name]);
 
 	return (
 		<fieldset className="mb-2">
@@ -126,6 +165,42 @@ export function PasswordField({
 					data-score={score}
 					style={{ "--score": score, "--total": RULES.length } as React.CSSProperties}
 				>
+					{/* zxcvbn strength meter */}
+					{zxcvbnScore !== null && (
+						<>
+							<div className="mt-2 text-sm">
+								<p className="">
+									Password strength:
+									<span
+										className={clsx(
+											"ml-1 font-semibold",
+											zxcvbnScore < 2 && "text-red-500",
+											zxcvbnScore === 2 && "text-yellow-500",
+											zxcvbnScore >= 3 && "text-green-600"
+										)}
+									>
+										{["Very Weak", "Weak", "Fair", "Strong", "Very Strong"][zxcvbnScore]}
+									</span>
+								</p>
+							</div>
+
+							{/* <div
+								className="password-strength-meter my-1"
+								data-score={zxcvbnScore}
+								style={{ "--score": zxcvbnScore, "--total": 4 } as React.CSSProperties}
+							>
+								<div className="flex gap-1">
+									{[0, 1, 2, 3, 4].map((i) => (
+										<span
+											key={i}
+											className={clsx("flex-1 h-1 rounded", i <= zxcvbnScore ? "bg-green-500" : "bg-gray-300")}
+										/>
+									))}
+								</div>
+							</div> */}
+						</>
+					)}
+
 					<div className="password-rules__meter flex-1 w-full">
 						<span></span>
 						<span></span>
@@ -134,6 +209,7 @@ export function PasswordField({
 						<span></span>
 						<div className="password-rules__score ml-1 -mt-0.5"></div>
 					</div>
+
 					<ul className="password-rules__checklist list-disc pl-5 text-sm text-muted">
 						{RULES.map((rule, idx) => {
 							const isMatched = rule.regex.test(value); // rule already satisfied

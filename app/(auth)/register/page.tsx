@@ -17,6 +17,7 @@ import { BiLoaderAlt } from "react-icons/bi";
 const Page = () => {
 	const [data, setData] = useState<FormState>({ errors: {}, message: "" });
 	const [isPending, setIsPending] = useState(false);
+	const [isAllowed, setIsAllowed] = useState(false);
 	const router = useRouter();
 
 	const handleFormSubmit = async (formData: FormData) => {
@@ -30,13 +31,17 @@ const Page = () => {
 	};
 
 	return (
-		<>
+		<section className="flex-1 flex items-center justify-center register-section max-md:pb-15 max-md:pt-5 overflow-x-hidden">
 			<AuthFormWrapper className="max-w-166">
 				<form
 					onSubmit={async (e) => {
 						e.preventDefault();
-						setIsPending(true);
+						if (!isAllowed) {
+							console.log("not allowed register");
+							return;
+						}
 
+						setIsPending(true);
 						const formData = new FormData(e.currentTarget);
 						await handleFormSubmit(formData);
 						setIsPending(false);
@@ -54,12 +59,19 @@ const Page = () => {
 
 					<div className="flex mb-0.5 sm:flex-row flex-col sm:gap-2 gap-1.5">
 						<InputField
+							required
 							errors={data.errors.displayName}
 							name="displayName"
 							placeholder="Display name"
 							icon={<RiUserLine />}
 						/>
-						<InputField errors={data.errors.username} name="username" placeholder="username" icon={<RiAtLine />} />
+						<InputField
+							required
+							errors={data.errors.username}
+							name="username"
+							placeholder="username"
+							icon={<RiAtLine />}
+						/>
 					</div>
 
 					<div className="flex flex-col gap-2">
@@ -72,7 +84,12 @@ const Page = () => {
 							placeholder="Enter your email"
 						/>
 
-						<PasswordField errors={data.errors.password} name="password"></PasswordField>
+						<PasswordField
+							setIsAllowed={setIsAllowed}
+							required
+							errors={data.errors.password}
+							name="password"
+						></PasswordField>
 					</div>
 
 					{data.message && <span className="text-sm text-red-500">{data.message}</span>}
@@ -102,7 +119,7 @@ const Page = () => {
 
 				<AuthOptions></AuthOptions>
 			</AuthFormWrapper>
-		</>
+		</section>
 	);
 };
 
