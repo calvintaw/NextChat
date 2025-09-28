@@ -258,12 +258,15 @@ const RequestTab = ({ user, friendRequests, setFriendRequests, setContacts }: Re
 				// local ui instant updates
 
 				socket.emit("refresh-contacts-page", user.id, friend.id);
+				const { createdAt, ...contact } = friend;
+				setContacts((prev) => {
+					return [...prev, { ...contact, online: "loading" }];
+				});
 				setFriendRequests((prev) => ({
 					...prev,
 					incoming: prev.incoming.filter((req) => req.id !== friend.id),
 				}));
 
-				const { createdAt, ...friendContact } = friend;
 				// setContacts((prev) => [...prev, {}]);
 
 				toast({ title: "Success!", mode: "positive", subtitle: result.message });

@@ -142,7 +142,7 @@ export type ChatType = Omit<User, "createdAt"> & {
 };
 
 export type ContactType = Omit<User, "createdAt"> & {
-	online: boolean;
+	online: boolean | "loading";
 };
 
 type RoomType = "public" | "private" | "dm";

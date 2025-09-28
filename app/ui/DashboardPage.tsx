@@ -7,7 +7,7 @@ import { Button } from "@/app/ui/general/Buttons";
 import { User } from "../lib/definitions";
 import React, { useRef, useState } from "react";
 import { FaUser, FaIdBadge, FaEnvelope } from "react-icons/fa6";
-import { editProfile } from "../lib/actions";
+import { editProfile, updateReadmeByUsername } from "../lib/actions";
 import InputField from "./form/InputField";
 import { ServerImageUploadBtn } from "./chat/components/UploadButtons";
 import imageCompression from "browser-image-compression";
@@ -20,6 +20,8 @@ import ReactMarkdown from "react-markdown";
 import { BiLoaderAlt } from "react-icons/bi";
 import remarkGfm from "remark-gfm";
 import rehypeReact from "rehype-react";
+import { useToast } from "../lib/hooks/useToast";
+import { normalizeMarkdown } from "../lib/utilities";
 
 type EditProfileState = {
 	errors: Record<string, string[]>;
@@ -92,6 +94,7 @@ const DashboardPage = ({ initialUser, isOwnPage = true }: { initialUser: User; i
 		}
 	}
 	const [isEditingReadme, setIsEditingReadme] = useState(false);
+	const [readMeUpdatePending, setReadMeUpdatePending] = useState(false);
 	const [readmeContent, setReadmeContent] = useState(
 		user.readme ??
 			`
@@ -131,12 +134,13 @@ const DashboardPage = ({ initialUser, isOwnPage = true }: { initialUser: User; i
 	);
 	const displayNameRef = useRef<HTMLInputElement | null>(null);
 	const readmeRef = useRef<HTMLTextAreaElement | null>(null);
+	const toast = useToast();
 	const style = "prose max-w-full dark:prose-invert flex-1 border border-green-500";
 
 	return (
-		<section className="flex flex-1 w-full min-h-0 break-words overflow-y-auto mb-5">
+		<section className="flex flex-1 w-full h-full min-h-0 break-words">
 			{!isReadMeMode && (
-				<div className=" w-fit h-full gap-4 flex-1 flex flex-col pt-5 px-2 sm:px-4 max-w-90 max-md:max-w-full max-md:w-full">
+				<div className="bg-contrast w-fit gap-4 flex flex-col pt-5 px-2 sm:px-4 max-w-90 max-md:max-w-full max-md:w-full">
 					<div className="flex items-center gap-3">
 						<Avatar
 							src={user.image}
@@ -307,21 +311,30 @@ const DashboardPage = ({ initialUser, isOwnPage = true }: { initialUser: User; i
 			)}
 			<div
 				className={clsx(
-					"w-full h-full border-contrast border-t-0 border-b-0 p-4 pt-2 pr-0 flex flex-col flex-1 min-h-0 min-w-0",
+					"w-full h-full readme-container border-contrast border border-t-0 p-4 pt-2 pr-0 flex flex-col flex-1 min-h-0 min-w-0",
 					!isReadMeMode && "max-md:hidden",
 					style
 				)}
 			>
 				<p className="text-muted text-sm mb-0">{user.username} / README.md</p>
-				<hr className="hr-separator mt-2 mb-6 border-contrast" />
+				<hr className="hr-separator mt-2 mb-4 border-contrast" />
 
 				{!isEditingReadme && (
 					<>
-						<div className="prose dark:prose-invert w-full max-w-none">
-							<ReactMarkdown remarkPlugins={[remarkGfm, rehypeReact]}>{readmeContent}</ReactMarkdown>
+						<div className="flex-1 min-h-0 min-w-0 overflow-y-auto pb-15">
+							<div className="prose dark:prose-invert w-full max-w-none">
+								<ReactMarkdown remarkPlugins={[remarkGfm, rehypeReact]}>{readmeContent}</ReactMarkdown>
+							</div>
 						</div>
+
+						<hr
+							className="hr-separator
+						border-contrast 
+						!my-0
+						"
+						></hr>
 						<Button
-							className="btn-inverted !border-border mt-2"
+							className="btn-inverted !border-border mt-4"
 							onClick={() => {
 								setIsEditingReadme(true);
 								setTimeout(() => {
@@ -343,15 +356,35 @@ const DashboardPage = ({ initialUser, isOwnPage = true }: { initialUser: User; i
 					<form
 						onSubmit={async (e) => {
 							e.preventDefault();
-							// Send updated readme to backend here (update user.readme)
-							// For example: await updateReadme(readmeContent);
-							setIsEditingReadme(false);
-							// Optionally refresh the page or state
+							setReadMeUpdatePending(true);
+
+							try {
+								if (normalizeMarkdown(readmeContent) === normalizeMarkdown(user.readme || "")) {
+									toast({ title: "Nothing changed in your README.md", subtitle: "", mode: "positive" });
+									setReadMeUpdatePending(false);
+									setIsEditingReadme(false);
+									return;
+								}
+
+								const res = await updateReadmeByUsername(readmeContent);
+								if (!res.success) {
+									toast({ title: res.message, subtitle: "", mode: "negative" });
+									return;
+								}
+								toast({ title: res.message, subtitle: "", mode: "positive" });
+							} catch (err) {
+								console.error(err);
+								toast({ title: "Something went wrong. Please try again.", subtitle: "", mode: "negative" });
+							} finally {
+								setReadMeUpdatePending(false);
+								setIsEditingReadme(false);
+							}
 						}}
 					>
 						{/* <textarea className="form-textarea w-full h-64 p-2 border rounded-lg bg-background text-text" /> */}
 						<TextareaAutosize
 							name="bio"
+							disabled={readMeUpdatePending}
 							ref={readmeRef}
 							minRows={20}
 							maxRows={20}
@@ -370,12 +403,18 @@ const DashboardPage = ({ initialUser, isOwnPage = true }: { initialUser: User; i
 							!outline-none
 							outline-transparent
 							!overflow-y-auto
+							disabled:!pointer-events-none
 		"
 						/>
 
-						<div className="flex gap-2 mt-2">
-							<Button type="submit" className="btn-purple">
-								Save
+						<div className="flex gap-2 mt-2 ">
+							<Button
+								disabled={readMeUpdatePending}
+								type="submit"
+								className="btn-purple btn-with-icon disabled:pointer-events-none"
+							>
+								{readMeUpdatePending ? "Saving" : "Save"}
+								{readMeUpdatePending && <BiLoaderAlt className="animate-spin text-lg"></BiLoaderAlt>}
 							</Button>
 							<Button type="button" className="btn-secondary" onClick={() => setIsEditingReadme(false)}>
 								Cancel

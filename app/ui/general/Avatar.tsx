@@ -3,7 +3,6 @@
 import { getBackgroundColorByInitial } from "@/app/lib/utilities";
 import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
-import { BiLoaderAlt } from "react-icons/bi";
 import { RiLoader3Line } from "react-icons/ri";
 
 type AvatarProps = {

@@ -1101,6 +1101,23 @@ export async function getReadmeByUsername(username: string) {
 	return { success: true, readme: result[0].readme };
 }
 
+export async function updateReadmeByUsername(readme: string) {
+	return withCurrentUser(async (user: User) => {
+		try {
+			await sql`
+        UPDATE users
+        SET readme = ${readme}
+        WHERE id = ${user.id}
+      `;
+			return { success: true, message: "README.md updated successfully." };
+		} catch (error) {
+			console.error("updateReadmeByUsername ERROR:", error);
+			return { success: false, message: "Failed to update README.md Please try again." };
+		}
+	});
+}
+
+
 export async function getBioByUsername(username: string) {
 	const result = await sql<User[]>`
 		SELECT bio from users where username = ${username} LIMIT 1
