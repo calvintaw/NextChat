@@ -12,7 +12,6 @@ import { RxCross2 } from "react-icons/rx";
 import { IconWithSVG } from "../../general/Buttons";
 import { useMessageLimiter } from "@/app/lib/hooks/useMsgLimiter";
 import { v4 as uuidv4 } from "uuid";
-import { time } from "console";
 import useEventListener from "@/app/lib/hooks/useEventListener";
 
 type ChatInputBoxProps = {
@@ -39,25 +38,31 @@ const ChatInputBox = ({
 	const { input, setInput, replyToMsg, setReplyToMsg, textRef } = useChatProvider();
 	const [style, setStyle] = useState("!max-h-10");
 	const [isFocused, setIsFocused] = useState(false);
+	const { canSendMessage } = useMessageLimiter(18, 60_000);
+	const { trigger, cancel } = useDebounce({
+		startCallback: () => socket.emit("typing started", roomId, user.displayName),
+		endCallback: () => socket.emit("typing stopped", roomId),
+		delay: 2000,
+	});
 
 	useEffect(() => {
 		setStyle("min-h-10");
 	}, []);
 
-	const { cancel } = useDebounce({
-		state: input,
-		startCallback: () => {
-			if (input.trim() !== "") {
-				socket.emit("typing started", roomId, user.displayName);
-			}
-		},
-		endCallback: () => socket.emit("typing stopped", roomId),
-		delay: 2000,
-	});
+	useEffect(() => {
+		if (!textRef.current) return;
+
+		const handleInput = () => trigger();
+
+		const textarea = textRef.current;
+		textarea.addEventListener("input", handleInput);
+
+		return () => {
+			textarea.removeEventListener("input", handleInput);
+		};
+	}, [trigger]);
 
 	const sendMessage = (input: string) => {
-		if (!input.trim()) return;
-		// instantly displaying for visuals
 		const tempId = uuidv4();
 		tempIdsRef.current.add(tempId);
 
@@ -72,7 +77,7 @@ const ChatInputBox = ({
 			replyTo: replyToMsg ? replyToMsg.id : null,
 		};
 
-		cancel(750);
+		cancel(750); // stop the typing animation
 		if (roomId.startsWith("system-room")) {
 			socket.emit("system", temp_msg);
 		} else {
@@ -94,8 +99,6 @@ const ChatInputBox = ({
 			];
 		});
 	};
-
-	const { canSendMessage } = useMessageLimiter(18, 60_000);
 
 	const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 		if (e.key === "Enter" && !e.shiftKey && textRef.current) {
