@@ -25,6 +25,9 @@ export default function ProgressBar() {
 
 		const handleClick = (e: MouseEvent) => {
 			const target = e.target as HTMLElement | null;
+			if (target && target.id === "remove-friend-btn-contact-card") {
+				return;
+			}
 			const anchor = target?.closest("a");
 
 			// Stop NProgress after 200ms

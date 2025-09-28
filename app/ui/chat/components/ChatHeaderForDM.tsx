@@ -10,6 +10,8 @@ import { Avatar } from "../../general/Avatar";
 import { ServerList } from "../Chatbox";
 import { usePathProvider } from "@/app/lib/PathContext";
 import clsx from "clsx";
+import { socket } from "@/app/lib/socket";
+import { useRouter } from "next/navigation";
 
 export function DirectMessageCard({
 	roomId,
@@ -26,6 +28,7 @@ export function DirectMessageCard({
 	const [commonServers, setCommonServers] = useState<Room[]>([]);
 	const [isPending, setIsPending] = useState(true);
 	const { setPath } = usePathProvider();
+	const router = useRouter();
 
 	useEffect(() => {
 		setPath(`@${user.username}`);
@@ -105,7 +108,13 @@ export function DirectMessageCard({
 					</button>
 					<button
 						className="btn btn-secondary"
-						onClick={() => removeFriendshipRequest({ username: user.username, id: user.id })}
+						onClick={async () => {
+							const result = await removeFriendshipRequest({ username: user.username, id: user.id });
+							if (result.success) {
+								router.refresh();
+								socket.emit("refresh-contacts-page", currentUserId, user.id);
+							}
+						}}
 					>
 						Unfriend
 					</button>

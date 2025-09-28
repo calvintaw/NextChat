@@ -62,8 +62,6 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		//==============
 
 		const fetchMessages = async () => {
-
-
 			const recent = await getRecentMessages(roomId);
 			setMessages((prev) => [...prev, ...recent]);
 			setInitialLoading(false);
@@ -214,13 +212,13 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	return (
 		<>
 			<div
-				className="flex flex-1 max-h-[calc(100vh-33px)] overflow-hidden flex-col shadow-md bg-contrast 
+				className="flex flex-1 min-lg:max-h-[calc(100vh-33px)] overflow-hidden flex-col shadow-md bg-contrast 
 			"
 			>
 				<ChatProvider config={{ setMessages, messages, roomId, user, containerRef, isBlocked }}>
 					<div
 						ref={containerRef}
-						className="flex-1 h-full flex flex-col overflow-y-scroll py-4 px-1 pb-10"
+						className="flex-1 h-full flex flex-col overflow-y-scroll py-4 px-1 pb-10 has-scroll-container"
 						// className="flex-1 min-h-0 flex flex-col overflow-y-auto py-4 pb-10"
 					>
 						{type === "dm" && recipient && (

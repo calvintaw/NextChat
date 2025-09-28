@@ -33,25 +33,25 @@ const UserPanel = ({ user }: Props) => {
 
 	return (
 		<div
-			className="@container !absolute max-lg:max-w-11 !bottom-4.5 !left-2 !right-2.5 z-40
+			className="@container !absolute !bottom-4.5 !left-2 !right-2.5 z-40
 
-		max-lg:[#sidebar.active_&]:!w-81
+		max-lg:[#sidebar.active_&]:!min-w-78
 		max-lg:[#sidebar.active_&]:!max-w-81
-		
+		max-sm:[#sidebar.active_&]:!w-[300px]
 		"
 		>
-			<div className="hidden [#sidebar.active_&]:!flex @min-[300px]:flex p-1 bg-surface rounded-lg border-2 border-contrast items-center gap-1">
-				<div className=" @min-[300px]:pl-1 @min-[300px]:w-fit w-full flex items-center justify-center">
+			<div className="hidden [#sidebar.active_&]:!flex @min-[200px]:flex p-1 bg-surface rounded-lg border-2 border-contrast items-center gap-1">
+				<div className=" @min-[200px]:pl-1 @min-[200px]:w-fit w-full flex items-center justify-center">
 					<Avatar id={user.id} status={isOnline} src={user.image} displayName={user.displayName}></Avatar>
 				</div>
 				<div
-					className="hidden [#sidebar.active_&]:!flex @min-[300px]:flex flex-1
+					className="hidden [#sidebar.active_&]:!flex @min-[200px]:flex flex-1
 				
 				
 				
 				[#sidebar.active_&]:!py-1
 				[#sidebar.active_&]:!pr-1
-				@min-[300px]:py-1 @min-[300px]:pr-1"
+				@min-[200px]:py-1 @min-[200px]:pr-1"
 				>
 					<div className="  ml-2 flex flex-1 flex-col justify-center overflow-hidden ">
 						<p className="text-sm font-semibold text-text truncate max-w-35 leading-tight">{user.displayName}</p>
@@ -62,7 +62,7 @@ const UserPanel = ({ user }: Props) => {
 			</div>
 
 			<DropdownMenu.Root modal={false}>
-				<DropdownMenu.Trigger asChild className="@min-[300px]:hidden [#sidebar.active_&]:!hidden">
+				<DropdownMenu.Trigger asChild className="@min-[200px]:hidden [#sidebar.active_&]:!hidden">
 					<button className="flex items-center justify-center w-full -mt-12.5 bg-transparent  p-0">
 						<Avatar id={user.id} status={isOnline} src={user.image} displayName={user.displayName}></Avatar>
 					</button>

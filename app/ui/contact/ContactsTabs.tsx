@@ -22,6 +22,9 @@ import Search from "../general/Search";
 import { ContactPreviewContainer } from "./ContactCard";
 import { User } from "@/app/lib/definitions";
 import { ImSpinner9 } from "react-icons/im";
+import { RiLoader2Fill } from "react-icons/ri";
+import { RiLoader4Line } from "react-icons/ri";
+import { BiLoaderAlt } from "react-icons/bi";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
 type friendRequestsType = { sent: User[]; incoming: User[] };
@@ -57,7 +60,8 @@ const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTa
 	const [request, formAction, isPending] = useActionState(
 		async (prevState: { success: boolean; message: string }, formData: FormData) => {
 			const result = await requestFriendship(prevState, formData);
-			if (result.success) {
+			if (result.success && result.targetUser) {
+				socket.emit("refresh-contacts-page", user.id, result.targetUser.id);
 				setFriendRequests((prev) => ({
 					incoming: [...prev.incoming],
 					sent: [...prev.sent, { ...result.targetUser! }],
@@ -82,6 +86,7 @@ const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTa
 	const friendsCount = contacts.length;
 
 	useEffect(() => {
+		socket.emit("join", user.id);
 		async function refrechContactsPage() {
 			console.log("revcieved socket! refresh-contacts-page");
 			// console.log("refetching contacts");
@@ -93,6 +98,7 @@ const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTa
 		socket.on(`refresh-contacts-page`, refrechContactsPage);
 		return () => {
 			socket.off(`refresh-contacts-page`, refrechContactsPage);
+			socket.disconnect();
 		};
 	}, []);
 
@@ -185,7 +191,7 @@ const AddContactTab = ({ formAction, addFriendInputRef, request, isPending }: Ad
 								bg-primary btn-with-icon opacity-65 group-focus-within:opacity-100 hover:bg-primary/75 active:bg-primary/50 py-1 sm:py-1.5 px-2 sm:px-3 text-[0.938rem] text-white rounded-md sm:rounded-lg sm:mr-0.5"
 							>
 								{isPending ? "Sending Friend Request" : "Send Friend Request"}
-								{isPending && <ImSpinner9 className="animate-spin"></ImSpinner9>}
+								{true && <BiLoaderAlt className="animate-spin text-lg"></BiLoaderAlt>}
 							</button>
 						</>
 					}
@@ -198,7 +204,7 @@ const AddContactTab = ({ formAction, addFriendInputRef, request, isPending }: Ad
 								bg-primary btn-with-icon opacity-65 group-focus-within:opacity-100 hover:bg-primary/75 active:bg-primary/50 py-1 sm:py-1.5 px-2 sm:px-3 text-[0.938rem] text-white rounded-md sm:rounded-lg sm:mr-0.5"
 				>
 					{isPending ? "Sending Friend Request" : "Send Friend Request"}
-					{isPending && <ImSpinner9 className="animate-spin"></ImSpinner9>}
+					{isPending && <BiLoaderAlt className="animate-spin text-lg"></BiLoaderAlt>}
 				</button>
 			</form>
 
@@ -244,9 +250,10 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 				setError(result.message);
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
-				// router.refresh();
 				// local ui instant updates
 
+				router.refresh();
+				socket.emit("refresh-contacts-page", user.id, friend.id);
 				setFriendRequests((prev) => ({
 					...prev,
 					incoming: prev.incoming.filter((req) => req.id !== friend.id),
@@ -270,9 +277,9 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 				setError(result.message);
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
-				// router.refresh();
 				// local ui instant updates
-
+				router.refresh();
+				socket.emit("refresh-contacts-page", user.id, friend.id);
 				setFriendRequests((prev) => ({
 					...prev,
 					[type]: prev[type].filter((req) => req.id !== friend.id),
@@ -337,7 +344,7 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 				{error && <p className="text-error text-sm my-2">{error}</p>}
 			</div>
 
-			<div className="flex flex-col p-2 px-0 pr-1 h-full overflow-y-scroll fade-bg-bottom pb-[100px]">
+			<div className="flex flex-col p-2 px-0 pr-1 h-full overflow-y-scroll has-scroll-container fade-bg-bottom pb-[100px]">
 				{friendRequests.incoming.length !== 0 && filter !== "sent" && (
 					<>
 						<div className="flex flex-col gap-2">
@@ -358,7 +365,20 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 									</div>
 
 									<div className={clsx("flex-1 text-center", filter !== "all" && "hidden")}>
-										<p className="text-muted text-sm">incoming</p>
+										<p
+											className={clsx(
+												"text-muted text-sm w-fit flex flex-col",
+												isPending.has(friend.id) && "-mb-1.5 mt-1.5"
+											)}
+										>
+											incoming
+											{isPending.has(friend.id) && (
+												<span className="text-sm text-muted flex items-center justify-center gap-1">
+													<BiLoaderAlt className="animate-spin"></BiLoaderAlt>
+													syncing
+												</span>
+											)}
+										</p>
 									</div>
 
 									<div className="flex gap-2 min-w-18 justify-end">
@@ -414,7 +434,20 @@ const RequestTab = ({ user, friendRequests, setFriendRequests }: RequestTabProps
 									</div>
 
 									<div className={clsx("flex-1 text-center", filter !== "all" && "hidden")}>
-										<p className="text-muted text-sm">sent</p>
+										<p
+											className={clsx(
+												"text-muted w-fit text-sm flex flex-col",
+												isPending.has(friend.id) && "-mb-1.5 mt-1.5"
+											)}
+										>
+											sent
+											{isPending.has(friend.id) && (
+												<span className="text-sm text-muted flex items-center justify-center gap-1">
+													<BiLoaderAlt className="animate-spin"></BiLoaderAlt>
+													syncing
+												</span>
+											)}
+										</p>
 									</div>
 
 									<div className="flex gap-2 min-w-18 justify-end">

@@ -12,6 +12,7 @@ import { FormState } from "@/app/lib/definitions";
 import { ImSpinner9 } from "react-icons/im";
 
 import { useRouter } from "next/navigation";
+import { BiLoaderAlt } from "react-icons/bi";
 
 const Page = () => {
 	const [data, setData] = useState<FormState>({ errors: {}, message: "" });
@@ -84,7 +85,7 @@ const Page = () => {
 						className="mt-8 mb-2 py-2 bg-primary hover:bg-primary/80 w-full items-center justify-center btn-with-icon"
 					>
 						{isPending ? "Creating account..." : "Create Account"}
-						{isPending && <ImSpinner9 className="animate-spin"></ImSpinner9>}
+						{isPending && <BiLoaderAlt className="animate-spin text-lg"></BiLoaderAlt>}
 					</Button>
 					<p className="text-muted text-sm">
 						Already have an account?{" "}

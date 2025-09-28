@@ -708,6 +708,7 @@ export async function requestFriendship(
 ): Promise<{ success: boolean; message: string; targetUser?: User }> {
 	return withCurrentUser(async (currentUser: User) => {
 		try {
+			socket.emit("join", currentUser.id);
 			const username = z.string().min(1).parse(formData.get("username"));
 			console.log("Sarting friendship request. Console log");
 
@@ -735,7 +736,7 @@ export async function requestFriendship(
 			});
 
 			console.log(`Success! Your friend requests to ${username} was sent.`);
-			socket.emit("refresh-contacts-page", currentUser.id, targetUser.id);
+			// socket.emit("refresh-contacts-page", currentUser.id, targetUser.id);
 
 			return {
 				success: true,
@@ -767,6 +768,7 @@ export async function removeFriendshipRequest(
 ): Promise<{ success: boolean; message: string }> {
 	return withCurrentUser(async (currentUser: User) => {
 		try {
+			socket.emit("join", currentUser.id);
 			console.log("Starting friendship cancel.");
 
 			const [user1_id, user2_id] = [targetUser.id, currentUser.id].sort((a, b) => a.localeCompare(b));
@@ -779,7 +781,7 @@ export async function removeFriendshipRequest(
 			});
 
 			console.log(`Success! Removed friend request to ${targetUser.username}.`);
-			socket.emit("refresh-contacts-page", currentUser.id, targetUser.id);
+			// socket.emit("refresh-contacts-page", currentUser.id, targetUser.id);
 
 			return { success: true, message: `Removed friend request to ${targetUser.username}.` };
 		} catch (error) {
@@ -853,6 +855,7 @@ export async function unblockFriendship(
 export async function acceptFriendshipRequest(targetUser: User): Promise<{ success: boolean; message: string }> {
 	return withCurrentUser(async (currentUser: User) => {
 		try {
+			socket.emit("join", currentUser.id);
 			console.log("Starting friendship accept...");
 
 			const room_id = getDMRoom(targetUser.id, currentUser.id);
@@ -882,7 +885,7 @@ export async function acceptFriendshipRequest(targetUser: User): Promise<{ succe
 			});
 
 			console.log(`Success! Accepted friend request from ${targetUser.username}.`);
-			socket.emit("refresh-contacts-page", currentUser.id, targetUser.id);
+			// socket.emit("refresh-contacts-page", currentUser.id, targetUser.id);
 
 			return {
 				success: true,
@@ -955,6 +958,7 @@ export async function editMsg({
 }): Promise<{ success: true; message: string } | { success: false; error: any; message: string }> {
 	return withCurrentUser(async (user: User) => {
 		try {
+			socket.emit("join", user.id);
 			await sql.begin(async (tx) => {
 				await tx`
 				UPDATE messages
@@ -983,24 +987,24 @@ export async function addReactionToMSG({
 	emoji: string;
 }): Promise<{ success: true; message: string } | { success: false; error: any; message: string }> {
 	try {
+		socket.emit("join", userId);
+
 		await sql.begin(async (tx) => {
 			await tx`
-UPDATE messages
-SET reactions = jsonb_set(
-    reactions,
-    ARRAY[${emoji}],
-    (
-        SELECT to_jsonb(array_agg(DISTINCT elem))
-        FROM (
-            SELECT jsonb_array_elements_text(COALESCE(reactions->${emoji}, '[]'::jsonb)) AS elem
-            UNION ALL
-            SELECT ${userId}  -- add userId
-        ) t
-    )
-)
-WHERE id = ${id};
-
-
+				UPDATE messages
+				SET reactions = jsonb_set(
+						reactions,
+						ARRAY[${emoji}],
+						(
+								SELECT to_jsonb(array_agg(DISTINCT elem))
+								FROM (
+										SELECT jsonb_array_elements_text(COALESCE(reactions->${emoji}, '[]'::jsonb)) AS elem
+										UNION ALL
+										SELECT ${userId}
+								) 
+						)
+				)
+				WHERE id = ${id};
 			`;
 		});
 
@@ -1025,6 +1029,8 @@ export async function removeReactionFromMSG({
 	emoji: string;
 }): Promise<{ success: true; message: string } | { success: false; error: any; message: string }> {
 	try {
+		socket.emit("join", userId);
+
 		await sql.begin(async (tx) => {
 			await tx`
 UPDATE messages

@@ -58,6 +58,7 @@ export const PathBanner = () => {
 			border-contrast
 			max-lg:border-l
 			max-lg:left-15.5
+			max-sm:left-13
 			"
 		>
 			{banner}

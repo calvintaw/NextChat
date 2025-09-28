@@ -54,6 +54,7 @@ export const ContactPreviewContainer = ({ user, contacts }: { user: User; contac
 				setError(result.message);
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
+				socket.emit("refresh-contacts-page", user.id, friend.id);
 				setLocalContacts((prev) => prev.filter((req) => req.id !== friend.id));
 				toast({ title: "Success!", mode: "positive", subtitle: result.message });
 			}
@@ -172,6 +173,7 @@ export const ContactPreview = ({
 					</IconWithSVG>
 
 					<IconWithSVG
+						id="remove-friend-btn-contact-card"
 						title={isPending ? "Syncing with server" : ""}
 						disabled={isPending}
 						onClick={(e) => {

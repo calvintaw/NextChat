@@ -1,5 +1,5 @@
 "use client";
-import React, {useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { IoMdClose, IoMdGlobe, IoMdPeople } from "react-icons/io";
 import { FiPlus } from "react-icons/fi";
@@ -21,10 +21,11 @@ import clsx from "clsx";
 import { MdMotionPhotosOff } from "react-icons/md";
 import useToggle from "../../lib/hooks/useToggle";
 import { ImSpinner9 } from "react-icons/im";
-import {supabase} from "@/app/lib/supabase";
+import { supabase } from "@/app/lib/supabase";
 import imageCompression from "browser-image-compression";
 import { nanoid } from "nanoid";
 import { useRouter } from "next/navigation";
+import { BiLoaderAlt } from "react-icons/bi";
 
 type FormState = {
 	errors: Record<string, string[]>;
@@ -42,13 +43,12 @@ export default function CreateServerFormDialog({ className, user }: { className:
 		success: false,
 	});
 
-
 	const [isPending, setIsPending] = useState(false);
-	const router = useRouter()
+	const router = useRouter();
 
 	const [uploaded, setUploaded] = useState<string>("");
-		const [selectedFile, setSelectedFile] = useState<File | null>(null);
-		const [publicImgUrl, setPublicImgUrl] = useState("");
+	const [selectedFile, setSelectedFile] = useState<File | null>(null);
+	const [publicImgUrl, setPublicImgUrl] = useState("");
 	const handleSubmit = async () => {
 		setIsPending(true);
 		const form = formRef.current;
@@ -62,48 +62,46 @@ export default function CreateServerFormDialog({ className, user }: { className:
 		formData.set("server_image", url);
 		const data = await createServer(formData);
 		if (data.success) {
-			router.refresh()
+			router.refresh();
 		}
-		setResult(data)
+		setResult(data);
 		setIsPending(false);
-		setOpen(false)
-		form?.reset()
+		setOpen(false);
+		form?.reset();
 	};
 
-
-		async function uploadAndGetURL() {
-			if (selectedFile === null) {
-				alert("Please select a file first.");
-				return publicImgUrl;
-			}
-	
-			try {
-				const options = {
-					maxSizeMB: 0.5,
-					maxWidthOrHeight: 500,
-					useWebWorker: true,
-				};
-	
-				const compressedFile = await imageCompression(selectedFile, options);
-
-				const filename = `${nanoid()}.${compressedFile.name.split(".").pop()}`;
-				const { data, error } = await supabase.storage.from("uploads").upload(filename, compressedFile);
-				if (error) throw error;
-	
-				const { data: publicData } = supabase.storage.from("uploads").getPublicUrl(data?.path || "");
-	
-				if (publicData?.publicUrl) {
-					return publicData.publicUrl
-				}
-
-				setUploaded("");
-				return ""
-			} catch (err) {
-				console.error("Upload error:", err);
-				return "";
-			}
+	async function uploadAndGetURL() {
+		if (selectedFile === null) {
+			alert("Please select a file first.");
+			return publicImgUrl;
 		}
 
+		try {
+			const options = {
+				maxSizeMB: 0.5,
+				maxWidthOrHeight: 500,
+				useWebWorker: true,
+			};
+
+			const compressedFile = await imageCompression(selectedFile, options);
+
+			const filename = `${nanoid()}.${compressedFile.name.split(".").pop()}`;
+			const { data, error } = await supabase.storage.from("uploads").upload(filename, compressedFile);
+			if (error) throw error;
+
+			const { data: publicData } = supabase.storage.from("uploads").getPublicUrl(data?.path || "");
+
+			if (publicData?.publicUrl) {
+				return publicData.publicUrl;
+			}
+
+			setUploaded("");
+			return "";
+		} catch (err) {
+			console.error("Upload error:", err);
+			return "";
+		}
+	}
 
 	const tabRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
@@ -112,7 +110,6 @@ export default function CreateServerFormDialog({ className, user }: { className:
 	const [activeTab, setActiveTab] = useState("default");
 	const [direction, setDirection] = useState<"forward" | "backward">("forward");
 	const [serverType, setServerType] = useState<"public" | "private">("private");
-
 
 	const handleTabChange = (value: string) => {
 		const prevIndex = tabOrder.indexOf(activeTab);
@@ -380,7 +377,12 @@ export default function CreateServerFormDialog({ className, user }: { className:
 							</div>
 
 							<form aria-disabled={isPending} ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-2">
-								<ServerImageUploadBtn uploaded={uploaded} setUploaded={setUploaded} publicImgUrl={publicImgUrl} setSelectedFile={setSelectedFile}></ServerImageUploadBtn>
+								<ServerImageUploadBtn
+									uploaded={uploaded}
+									setUploaded={setUploaded}
+									publicImgUrl={publicImgUrl}
+									setSelectedFile={setSelectedFile}
+								></ServerImageUploadBtn>
 								<InputField
 									disabled={isPending}
 									defaultValue={`${user?.displayName}'s server`}
@@ -413,7 +415,7 @@ export default function CreateServerFormDialog({ className, user }: { className:
 										className="btn btn-primary btn-with-icon disabled:pointer-events-none"
 									>
 										{isPending ? "Creating" : "Create Server"}
-										{isPending && <ImSpinner9 className="animate-spin"></ImSpinner9>}
+										{isPending && <BiLoaderAlt className="animate-spin text-lg"></BiLoaderAlt>}
 									</button>
 								</div>
 							</form>

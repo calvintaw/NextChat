@@ -12,6 +12,7 @@ import InputField, { PasswordField } from "./InputField";
 import { clsx } from "clsx";
 import { ImSpinner9 } from "react-icons/im";
 import { Route } from "next";
+import { BiLoaderAlt } from "react-icons/bi";
 
 export const AuthFormWrapper = ({ className, children }: { className?: string; children: React.ReactNode }) => {
 	return (
@@ -68,7 +69,7 @@ export default function AuthForm() {
 					className="my-4 py-2 bg-primary hover:bg-primary/80 w-full btn-with-icon"
 				>
 					{isPending ? "Signing up" : "Sign up"}
-					{isPending && <ImSpinner9 className="animate-spin"></ImSpinner9>}
+					{isPending && <BiLoaderAlt className="animate-spin text-lg"></BiLoaderAlt>}
 				</Button>
 
 				<p className="text-muted text-sm">
@@ -90,12 +91,19 @@ export default function AuthForm() {
 	);
 }
 
-
 export const TermsAndServices = () => {
 	return (
 		<div className="flex items-center gap-2 text-muted mt-1 ml-0.5 text-sm">
-			<input type="checkbox" defaultChecked name="term-services-agree" className="form-checkbox size-4.5 rounded-sm transform" />I agree to the
-			<Link href={"/terms_and_services" as Route} className="text-primary hover:underline cursor-pointer -ml-1">Terms and Conditions</Link>	
+			<input
+				type="checkbox"
+				defaultChecked
+				name="term-services-agree"
+				className="form-checkbox size-4.5 rounded-sm transform"
+			/>
+			I agree to the
+			<Link href={"/terms_and_services" as Route} className="text-primary hover:underline cursor-pointer -ml-1">
+				Terms and Conditions
+			</Link>
 		</div>
 	);
 };

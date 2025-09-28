@@ -16,6 +16,7 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { AuthFormWrapper, TermsAndServices, AuthOptions } from "@/app/ui/form/AuthForm";
 import { ImSpinner9 } from "react-icons/im";
+import { BiLoaderAlt } from "react-icons/bi";
 
 const images = [
 	{
@@ -93,7 +94,7 @@ function LoginForm() {
 					className="mt-8 mb-4 py-2 bg-primary hover:bg-primary/80 w-full btn-with-icon justify-center"
 				>
 					{isPending ? "Logging in" : "Log in"}
-					{isPending && <ImSpinner9 className="animate-spin"></ImSpinner9>}
+					{isPending && <BiLoaderAlt className="animate-spin text-lg"></BiLoaderAlt>}
 				</Button>
 
 				<p className="text-muted text-sm">

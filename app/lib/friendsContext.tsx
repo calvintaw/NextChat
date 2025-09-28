@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { createContext, useState, useContext, ReactNode } from "react";
 import { ChatType } from "./definitions";
 

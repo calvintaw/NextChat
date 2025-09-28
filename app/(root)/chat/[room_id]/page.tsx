@@ -14,7 +14,6 @@ export default async function Page({ params }: { params: Promise<{ room_id: stri
 	const recipientId = decodedRoomId.split(":").filter((str) => str !== currentUser.id && str !== "@me")[0];
 	const recipient = await getUser(recipientId);
 	if (!recipient) return null;
-	console.log("decoded ROOMID: ", decodedRoomId);
 
 	return <Chatbox roomId={decodedRoomId} type="dm" recipient={recipient} user={currentUser}></Chatbox>;
 } 

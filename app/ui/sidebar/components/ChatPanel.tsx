@@ -9,14 +9,17 @@ const ChatPanel = async ({ user }: { user: User }) => {
 			id="chat-panel"
 			className="
     min-w-[280px] flex-col flex-1 h-full max-h-[90vh]  pb-40 p-2 px-2.5 pr-0.5 overflow-y-scroll gap-1.5 
-		border-contrast
 		border
+		border-contrast
 		border-r-0
 		lg:rounded-tl-2xl
     absolute left-15.75
+		max-sm:left-13
 		bottom-0
 		max-lg:border-border
-		-translate-x-[calc(100%+64px)] z-30 bg-background 
+		-translate-x-[calc(100%+64px)]
+		[#sidebar.active_&]:translate-x-0
+		z-30 bg-background 
     lg:static lg:translate-x-0 lg:flex lg:z-auto lg:bg-transparent 
     
     sidebar-scrollbar

@@ -811,13 +811,16 @@ html {
 
 @media (max-width: 1023px) {
 	#sidebar.active #chat-panel {
-		transform: translateX(calc(100% + 3.938rem)) !important;
+		/* transform: translateX(calc(100% + 3.938rem)) !important; */
 		top: 40px;
 		max-height: calc(100vh - 40px) !important;
 	}
 
 	#sidebar.active #nav-bar {
 		z-index: 10;
+	}
+	body:has(#sidebar.active) .has-scroll-container {
+		overflow-y: hidden;
 	}
 
 	body:has(#sidebar.active)::after {
@@ -829,7 +832,6 @@ html {
 		height: 100vh;
 		background: rgba(0, 0, 0, 0.75);
 		z-index: 5;
-		pointer-events: none;
 	}
 
 	body:has(#sidebar.active) #path-banner {

@@ -16,6 +16,7 @@ import { nanoid } from "nanoid";
 import { supabase } from "../lib/supabase";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
+import { BiLoaderAlt } from "react-icons/bi";
 
 type EditProfileState = {
 	errors: Record<string, string[]>;
@@ -181,7 +182,7 @@ const DashboardPage = ({ initialUser }: { initialUser: User }) => {
 											type="submit"
 										>
 											{isPending ? "Saving..." : "Save Changes"}
-											{isPending && <ImSpinner9 className="animate-spin" />}
+											{isPending && <BiLoaderAlt className="animate-spin text-lg" />}
 										</Button>
 									</div>
 								</form>

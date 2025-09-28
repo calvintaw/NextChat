@@ -35,6 +35,8 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 	}, [chats]);
 
 	useEffect(() => {
+		socket.emit("join", user.id);
+
 		async function refetchContacts() {
 			const newContacts = await getChats(user.id);
 			setLocalChats(newContacts);
@@ -44,6 +46,7 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 
 		return () => {
 			socket.off(`refresh-contacts-page`, refetchContacts);
+			socket.disconnect();
 		};
 	}, []);
 	const toast = useToast();
@@ -131,6 +134,7 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 
 										if (result.success) {
 											router.refresh();
+											socket.emit("refresh-contacts-page", user.id, selectedChat.id);
 											toast({
 												title: "",
 												mode: "positive",
