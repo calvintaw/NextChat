@@ -15,6 +15,10 @@
 	height: 100%;
 }
 
+.disable-stars-bg .bg-animation {
+	display: none;
+}
+
 #stars {
 	width: 1px;
 	height: 1px;

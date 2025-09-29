@@ -29,6 +29,9 @@ export const metadata: Metadata = {
 	title: "NextChat | auth",
 	description:
 		"NextChat - A Discord-inspired chat app with real-time messaging, servers, reactions, image uploads, and profile customization. | Created By calvintaw",
+	icons: {
+		icon: "/logo.svg",
+	},
 };
 
 export default async function RootLayout({

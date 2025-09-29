@@ -21,7 +21,7 @@ interface ChatProviderProps {
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
-export const ChatProvider = ({ children, config = {} }: ChatProviderProps) => {
+const ChatProvider = ({ children, config = {} }: ChatProviderProps) => {
 	const [input, setInput] = useState("");
 	const [replyToMsg, setReplyToMsg] = useState<MessageType | null>(null);
 	const [msgToEdit, setMsgToEdit] = useState<string | null>(null);

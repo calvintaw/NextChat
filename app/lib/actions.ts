@@ -24,6 +24,7 @@ import { newsData } from "./news";
 import { socket } from "./socket";
 import console, { error } from "console";
 import { cookies } from "next/headers";
+import { io } from "socket.io-client";
 
 // Utility for easy access to the currently authenticated user.
 // Functions using this tool could be refactored to not depend on it if needed.
@@ -142,13 +143,17 @@ export async function getContacts(currentUserId: string): Promise<ContactType[]>
 }
 
 interface GetMessagesOptions {
-	sortOrder?: "ASC" | "DESC"; // defaults to ASC
-	offset?: number; // defaults to 0
+	cursor?: string; // defaults to 0
 	limit?: number; // optional, number of messages to fetch
 }
 
 export async function getRecentMessages(room_id: string, options: GetMessagesOptions = {}) {
-	const { sortOrder = "ASC", offset = 0, limit } = options;
+	const { cursor = "", limit = 15 } = options;
+
+	let where = sql`m.room_id = ${room_id}`;
+	if (cursor) {
+		where = sql`${where} AND m.created_at < ${cursor}`;
+	}
 
 	return (await sql`
     SELECT 
@@ -164,9 +169,46 @@ export async function getRecentMessages(room_id: string, options: GetMessagesOpt
       m.replyTo AS "replyTo"
     FROM messages m
     JOIN users ON m.sender_id = users.id
-    WHERE m.room_id = ${room_id}
-    ORDER BY m.created_at ASC
+    WHERE ${where}
+    ORDER BY m.created_at DESC
+		LIMIT ${limit} 
+		
   `) as MessageType[];
+}
+
+type LocalMessageType = Omit<MessageType, "id" | "createdAt"> & {
+	room_id: string;
+};
+
+export async function insertMessageInDB(msg: LocalMessageType): Promise<{ success: boolean; message?: string }> {
+	try {
+		await sql.begin(async (sql) => {
+			const results = await sql`
+					INSERT INTO messages (room_id, sender_id, content, type, replyTo)
+					VALUES (${msg.room_id}, ${msg.sender_id}, ${msg.content}, ${msg.type}, ${msg.replyTo})
+					RETURNING id, created_at
+				`;
+
+			const { id, created_at: createdAt } = results[0];
+			const insertedMsg = { ...msg, id, createdAt, synced: true };
+
+			if (msg.room_id.startsWith("system-room")) {
+				socket.emit("system", insertedMsg);
+			} else {
+				socket.emit("message", insertedMsg);
+			}
+
+			console.log("Sent:", { name: msg.sender_display_name, msg: msg.content });
+		});
+
+		return { success: true };
+	} catch (error) {
+		console.error("insertMessageInDB ERROR:", error);
+		return {
+			success: false,
+			message: "Failed to send message. Please try again.",
+		};
+	}
 }
 
 export async function getServer(id: string): Promise<Room[]> {

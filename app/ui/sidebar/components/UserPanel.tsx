@@ -87,6 +87,18 @@ const UserPanel = ({ user }: Props) => {
 };
 
 const Buttons = () => {
+	const [enabled, setEnabled] = useState(true);
+
+	useEffect(() => {
+		setEnabled(!document.documentElement.classList.contains("disable-stars-bg"));
+	}, []);
+
+	const handleToggle = () => {
+		if (typeof window === "undefined") return;
+		document.documentElement.classList.toggle("disable-stars-bg");
+		setEnabled(!document.documentElement.classList.contains("disable-stars-bg"));
+	};
+
 	return (
 		<>
 			<span data-tooltip-id="tooltip-darkmode">
@@ -97,11 +109,11 @@ const Buttons = () => {
 			</span>
 
 			<span data-tooltip-id="tooltip-settings">
-				<IconWithSVG className="!size-9 group hover:bg-background">
+				<IconWithSVG className="!size-9 group hover:bg-background" onClick={handleToggle}>
 					<IoMdSettings className="group-hover:animate-spin-delay" />
 				</IconWithSVG>
 				<Tooltip offset={15} className="my-tooltip" id="tooltip-settings" place="top" border={`var(--tooltip-border)`}>
-					<span>Settings {`(Coming soon)`}</span>
+					<span>{enabled ? "Disable" : "Enable"} stars background</span>
 				</Tooltip>
 			</span>
 

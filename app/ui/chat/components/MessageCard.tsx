@@ -13,6 +13,7 @@ import { flushSync } from "react-dom";
 import { useToast } from "@/app/lib/hooks/useToast";
 import { RxCross1, RxCross2 } from "react-icons/rx";
 import { IconWithSVG } from "../../general/Buttons";
+import { BiLoaderAlt } from "react-icons/bi";
 
 type MessageCardType = {
 	msg: MessageType;
@@ -21,14 +22,10 @@ type MessageCardType = {
 };
 
 const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
-	const msg_date = getLocalTimeString(msg.createdAt);
+	const msg_date = getLocalTimeString(msg.createdAt, { hour: "numeric", minute: "numeric", hour12: true });
 	const editInputRef = useRef<HTMLInputElement | null>(null);
 	const { msgToEdit, messages, setMessages, setMsgToEdit, roomId, replyToMsg } = useChatProvider();
 	const toast = useToast();
-
-	useEffect(() => {
-		console.log("MSG TO EDIT ID:", msgToEdit);
-	}, [msgToEdit]);
 
 	const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -183,9 +180,9 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 							<>
 								<div
 									className="max-sm:hidden w-11 h-auto font-mono text-center whitespace-nowrap text-nowrap flex items-center justify-center text-[11px] text-muted -z-50 group-hover:z-0"
-									title={getLocalTimeString(msg.createdAt, { hour: "numeric", minute: "numeric", hour12: true })}
+									title={msg_date}
 								>
-									{getLocalTimeString(msg.createdAt, { hour: "numeric", minute: "numeric", hour12: true })}
+									{msg_date}
 								</div>
 								<div className="min-sm:hidden"></div>
 							</>
@@ -193,7 +190,7 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 
 						{msg.type === "text" &&
 							(msgToEdit !== msg.id ? (
-								<div className="w-full flex max-sm:justify-between">
+								<div className="w-full flex max-sm:justify-between relative">
 									<div
 										className={clsx(
 											"relative max-w-full break-words break-all whitespace-pre-wrap text-sm",
@@ -210,10 +207,27 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 											"min-sm:hidden w-11 h-auto font-mono text-center whitespace-nowrap text-nowrap flex items-center justify-center text-[11px] text-muted -z-50 group-hover:z-0",
 											isFirstGroup && "hidden"
 										)}
-										title={getLocalTimeString(msg.createdAt, { hour: "numeric", minute: "numeric", hour12: true })}
+										title={msg_date}
 									>
-										{getLocalTimeString(msg.createdAt, { hour: "numeric", minute: "numeric", hour12: true })}
+										{msg_date} {typeof msg.synced === "boolean" && msg.synced && "✅"}
+										{typeof msg.synced === "boolean" && !msg.synced && "❌"}
+										{msg.synced === "pending" && "⌛"}
 									</div>
+
+									{msg.synced && (
+										<p
+											className="
+											max-sm:hidden
+											flex gap-0.5 items-center h-fit w-fit m-0 p-0 text-muted absolute -bottom-1 right-0
+										text-[11px] -z-50 group-hover:z-0
+										"
+										>
+											{typeof msg.synced === "boolean" && msg.synced && "sent ✅"}
+											{typeof msg.synced === "boolean" && !msg.synced && "failed ❌"}
+											{msg.synced === "pending" && "sending ⌛"}
+											{/* <BiLoaderAlt className="animate-spin"></BiLoaderAlt> */}
+										</p>
+									)}
 								</div>
 							) : (
 								<form onSubmit={handleEditSubmit} className="w-full">

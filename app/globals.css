@@ -668,6 +668,10 @@ html {
 	display: inline-block;
 }
 
+.wave-strong {
+	animation: wave_strong 1.2s infinite ease-in-out;
+}
+
 /* Delay for individual dots to create waving effect */
 .typing-dot:nth-child(1) {
 	animation-delay: 0s;

@@ -13,6 +13,8 @@ import { IconWithSVG } from "../../general/Buttons";
 import { useMessageLimiter } from "@/app/lib/hooks/useMsgLimiter";
 import { v4 as uuidv4 } from "uuid";
 import useEventListener from "@/app/lib/hooks/useEventListener";
+import { insertMessageInDB } from "@/app/lib/actions";
+import { useToast } from "@/app/lib/hooks/useToast";
 
 type ChatInputBoxProps = {
 	activePersons: string[];
@@ -36,12 +38,13 @@ const ChatInputBox = ({
 	const { input, setInput, replyToMsg, setReplyToMsg, textRef } = useChatProvider();
 	const [style, setStyle] = useState("!max-h-10");
 	const [isFocused, setIsFocused] = useState(false);
-	const { canSendMessage } = useMessageLimiter(18, 60_000);
+	const { canSendMessage } = useMessageLimiter(25, 60_000);
 	const { trigger, cancel } = useDebounce({
 		startCallback: () => socket.emit("typing started", roomId, user.displayName),
 		endCallback: () => socket.emit("typing stopped", roomId),
 		delay: 2000,
 	});
+	const toast = useToast();
 
 	useEffect(() => {
 		setStyle("min-h-10");
@@ -60,7 +63,7 @@ const ChatInputBox = ({
 		};
 	}, [trigger]);
 
-	const sendMessage = (input: string, type: MessageContentType = "text") => {
+	const sendMessage = async (input: string, type: MessageContentType = "text") => {
 		if (isBlocked) return;
 		const tempId = uuidv4();
 		tempIdsRef.current.add(tempId);
@@ -74,14 +77,11 @@ const ChatInputBox = ({
 			content: input,
 			type,
 			replyTo: replyToMsg ? replyToMsg.id : null,
+			edited: false,
+			reactions: {},
 		};
 
 		cancel(750); // stop the typing animation
-		if (roomId.startsWith("system-room")) {
-			socket.emit("system", temp_msg);
-		} else {
-			socket.emit("message", temp_msg);
-		}
 
 		setMessages((prev) => {
 			return [
@@ -92,11 +92,18 @@ const ChatInputBox = ({
 					type,
 					id: tempId,
 					createdAt: new Date().toISOString(),
-					edited: false,
-					reactions: {},
+					synced: "pending",
 				},
 			];
 		});
+
+		const result = await insertMessageInDB(temp_msg);
+		if (!result.success && result.message) {
+			toast({ title: result.message, subtitle: "", mode: "negative" });
+			setMessages((prev) => prev.map((msg) => (msg.id === tempId ? { ...msg, synced: false } : msg)));
+		} else if (result.success) {
+			setMessages((prev) => prev.map((msg) => (msg.id === tempId ? { ...msg, synced: true } : msg)));
+		}
 	};
 
 	const handleFileUpload = (url: string[], type: "image" | "video") => {

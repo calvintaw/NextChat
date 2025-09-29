@@ -39,7 +39,6 @@ const NavigationSections = [
 
 const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: Room[] }) => {
 	const pathname = usePathname();
-	console.log("pathname: ", pathname);
 	const nav_icon_styles =
 		"group hover:bg-primary not-dark:hover:bg-foreground border-2 border-transparent max-sm:!rounded-lg !rounded-xl max-sm:!size-10 !size-11.5";
 

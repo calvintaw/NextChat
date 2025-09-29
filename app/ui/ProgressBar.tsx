@@ -70,7 +70,6 @@ export default function ProgressBar() {
 	// When pathname changes → navigation finished → stop NProgress
 	useEffect(() => {
 		if (!pathname) return;
-		console.log("pathname:", pathname);
 		NProgress.done();
 	}, [pathname]);
 

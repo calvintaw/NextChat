@@ -32,12 +32,12 @@ const ChatMessages = ({ messages, deleteMessage }: { messages: MessageType[]; de
 
 			{!isBlocked &&
 				messages.map((msg, i) => {
-					const prevMsg = messages[i - 1];
+					const prevMsg = i - 1 >= 0 ? messages[i - 1] : null;
 					const isFirstGroup =
-						i === 0 ||
-						prevMsg.sender_id !== msg.sender_id ||
-						(prevMsg && dayjs(msg.createdAt).diff(dayjs(prevMsg.createdAt), "minute") >= 5);
-					const separateLogic = i === 0 || (prevMsg && dayjs(msg.createdAt).diff(dayjs(prevMsg.createdAt), "day") >= 1);
+						i % 5 === 0 ||
+						(!!prevMsg && prevMsg.sender_id !== msg.sender_id) ||
+						(!!prevMsg && dayjs(msg.createdAt).diff(dayjs(prevMsg.createdAt), "minute") >= 5);
+					const separateLogic = prevMsg && dayjs(msg.createdAt).diff(dayjs(prevMsg.createdAt), "day") >= 1;
 
 					return (
 						<React.Fragment key={msg.id}>

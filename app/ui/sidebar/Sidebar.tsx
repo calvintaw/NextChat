@@ -5,7 +5,6 @@ import NavigationBar from "./components/NavigationBar";
 import UserPanel from "./components/UserPanel";
 import { getJoinedServers } from "@/app/lib/actions";
 import { redirect } from "next/navigation";
-import clsx from "clsx";
 
 const Sidebar = async ({ className }: { className?: string }) => {
 	const session = await auth();
@@ -17,10 +16,8 @@ const Sidebar = async ({ className }: { className?: string }) => {
 		<>
 			<nav
 				id="sidebar"
-				className={clsx(
-					"relative max-w-86  h-full flex flex-row items-start w-min border-contrast lg:border-r bg-background",
-					className
-				)}
+				className={`relative max-w-86  h-full flex flex-row items-start w-min border-contrast lg:border-r bg-background ${className}
+				`}
 			>
 				<OnlineIndicator name={user.displayName} userId={user.id}></OnlineIndicator>
 
