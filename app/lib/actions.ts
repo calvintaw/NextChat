@@ -52,9 +52,9 @@ export async function getUser(user_id: string): Promise<User | null> {
 }
 
 // one time use fn for displaying individual user info
-export async function getUserByUsername(username: string): Promise<User | null> {
+export async function getUserForProfilePage(id: string): Promise<User | null> {
 	const result = await sql<User[]>`
-		SELECT id, username, display_name as "displayName", email, created_at as "createdAt", image, bio, readme FROM users WHERE username = ${username} LIMIT 1
+		SELECT id, username, display_name as "displayName", email, created_at as "createdAt", image, bio, readme FROM users WHERE id = ${id} LIMIT 1
 	`;
 	return result[0] ?? null;
 }

@@ -17,9 +17,11 @@ type AvatarProps = {
 	statusIndicator?: boolean;
 	radius?: string;
 	parentClassName?: string;
+	onParentClick?: () => void;
 } & Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src" | "alt">; // Omit conflicting src type
 
 export const Avatar = ({
+	onParentClick = () => {},
 	src,
 	fontSize = "text-base",
 	radius = "rounded-full",
@@ -63,6 +65,7 @@ export const Avatar = ({
 		<>
 			{hasValidSrc && (
 				<div
+					onClick={onParentClick}
 					data-tooltip-id="avatar-tooltip"
 					data-tooltip-content={`View ${displayName}'s profile`}
 					className={clsx("relative", size, parentClassName)}
@@ -114,12 +117,12 @@ export const Avatar = ({
 
 			{!hasValidSrc && (
 				<div
+					onClick={onParentClick}
 					data-tooltip-id="avatar-tooltip"
 					data-tooltip-content={`View ${displayName}'s profile`}
 					className={clsx("relative", size, parentClassName)}
 				>
 					<div
-						role="img"
 						className={clsx(
 							"relative shrink-0  z-0 flex items-center justify-center text-white",
 							size,
@@ -137,7 +140,6 @@ export const Avatar = ({
 					)}
 				</div>
 			)}
-
 		</>
 	);
 };
