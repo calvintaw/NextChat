@@ -8,7 +8,7 @@ import { Tooltip } from "react-tooltip";
 import { Avatar } from "../../general/Avatar";
 import { ServerEditForm } from "./Server_edit_form";
 
-export function ServerCardHeader({ server, user, isBlocked}: { server: Room; user: User; isBlocked: boolean }) {
+export function ServerCardHeader({ server, user, isBlocked }: { server: Room; user: User; isBlocked: boolean }) {
 	const [clipboard, setClipboard] = useState("");
 	const [localServer, setLocalServer] = useState(() => server);
 
@@ -18,7 +18,7 @@ export function ServerCardHeader({ server, user, isBlocked}: { server: Room; use
 	};
 
 	return (
-		<div className="bg-contrast text-white p-6 px-4 pb-2 rounded-lg max-w-md w-full flex flex-col gap-3">
+		<div className="bg-contrast text-white pt-2 px-4 pb-2 rounded-lg max-w-md w-full flex flex-col gap-3">
 			<div className="flex items-center gap-3">
 				{/* Server Icon */}
 				<Avatar size="size-14" displayName={localServer.name} src={localServer.profile ?? ""} statusIndicator={false} />

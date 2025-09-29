@@ -62,9 +62,8 @@ export function DirectMessageCard({
 		fetchCommonServers();
 	}, [user.id]);
 
-	
 	return (
-		<div className="bg-contrast text-white p-6 px-4 pb-2 rounded-lg max-w-full">
+		<div className="bg-contrast text-white pt-2 px-4 pb-2 rounded-lg max-w-full">
 			<div className="flex items-center justify-between mb-4">
 				<div className="flex items-center gap-3">
 					<Avatar size={"size-12"} displayName={user.username} src={user.image} statusIndicator={false}></Avatar>

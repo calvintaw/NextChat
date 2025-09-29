@@ -270,7 +270,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 						)}
 						<div
 							ref={observerRef}
-							className={clsx("h-10 absolute top-25 left-0 right-0", initialLoading && "hidden")}
+							className={clsx("h-10 absolute top-25 left-0 right-0", (initialLoading || isLoadingOldMsg) && "hidden")}
 						></div>
 
 						{initialLoading ? (
