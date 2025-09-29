@@ -1,4 +1,3 @@
-
 import * as Dialog from "@radix-ui/react-dialog";
 import { IoClose } from "react-icons/io5";
 import clsx from "clsx";
@@ -58,8 +57,9 @@ const ImageUploadDialog = ({
 										<>
 											<img src={src} alt="Uploaded preview" className="w-full h-full object-cover rounded-lg" />
 											<IconWithSVG
+												disabled={isUploading}
 												onClick={() => removeFileUpload(i)}
-												className="!absolute top-1 right-1 icon-small group-hover:opacity-100 opacity-0"
+												className="!absolute disabled:opacity-0 top-1 right-1 icon-small group-hover:opacity-100 opacity-0 btn-secondary-border outline-0 border-foreground"
 											>
 												<IoClose />
 											</IconWithSVG>
@@ -70,8 +70,9 @@ const ImageUploadDialog = ({
 										<>
 											<video src={src} controls muted autoPlay loop className="w-full h-full object-cover rounded-lg" />
 											<IconWithSVG
+												disabled={isUploading}
 												onClick={() => removeFileUpload(i)}
-												className="!absolute top-1 right-1 icon-small group-hover:opacity-100 opacity-0"
+												className="!absolute disabled:opacity-0 top-1 right-1 icon-small group-hover:opacity-100 opacity-0 btn-secondary-border outline-0 border-foreground"
 											>
 												<IoClose />
 											</IconWithSVG>
@@ -83,6 +84,7 @@ const ImageUploadDialog = ({
 
 						<div className="flex items-center gap-2">
 							<input
+								disabled={isUploading}
 								type="checkbox"
 								id="compress-file-checkbox"
 								checked={compress}
@@ -102,6 +104,7 @@ const ImageUploadDialog = ({
 
 					<div className="flex justify-end gap-3 mt-auto">
 						<FileUploadBtn
+							disabled={isUploading}
 							selectedFiles={selectedFiles}
 							setSelectedFiles={setSelectedFiles}
 							compress={compress}

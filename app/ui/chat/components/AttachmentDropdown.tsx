@@ -4,7 +4,7 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
 import imageCompression from "browser-image-compression";
 import { IconWithSVG } from "@/app/ui/general/Buttons";
-import {supabase} from "@/app/lib/supabase";
+import { supabase } from "@/app/lib/supabase";
 import { nanoid } from "nanoid";
 import { useState } from "react";
 import ImageUploadDialog from "./ImgUploadDialog";
@@ -15,7 +15,7 @@ type Props = {
 };
 
 export const AttachmentDropdown = ({ handleFileUpload }: Props) => {
-	const [uploaded, setUploaded] = useState<string[]>([]); 	// array used for storing base64 encoded strings of imgs or videos url to display locally in browser
+	const [uploaded, setUploaded] = useState<string[]>([]); // array used for storing base64 encoded strings of imgs or videos url to display locally in browser
 	const [dialogOpen, setDialogOpen] = useState(false); // manually control dialog box Open State as UI has some special requirements
 	const [dropdownOpen, setDropdownOpen] = useState(false); // same with this dropdown
 	const [compress, setCompress] = useState(true); // compress images option YES/NO
@@ -74,11 +74,11 @@ export const AttachmentDropdown = ({ handleFileUpload }: Props) => {
 			if (videoArray.length > 0) {
 				handleFileUpload(videoArray, "video");
 			}
-
-			setUploaded([]);
 		} catch (err) {
 			console.error("Upload error:", err);
 		} finally {
+			setUploaded([]);
+			setSelectedFiles([]);
 			setIsUploading(false);
 		}
 	};

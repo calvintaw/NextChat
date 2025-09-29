@@ -24,9 +24,11 @@ const roboto = localFont({
 	variable: "--font-roboto",
 	display: "swap",
 });
+
 export const metadata: Metadata = {
-	title: "Discord Clone",
-	description: "Created By AB",
+	title: "NextChat | auth",
+	description:
+		"NextChat - A Discord-inspired chat app with real-time messaging, servers, reactions, image uploads, and profile customization. | Created By calvintaw",
 };
 
 export default async function RootLayout({

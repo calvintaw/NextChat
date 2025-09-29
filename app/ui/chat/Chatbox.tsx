@@ -155,19 +155,6 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 	const toast = useToast();
 
-	const handleFileUpload = (url: string[], type: "image" | "video") => {
-		if (isBlocked) return;
-
-		socket.emit("message", {
-			room_id: roomId,
-			sender_id: user.id,
-			sender_image: user.image ?? null,
-			sender_display_name: user.displayName,
-			content: JSON.stringify(url), // turn to json string as database schema only accepts STRING,
-			type: type,
-		});
-	};
-
 	const deleteMessage = async (id: string) => {
 		if (isBlocked) return;
 
@@ -222,7 +209,6 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 						roomId={roomId}
 						user={user}
 						activePersons={activePersons}
-						handleFileUpload={handleFileUpload}
 					/>
 				</ChatProvider>
 			</div>

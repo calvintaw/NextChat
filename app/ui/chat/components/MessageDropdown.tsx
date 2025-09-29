@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import {
 	FaThumbsUp,
@@ -29,27 +29,27 @@ import { flushSync } from "react-dom";
 import { useToast } from "@/app/lib/hooks/useToast";
 
 type Props = {
-	msg: MessageType,
+	msg: MessageType;
 	onDelete: (id: string) => void;
 };
 
-export function MessageDropdownMenu({ msg,onDelete }: Props) {
+export function MessageDropdownMenu({ msg, onDelete }: Props) {
 	const [open, toggleOpen] = useToggle(false);
-	const [copied, setCopied] = useState(false)
-	const { setMsgToEdit, messages, setMessages, user, roomId, setReplyToMsg} = useChatProvider()	
-	const toast = useToast()
-	
+	const [copied, setCopied] = useState(false);
+	const { setMsgToEdit, messages, setMessages, user, roomId, setReplyToMsg } = useChatProvider();
+	const toast = useToast();
+
 	const toggleReaction = async (emoji: string) => {
-		const originalMsg = [...messages]
+		const originalMsg = [...messages];
 		let didChange = false; // track if reaction changed
 		setMessages((prev: MessageType[]) => {
 			const index = prev.findIndex((tx) => tx.id === msg.id);
 			if (index === -1) return prev;
-			
-			const newMsg = [...prev]
 
-			const currentReactors  = new Set(newMsg[index].reactions?.[emoji] || [])
-			const hasReacted = currentReactors .has(user.id)
+			const newMsg = [...prev];
+
+			const currentReactors = new Set(newMsg[index].reactions?.[emoji] || []);
+			const hasReacted = currentReactors.has(user.id);
 			if (hasReacted) {
 				currentReactors.delete(user.id);
 				didChange = false; // user removed reaction
@@ -62,19 +62,19 @@ export function MessageDropdownMenu({ msg,onDelete }: Props) {
 				...newMsg[index],
 				reactions: {
 					...newMsg[index].reactions,
-					[emoji]: [...currentReactors ],
+					[emoji]: [...currentReactors],
 				},
 			};
 			return newMsg;
-		})
-				const result = didChange
+		});
+		const result = didChange
 			? await addReactionToMSG({ id: msg.id, roomId, userId: user.id, emoji })
 			: await removeReactionFromMSG({ id: msg.id, roomId, userId: user.id, emoji });
 		if (!result.success) {
-			setMessages(originalMsg)
+			setMessages(originalMsg);
 			toast({ title: "Error!", mode: "negative", subtitle: result.message });
-		}		
-	}
+		}
+	};
 
 	const handleCopy = async (text: string) => {
 		try {
@@ -94,7 +94,7 @@ export function MessageDropdownMenu({ msg,onDelete }: Props) {
 						`
 							hidden
 							group-hover:!flex
-							absolute bg-background dark:bg-surface z-40 -top-3 right-20 rounded-lg border border-border/30 gap-1 items-center p-[0.2rem]
+							absolute bg-background dark:bg-surface z-40 -top-3 max-sm:-top-7 max-sm:right-5 right-20 rounded-lg border border-border/30 gap-1 items-center p-[0.2rem]
 							`,
 						open ? "!flex" : ""
 					)}
@@ -178,9 +178,7 @@ export function MessageDropdownMenu({ msg,onDelete }: Props) {
 								onClick={() => toggleReaction("👍")}
 								className="p-0 focus:outline-none data-[highlighted]:ring-2 data-[highlighted]:ring-blue-500 rounded-lg"
 							>
-								<IconWithSVG className="text-2xl bg-accent/50 hover:bg-accent text-yellow-400">
-									👍
-								</IconWithSVG>
+								<IconWithSVG className="text-2xl bg-accent/50 hover:bg-accent text-yellow-400">👍</IconWithSVG>
 							</DropdownMenu.Item>
 
 							<DropdownMenu.Item

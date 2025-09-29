@@ -122,6 +122,8 @@ export type User = {
 	password?: string;
 };
 
+export type MessageContentType = "text" | "video" | "image" | "system" | "file" | "reaction" | "reply";
+
 export type MessageType = {
 	id: string;
 	sender_id: string;
@@ -129,7 +131,7 @@ export type MessageType = {
 	sender_image: string;
 	content: string;
 	createdAt: string;
-	type: "text" | "video" | "image" | "system" | "file" | "reaction" | "reply";
+	type: MessageContentType;
 	edited: boolean;
 	reactions: Record<string, string[]>;
 	replyTo: string | null;

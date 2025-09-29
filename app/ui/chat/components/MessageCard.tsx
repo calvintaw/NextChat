@@ -136,7 +136,7 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 			data-content={msg.content.slice(0, 200)}
 			id={msg.id}
 			className={clsx(
-				"flex flex-col w-full dark:hover:bg-background/75 hover:bg-accent/75 px-2 pl-3 py-2 relative ",
+				"flex flex-col w-full dark:hover:bg-background/75 hover:bg-accent/75 px-2 pl-3 py-2 max-sm:pb-1 relative ",
 				msgToEdit === msg.id ? "dark:bg-background/75 bg-accent" : "group",
 
 				replyToMsg &&
@@ -148,7 +148,7 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 
 			<div className="flex items-start gap-4 max-w-[95%]">
 				{(isFirstGroup || msg.replyTo) && (
-					<div className="min-w-11 flex justify-center">
+					<div className="min-w-11 flex justify-center max-sm:hidden">
 						<Avatar
 							size="size-10"
 							id={msg.sender_id}
@@ -162,6 +162,15 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 					{/* User Name and MSG sent time */}
 					{(isFirstGroup || msg.replyTo) && (
 						<div className="text-sm text-muted flex items-center gap-2 mb-1">
+							<Avatar
+								size="size-8"
+								id={msg.sender_id}
+								src={msg.sender_image}
+								statusIndicator={false}
+								fontSize="text-sm"
+								displayName={msg.sender_display_name}
+								parentClassName="min-sm:hidden"
+							></Avatar>
 							<p className="font-semibold text-foreground hover:underline hover:cursor-pointer">
 								{msg.sender_display_name}
 							</p>
@@ -169,23 +178,42 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 						</div>
 					)}
 					{/* Message bubble */}
-					<div className={clsx("flex gap-4")}>
+					<div className={clsx("flex gap-4 max-sm:gap-x-3")}>
 						{!isFirstGroup && !msg.replyTo && (
-							<div
-								className="w-11 h-auto font-mono text-center whitespace-nowrap text-nowrap flex items-center justify-center text-[11px] text-muted -z-50 group-hover:z-0"
-								title={getLocalTimeString(msg.createdAt, { hour: "numeric", minute: "numeric", hour12: true })}
-							>
-								{getLocalTimeString(msg.createdAt, { hour: "numeric", minute: "numeric", hour12: true })}
-							</div>
+							<>
+								<div
+									className="max-sm:hidden w-11 h-auto font-mono text-center whitespace-nowrap text-nowrap flex items-center justify-center text-[11px] text-muted -z-50 group-hover:z-0"
+									title={getLocalTimeString(msg.createdAt, { hour: "numeric", minute: "numeric", hour12: true })}
+								>
+									{getLocalTimeString(msg.createdAt, { hour: "numeric", minute: "numeric", hour12: true })}
+								</div>
+								<div className="min-sm:hidden"></div>
+							</>
 						)}
 
 						{msg.type === "text" &&
 							(msgToEdit !== msg.id ? (
-								<div className="relative max-w-full break-words break-all whitespace-pre-wrap text-sm">
-									{msg.content}{" "}
-									{msg.edited && (
-										<span className="text-[11px] tracking-wide text-muted relative top-[1px]">{"(edited)"}</span>
-									)}
+								<div className="w-full flex max-sm:justify-between">
+									<div
+										className={clsx(
+											"relative max-w-full break-words break-all whitespace-pre-wrap text-sm",
+											isFirstGroup && "max-sm:pl-3 max-sm:mt-1"
+										)}
+									>
+										{msg.content}{" "}
+										{msg.edited && (
+											<span className="text-[11px] tracking-wide text-muted relative top-[1px]">{"(edited)"}</span>
+										)}
+									</div>
+									<div
+										className={clsx(
+											"min-sm:hidden w-11 h-auto font-mono text-center whitespace-nowrap text-nowrap flex items-center justify-center text-[11px] text-muted -z-50 group-hover:z-0",
+											isFirstGroup && "hidden"
+										)}
+										title={getLocalTimeString(msg.createdAt, { hour: "numeric", minute: "numeric", hour12: true })}
+									>
+										{getLocalTimeString(msg.createdAt, { hour: "numeric", minute: "numeric", hour12: true })}
+									</div>
 								</div>
 							) : (
 								<form onSubmit={handleEditSubmit} className="w-full">
@@ -210,7 +238,12 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 							))}
 
 						{(msg.type === "image" || msg.type === "video") && (
-							<div className="max-w-100 grid gap-2 rounded-md img-upload-scrollbar">
+							<div
+								className={clsx(
+									"max-w-120 grid gap-2 rounded-md img-upload-scrollbar",
+									isFirstGroup && "max-sm:mt-2 max-sm:pl-3"
+								)}
+							>
 								{JSON.parse(msg.content).map((src: string, i: number) => {
 									const isEven = JSON.parse(msg.content).length % 2 === 0;
 									const total = JSON.parse(msg.content).length;
@@ -222,7 +255,7 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 									return (
 										<div
 											key={`${src}-${i}`}
-											className="rounded-lg max-h-56 flex items-center justify-center bg-accent"
+											className="rounded-lg max-h-70 flex items-center justify-center bg-accent"
 											style={{
 												gridColumn: `span ${colSpan}`,
 												gridRow: `span ${rowSpan}`,

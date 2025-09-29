@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { clsx } from "clsx";
 import React from "react";
 import { socket } from "@/app/lib/socket";
-import { MessageType, User } from "@/app/lib/definitions";
+import { MessageContentType, MessageType, User } from "@/app/lib/definitions";
 import useDebounce from "@/app/lib/hooks/useDebounce";
 import { useChatProvider } from "../ChatBoxWrapper";
 import { RxCross2 } from "react-icons/rx";
@@ -16,7 +16,6 @@ import useEventListener from "@/app/lib/hooks/useEventListener";
 
 type ChatInputBoxProps = {
 	activePersons: string[];
-	handleFileUpload: (url: string[], type: "image" | "video") => void;
 	roomId: string;
 	user: User;
 	setMessages: React.Dispatch<React.SetStateAction<MessageType[]>>;
@@ -29,7 +28,6 @@ const ChatInputBox = ({
 	activePersons,
 	roomId,
 	user,
-	handleFileUpload,
 	setMessages,
 	initialLoading,
 	tempIdsRef,
@@ -62,7 +60,8 @@ const ChatInputBox = ({
 		};
 	}, [trigger]);
 
-	const sendMessage = (input: string) => {
+	const sendMessage = (input: string, type: MessageContentType = "text") => {
+		if (isBlocked) return;
 		const tempId = uuidv4();
 		tempIdsRef.current.add(tempId);
 
@@ -73,7 +72,7 @@ const ChatInputBox = ({
 			sender_image: user.image ?? null,
 			sender_display_name: user.displayName,
 			content: input,
-			type: "text",
+			type,
 			replyTo: replyToMsg ? replyToMsg.id : null,
 		};
 
@@ -90,7 +89,7 @@ const ChatInputBox = ({
 				{
 					...temp_msg,
 					content: `${temp_msg.content}`,
-					type: "text",
+					type,
 					id: tempId,
 					createdAt: new Date().toISOString(),
 					edited: false,
@@ -100,6 +99,11 @@ const ChatInputBox = ({
 		});
 	};
 
+	const handleFileUpload = (url: string[], type: "image" | "video") => {
+		sendMessage(JSON.stringify(url), type); // turn url to json as there can be multiple images or videos uploaded at the same time so URL is ARRAY type
+	};
+
+	// function that calls sendMessage and is triggered when user click ENTER
 	const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 		if (e.key === "Enter" && !e.shiftKey && textRef.current) {
 			e.preventDefault(); // prevents new line from being written
@@ -114,6 +118,7 @@ const ChatInputBox = ({
 		}
 	};
 
+	// use effect side effect for focusing input when ctrl + /
 	useEventListener("keydown", (event: KeyboardEvent) => {
 		if (event.ctrlKey && event.key === "/" && textRef.current) {
 			console.log("Ctrl + / was pressed!");
@@ -121,6 +126,7 @@ const ChatInputBox = ({
 		}
 	});
 
+	// when user click reply, auto focuses the input
 	useEffect(() => {
 		if (replyToMsg) textRef.current?.focus();
 	}, [replyToMsg]);
