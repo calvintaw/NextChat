@@ -53,7 +53,7 @@ export default async function RootLayout({
 			<body
 				className={`font-sans ${roboto.className} antialiased flex flex-col h-full min-h-screen w-full min-w-0 scroll-smooth`}
 			>
-				<div className="bg-animation">
+				<div className="bg-animation !z-[1000]">
 					<div id="stars"></div>
 					<div id="stars2"></div>
 					<div id="stars3"></div>
