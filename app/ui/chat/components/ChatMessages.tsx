@@ -1,5 +1,5 @@
 "use client";
-import { MessageType } from "@/app/lib/definitions";
+import { MessageContentType, MessageType } from "@/app/lib/definitions";
 import React, { useLayoutEffect, useRef } from "react";
 
 import dayjs from "dayjs";
@@ -15,7 +15,7 @@ dayjs.extend(isToday);
 dayjs.extend(isYesterday);
 dayjs.extend(weekday);
 
-const ChatMessages = ({ messages, deleteMessage }: { messages: MessageType[]; deleteMessage: Function }) => {
+const ChatMessages = ({ messages }: { messages: MessageType[] }) => {
 	const { isBlocked, isSystem } = useChatProvider();
 
 	// relative min-h-[calc(100vh-400px)] h-full
@@ -52,12 +52,7 @@ const ChatMessages = ({ messages, deleteMessage }: { messages: MessageType[]; de
 						<React.Fragment key={msg.id}>
 							{separateLogic && <MessageSeparator date={msg.createdAt} />}
 
-							<MessageCard
-								msg={msg}
-								key={msg.id}
-								isFirstGroup={isFirstGroup}
-								onDelete={(id: string) => deleteMessage(id)}
-							></MessageCard>
+							<MessageCard msg={msg} key={msg.id} isFirstGroup={isFirstGroup}></MessageCard>
 						</React.Fragment>
 					);
 				})}

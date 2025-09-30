@@ -19,10 +19,9 @@ import { uuidv4 } from "zod/v4";
 type MessageCardType = {
 	msg: MessageType;
 	isFirstGroup: boolean;
-	onDelete: (id: string) => void;
 };
 
-const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
+const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 	const msg_date = getLocalTimeString(msg.createdAt, { hour: "numeric", minute: "numeric", hour12: true });
 	const editInputRef = useRef<HTMLInputElement | null>(null);
 	const { msgToEdit, messages, setMessages, setMsgToEdit, roomId, replyToMsg } = useChatProvider();
@@ -362,7 +361,6 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 				sendMessage={sendMessage}
 				key={`${msg.id}-dropdownMenu`}
 				msg={msg}
-				onDelete={onDelete}
 			></MessageDropdownMenu>
 		</div>
 	);

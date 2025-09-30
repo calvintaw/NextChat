@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { socket } from "../../lib/socket";
-import { MessageType, Room, User } from "../../lib/definitions";
+import { MessageContentType, MessageType, Room, User } from "../../lib/definitions";
 import { checkIfBlocked, deleteMsg, getRecentMessages } from "../../lib/actions";
 import dayjs from "dayjs";
 import isToday from "dayjs/plugin/isToday";
@@ -215,12 +215,12 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 	const toast = useToast();
 
-	const deleteMessage = async (id: string) => {
+	const deleteMessage = async (id: string, type: MessageContentType = "text", content: string) => {
 		if (isBlocked || isSystem) return;
 
 		const originalMsg = [...messages];
 		setMessages((prev) => prev.filter((tx) => tx.id != id));
-		const result = await deleteMsg(id, roomId);
+		const result = await deleteMsg(id, roomId, type, content);
 		if (!result.success) {
 			setMessages(originalMsg);
 			toast({ title: "Error!", mode: "negative", subtitle: result.message });
@@ -296,7 +296,9 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 				className="flex flex-1 min-lg:max-h-[calc(100vh-33px)] overflow-hidden flex-col shadow-md bg-contrast 
 			"
 			>
-				<ChatProvider config={{ setMessages, messages, roomId, user, containerRef, isBlocked, isSystem }}>
+				<ChatProvider
+					config={{ setMessages, messages, roomId, user, containerRef, isBlocked, isSystem, deleteMessage }}
+				>
 					<div
 						ref={containerRef}
 						className="flex-1 h-full flex flex-col overflow-y-scroll py-4 px-1 pb-10 has-scroll-container relative "
@@ -329,7 +331,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 							<Loading className="!w-full !flex-1"></Loading>
 						) : (
 							<>
-								<ChatMessages messages={messages} deleteMessage={deleteMessage} />
+								<ChatMessages messages={messages} />
 							</>
 						)}
 					</div>

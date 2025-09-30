@@ -53,9 +53,9 @@ export default function CreateServerFormDialog({ className, user }: { className:
 		setIsPending(true);
 		const form = formRef.current;
 		const formData = new FormData(form!);
-		const url = await uploadAndGetURL();
+		const url = await uploadAndGetURL(formData.get("server_name"));
 		if (!url) {
-			alert("Upload required!");
+			alert("Upload required! (Fill out the form correctly)");
 			setIsPending(false);
 			return;
 		}
@@ -70,7 +70,13 @@ export default function CreateServerFormDialog({ className, user }: { className:
 		form?.reset();
 	};
 
-	async function uploadAndGetURL() {
+	async function uploadAndGetURL(name: FormDataEntryValue | null) {
+		const server_name = name?.toString().trim();
+		if (!server_name) {
+			alert("Please fill out the form!");
+			return publicImgUrl;
+		}
+
 		if (selectedFile === null) {
 			alert("Please select a file first.");
 			return publicImgUrl;
@@ -81,12 +87,15 @@ export default function CreateServerFormDialog({ className, user }: { className:
 				maxSizeMB: 0.5,
 				maxWidthOrHeight: 500,
 				useWebWorker: true,
+				fileType: "image/jpg",
 			};
 
 			const compressedFile = await imageCompression(selectedFile, options);
 
-			const filename = `${nanoid()}.${compressedFile.name.split(".").pop()}`;
-			const { data, error } = await supabase.storage.from("uploads").upload(filename, compressedFile);
+			const filename = `profile.jpg`;
+			const filePath = `${server_name}/${filename}`;
+
+			const { data, error } = await supabase.storage.from("uploads").upload(filePath, compressedFile, {upsert: true});
 			if (error) throw error;
 
 			const { data: publicData } = supabase.storage.from("uploads").getPublicUrl(data?.path || "");

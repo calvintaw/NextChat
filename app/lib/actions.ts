@@ -16,6 +16,7 @@ import {
 	NewsApiResponse,
 	NewsApiParams,
 	Room,
+	MessageContentType,
 } from "./definitions";
 import bcrypt from "bcryptjs";
 import z from "zod";
@@ -25,6 +26,7 @@ import { socket } from "./socket";
 import console, { error } from "console";
 import { cookies } from "next/headers";
 import { io } from "socket.io-client";
+import { supabase } from "./supabase";
 
 // Utility for easy access to the currently authenticated user.
 // Functions using this tool could be refactored to not depend on it if needed.
@@ -87,8 +89,10 @@ export async function getServersInCommon(currentUserId: string, targetUserId: st
 
 export async function deleteMsg(
 	id: string,
-	roomId: string
-): Promise<{ success: true; message: string } | { success: false; error: any; message: string }> {
+	roomId: string,
+	type: MessageContentType,
+	content: string
+): Promise<{ success: true; message: string } | { success: false; message: string }> {
 	try {
 		await sql.begin(async (tx) => {
 			await tx`
@@ -96,12 +100,33 @@ export async function deleteMsg(
 				WHERE id = ${id}
 			`;
 		});
+
+		if (type === "video" || type === "image") {
+			let files: string[] = [];
+			try {
+				files = JSON.parse(content);
+				if (!Array.isArray(files)) files = []; // guard in case it's not an array
+			} catch (err) {
+				console.error("Invalid message format", err);
+				return { success: false, message: "Invalid message format" };
+			}
+
+			const { error } = await supabase.storage
+				.from("uploads") 
+				.remove(files);
+
+			if (error) {
+				console.error("Error deleting file:", error.message);
+				return { success: false, message: "Failed to delete the message. Please try again!" };
+			}
+		}
+
 		socket.emit("delete message", id, roomId);
 
 		return { success: true, message: "Message deleted successfully." };
 	} catch (error) {
 		console.error("Error deleting message:", error);
-		return { success: false, error, message: "Failed to delete the message. Please try again!" };
+		return { success: false, message: "Failed to delete the message. Please try again!" };
 	}
 }
 

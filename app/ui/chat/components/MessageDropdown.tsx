@@ -11,7 +11,7 @@ import { AiOutlineReload } from "react-icons/ai";
 import { useChatProvider } from "../ChatBoxWrapper";
 import { FiEdit } from "react-icons/fi";
 import { addReactionToMSG, removeReactionFromMSG } from "@/app/lib/actions";
-import { MessageType } from "@/app/lib/definitions";
+import { MessageContentType, MessageType } from "@/app/lib/definitions";
 import { HiReply } from "react-icons/hi";
 import { useToast } from "@/app/lib/hooks/useToast";
 import { ImBin } from "react-icons/im";
@@ -19,13 +19,13 @@ import { ImBin } from "react-icons/im";
 type Props = {
 	msg: MessageType;
 	sendMessage: (msg: MessageType) => void;
-	onDelete: (id: string) => void;
 };
 
-export function MessageDropdownMenu({ msg, onDelete, sendMessage }: Props) {
+export function MessageDropdownMenu({ msg, sendMessage }: Props) {
 	const [open, toggleOpen] = useToggle(false);
 	const [copied, setCopied] = useState(false);
-	const { setMsgToEdit, messages, setMessages, user, roomId, setReplyToMsg } = useChatProvider();
+	const { setMsgToEdit, messages, setMessages, user, roomId, setReplyToMsg, deleteMessage } = useChatProvider();
+
 	const toast = useToast();
 
 	const toggleReaction = async (emoji: string) => {
@@ -134,7 +134,7 @@ export function MessageDropdownMenu({ msg, onDelete, sendMessage }: Props) {
 						data-tooltip-id="icon-message-dropdown-menu-id"
 						data-tooltip-content="Delete"
 						className="icon-message-tooltip"
-						onClick={() => onDelete(msg.id)}
+						onClick={() => deleteMessage(msg.id, msg.type, msg.content)}
 					>
 						<ImBin className="!text-[20px]" />
 					</IconWithSVG>
@@ -252,7 +252,7 @@ export function MessageDropdownMenu({ msg, onDelete, sendMessage }: Props) {
 						<DropdownMenu.Separator className="DropdownMenu__Separator" />
 
 						<DropdownMenu.Item
-							onClick={() => onDelete(msg.id)}
+							onClick={() => deleteMessage(msg.id, msg.type, msg.content)}
 							className="DropdownMenuItem data-[highlighted]:bg:error/20 text-error gap-3"
 						>
 							<ImBin className="text-lg" /> Delete Message {"(Works)"}
