@@ -36,18 +36,18 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	const [activePersons, setActivePersons] = useState<string[]>([]);
 	const tempIdsRef = useRef<Set<string>>(new Set());
 	const [initialLoading, setInitialLoading] = useState(true);
-	const [isLoadingOldMsg, setIsLoadingOldMsg] = useState(false);
 	const [isBlocked, setIsBlocked] = useState(false);
 	const [isSystem, setIsSystem] = useState(false);
 
 	const containerRef = useRef<HTMLDivElement>(null);
 	const observerRef = useRef<HTMLDivElement>(null);
+	const scrollHeightBefore = useRef(0);
 	const offsetRef = useRef(0);
 	const limit = 15;
 	const lastBatctLength = useRef(limit);
 	const oldestMsgCreatedAt = useRef<string>("");
-	const scrollHeightBefore = useRef(0);
 	const [hasMore, setHasMore] = useState(true);
+	const [isLoadingOldMsg, setIsLoadingOldMsg] = useState(false);
 
 	const sortMessagesAsc = (msgs: MessageType[]) =>
 		[...msgs].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
@@ -76,14 +76,23 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 	// fetching msgs at startup and add listeners for typing event
 	useEffect(() => {
-		if (isBlocked || isSystem) return;
+		if (isBlocked || isSystem) {
+			setInitialLoading(false);
+			setHasMore(false);
+			return;
+		}
 
 		const fetchMessages = async () => {
 			const recent = await getRecentMessages(roomId);
-			offsetRef.current = recent.length;
-			lastBatctLength.current = recent.length;
-			oldestMsgCreatedAt.current = recent[recent.length - 1].createdAt;
-			setMessages(sortMessagesAsc(recent));
+			if (recent.length !== 0) {
+				offsetRef.current = recent.length;
+				lastBatctLength.current = recent.length;
+				oldestMsgCreatedAt.current = recent[recent.length - 1].createdAt;
+				setMessages(sortMessagesAsc(recent));
+			} else {
+				setHasMore(false);
+			}
+
 			setInitialLoading(false);
 		};
 
@@ -350,12 +359,7 @@ import Loading from "@/app/(root)/chat/[room_id]/loading";
 import { useToast } from "@/app/lib/hooks/useToast";
 import { DirectMessageCard } from "./components/ChatHeaderForDM";
 import { ServerCardHeader } from "./components/ChatHeaderForServer";
-import { useLocalStorage } from "@/app/lib/hooks/useStorage";
-import { BiLoaderAlt } from "react-icons/bi";
 import useOnScreen from "@/app/lib/hooks/useOnScreen";
-import { string } from "zod";
-import { emoji } from "zod/v4";
-import { id } from "zod/v4/locales";
 
 export const ServerList = ({ servers }: { servers: Room[] }) => {
 	if (!servers || servers.length === 0) {
