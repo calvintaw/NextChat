@@ -195,7 +195,6 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 			});
 		};
 
-		socket.emit("join", roomId);
 		socket.on("message", handleIncomingMsg);
 
 		socket.on("message deleted", handleMessageDeleted);
@@ -209,9 +208,16 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 			socket.off("message edited", handleMessageEdited);
 			socket.off("add_reaction_msg", toggleReaction);
 			socket.off("remove_reaction_msg", toggleReaction);
-			socket.emit("leave", roomId);
 		};
 	}, [roomId, isBlocked, isSystem]);
+
+	useEffect(() => {
+		socket.emit("join", roomId);
+
+		return () => {
+			socket.emit("leave", roomId);
+		};
+	}, [roomId]);
 
 	const toast = useToast();
 
