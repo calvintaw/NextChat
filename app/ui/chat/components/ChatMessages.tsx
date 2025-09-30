@@ -20,7 +20,7 @@ const ChatMessages = ({ messages, deleteMessage }: { messages: MessageType[]; de
 
 	// relative min-h-[calc(100vh-400px)] h-full
 	return (
-		<div className={clsx("flex-1 flex flex-col relative")} >
+		<div className={clsx("flex-1 flex flex-col relative")}>
 			{isBlocked && (
 				<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
 					<div className="bg-accent text-text px-4 py-2 rounded-lg flex items-center gap-2 max-w-[90vw] mx-3">
@@ -43,10 +43,15 @@ const ChatMessages = ({ messages, deleteMessage }: { messages: MessageType[]; de
 				messages.map((msg, i) => {
 					const prevMsg = i - 1 >= 0 ? messages[i - 1] : null;
 					const isFirstGroup =
-						i % 5 === 0 ||
+						i % 7 === 0 ||
 						(!!prevMsg && prevMsg.sender_id !== msg.sender_id) ||
 						(!!prevMsg && dayjs(msg.createdAt).diff(dayjs(prevMsg.createdAt), "minute") >= 5);
 					const separateLogic = prevMsg && dayjs(msg.createdAt).diff(dayjs(prevMsg.createdAt), "day") >= 1;
+
+					if (i >= 1) {
+						const before_msg = messages[i - 1];
+						if (msg.id === before_msg.id) return;
+					}
 
 					return (
 						<React.Fragment key={msg.id}>
