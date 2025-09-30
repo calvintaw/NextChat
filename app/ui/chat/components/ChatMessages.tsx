@@ -20,7 +20,7 @@ const ChatMessages = ({ messages, deleteMessage }: { messages: MessageType[]; de
 
 	// relative min-h-[calc(100vh-400px)] h-full
 	return (
-		<div className={clsx("flex-1 flex flex-col relative border")} >
+		<div className={clsx("flex-1 flex flex-col relative")} >
 			{isBlocked && (
 				<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
 					<div className="bg-accent text-text px-4 py-2 rounded-lg flex items-center gap-2 max-w-[90vw] mx-3">
