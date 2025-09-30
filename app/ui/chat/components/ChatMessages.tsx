@@ -44,6 +44,7 @@ const ChatMessages = ({ messages, deleteMessage }: { messages: MessageType[]; de
 							{separateLogic && <MessageSeparator date={msg.createdAt} />}
 
 							<MessageCard
+								index={i}
 								msg={msg}
 								key={msg.id}
 								isFirstGroup={isFirstGroup}

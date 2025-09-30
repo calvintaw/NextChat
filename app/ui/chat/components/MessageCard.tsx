@@ -21,13 +21,14 @@ import { Route } from "next";
 type MessageCardType = {
 	msg: MessageType;
 	isFirstGroup: boolean;
+	index: number;
 	onDelete: (id: string) => void;
 };
 
-const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
+const MessageCard = ({ msg, isFirstGroup, onDelete, index }: MessageCardType) => {
 	const msg_date = getLocalTimeString(msg.createdAt, { hour: "numeric", minute: "numeric", hour12: true });
 	const editInputRef = useRef<HTMLInputElement | null>(null);
-	const { msgToEdit, messages, setMessages, setMsgToEdit, roomId, replyToMsg } = useChatProvider();
+	const { msgToEdit, messages, setMessages, setMsgToEdit, roomId, replyToMsg, topMsgRef } = useChatProvider();
 	const toast = useToast();
 
 	const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -134,6 +135,7 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 
 	return (
 		<div
+			ref={index === 0 ? topMsgRef : null}
 			data-image-url={msg.sender_image}
 			data-displayname={msg.sender_display_name}
 			data-content={msg.content.slice(0, 200)}
@@ -312,7 +314,7 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 				</div>
 			</div>
 
-			<MessageDropdownMenu msg={msg} onDelete={onDelete}></MessageDropdownMenu>
+			<MessageDropdownMenu key={`${msg.id}-dropdownMenu`} msg={msg} onDelete={onDelete}></MessageDropdownMenu>
 		</div>
 	);
 };

@@ -27,6 +27,8 @@ import { HiReply } from "react-icons/hi";
 import { emoji } from "zod/v4";
 import { flushSync } from "react-dom";
 import { useToast } from "@/app/lib/hooks/useToast";
+import { ImBin } from "react-icons/im";
+import { RiDeleteBinFill } from "react-icons/ri";
 
 type Props = {
 	msg: MessageType;
@@ -141,6 +143,15 @@ export function MessageDropdownMenu({ msg, onDelete }: Props) {
 						</IconWithSVG>
 					)}
 
+					<IconWithSVG
+						data-tooltip-id="icon-message-dropdown-menu-id"
+						data-tooltip-content="Delete"
+						className="icon-message-tooltip"
+						onClick={() => onDelete(msg.id)}
+					>
+						<ImBin className="!text-[20px]" />
+					</IconWithSVG>
+
 					{msg.sender_id !== user.id && (
 						<IconWithSVG
 							data-tooltip-id="icon-message-dropdown-menu-id"
@@ -246,7 +257,7 @@ export function MessageDropdownMenu({ msg, onDelete }: Props) {
 							onClick={() => onDelete(msg.id)}
 							className="DropdownMenuItem data-[highlighted]:bg:error/20 text-error gap-3"
 						>
-							<MdDelete className="text-xl" /> Delete Message {"(Works)"}
+							<ImBin className="text-lg" /> Delete Message {"(Works)"}
 						</DropdownMenu.Item>
 					</DropdownMenu.Content>
 				</DropdownMenu.Portal>

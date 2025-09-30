@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { socket } from "../../lib/socket";
 import { MessageType, Room, User } from "../../lib/definitions";
 import { checkIfBlocked, deleteMsg, getRecentMessages } from "../../lib/actions";
@@ -30,6 +30,9 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	const limit = 15;
 	const lastBatctLength = useRef(limit);
 	const oldestMsgCreatedAt = useRef<string>("");
+	const topMsgRef = useRef<HTMLElement | null>(null);
+	const scrollHeightBefore = useRef(0);
+	const [prependTrigger, setPrependTrigger] = useState(0);
 
 	const sortMessagesAsc = (msgs: MessageType[]) =>
 		[...msgs].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
@@ -210,21 +213,21 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 			setIsLoadingOldMsg(false);
 			return;
 		}
-		oldestMsgCreatedAt.current = olderMessages[olderMessages.length - 1].createdAt;
+		oldestMsgCreatedAt.current = olderMessages.length >= 1 ? olderMessages[olderMessages.length - 1].createdAt : "";
 
 		const scrollContainer = containerRef.current;
-		const scrollHeightBefore = scrollContainer.scrollHeight;
+		scrollHeightBefore.current = scrollContainer.scrollHeight;
 
 		// prepend messages
 		setMessages((prev) => sortMessagesAsc([...olderMessages, ...prev]));
-		// maintain scroll position
-		const scrollHeightAfter = scrollContainer.scrollHeight;
-		scrollContainer.scrollTop += scrollHeightAfter - scrollHeightBefore;
-
 		setIsLoadingOldMsg(false);
+		setPrependTrigger((t) => t + 1);
 	};
 
-	const isTopVisible = useOnScreen(observerRef);
+	// end of ai code
+
+	// observes the first msg in the msg array
+	const isTopVisible = useOnScreen(topMsgRef);
 	useEffect(() => {
 		if (isTopVisible) {
 			console.log("top visible");
@@ -232,7 +235,12 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		}
 	}, [isTopVisible]);
 
-	// end of ai code
+	useLayoutEffect(() => {
+		if (!containerRef.current) return;
+		const scrollContainer = containerRef.current;
+		const diff = scrollContainer.scrollHeight - scrollHeightBefore.current;
+		scrollContainer.scrollTop += diff;
+	}, [prependTrigger]);
 
 	return (
 		<>
@@ -240,7 +248,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 				className="flex flex-1 min-lg:max-h-[calc(100vh-33px)] overflow-hidden flex-col shadow-md bg-contrast 
 			"
 			>
-				<ChatProvider config={{ setMessages, messages, roomId, user, containerRef, isBlocked }}>
+				<ChatProvider config={{ setMessages, messages, roomId, user, containerRef, isBlocked, topMsgRef }}>
 					<div
 						ref={containerRef}
 						className="flex-1 h-full flex flex-col overflow-y-scroll py-4 px-1 pb-10 has-scroll-container relative"

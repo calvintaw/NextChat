@@ -354,7 +354,7 @@ html {
 	}
 
 	.icon-message-tooltip svg {
-		@apply !text-[22px];
+		@apply text-[22px];
 	}
 
 	.icon-chatbox {
