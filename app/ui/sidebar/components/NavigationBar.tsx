@@ -52,6 +52,7 @@ const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: R
 			min-w-[52px]
 			max-lg:border-r
 			dark:border-surface border-surface/10
+			z-10
 			"
 			>
 				<DashboardBtn />
@@ -74,7 +75,7 @@ const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: R
 									)}
 								/>
 								<IconWithSVG
-									data-tooltip-id={"navigation-bar-tooltips"}
+									data-tooltip-id={`navigation-bar-tooltips-${index}`}
 									data-tooltip-content={icon.description}
 									className={clsx(nav_icon_styles, pathname === icon.href && "bg-primary not-dark:bg-foreground")}
 								>
@@ -85,6 +86,13 @@ const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: R
 										)}
 									/>
 								</IconWithSVG>
+								<Tooltip
+									positionStrategy="fixed"
+									className="my-tooltip"
+									id={`navigation-bar-tooltips-${index}`}
+									border={`var(--tooltip-border)`}
+									place="right"
+								/>
 							</Link>
 						);
 					} else {
@@ -103,7 +111,7 @@ const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: R
 									)}
 								/>
 								<IconWithSVG
-									data-tooltip-id={"navigation-bar-tooltips"}
+									data-tooltip-id={`navigation-bar-tooltips-${index}`}
 									data-tooltip-content={icon.description}
 									className={clsx(nav_icon_styles, pathname === icon.href && "bg-primary not-dark:bg-foreground")}
 								>
@@ -115,6 +123,13 @@ const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: R
 										)}
 									/>
 								</IconWithSVG>
+								<Tooltip
+									positionStrategy="fixed"
+									className="my-tooltip"
+									id={`navigation-bar-tooltips-${index}`}
+									border={`var(--tooltip-border)`}
+									place="right"
+								/>
 							</div>
 						);
 					}
@@ -149,8 +164,6 @@ const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: R
 						</Link>
 					))}
 			</aside>
-
-			<Tooltip className="my-tooltip" id={"navigation-bar-tooltips"} border={`var(--tooltip-border)`} place="right" />
 		</>
 	);
 };

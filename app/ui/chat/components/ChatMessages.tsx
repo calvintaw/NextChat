@@ -48,7 +48,7 @@ const ChatMessages = ({ messages, deleteMessage }: { messages: MessageType[]; de
 								key={msg.id}
 								isFirstGroup={isFirstGroup}
 								onDelete={(id: string) => deleteMessage(id)}
-							></MessageCard>
+						></MessageCard>
 						</React.Fragment>
 					);
 				})}

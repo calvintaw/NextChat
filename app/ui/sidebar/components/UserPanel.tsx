@@ -8,6 +8,7 @@ import { Tooltip } from "react-tooltip";
 import { User } from "@/app/lib/definitions";
 import { signOut } from "next-auth/react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { useLocalStorage } from "@/app/lib/hooks/useStorage";
 
 type Props = {
 	user: User;
@@ -87,7 +88,7 @@ const UserPanel = ({ user }: Props) => {
 };
 
 const Buttons = () => {
-	const [enabled, setEnabled] = useState(true);
+	const [enabled, setEnabled] = useLocalStorage("stars-background-enabled", true);
 
 	useEffect(() => {
 		setEnabled(!document.documentElement.classList.contains("disable-stars-bg"));
