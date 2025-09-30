@@ -35,8 +35,7 @@ const ChatInputBox = ({
 	tempIdsRef,
 	isBlocked,
 }: ChatInputBoxProps) => {
-	const { input, setInput, replyToMsg, setReplyToMsg, textRef } = useChatProvider();
-	const [style, setStyle] = useState("!max-h-10");
+	const { input, setInput, replyToMsg, setReplyToMsg, textRef, isSystem } = useChatProvider();
 	const [isFocused, setIsFocused] = useState(false);
 	const { canSendMessage } = useMessageLimiter(25, 60_000);
 	const { trigger, cancel } = useDebounce({
@@ -45,10 +44,6 @@ const ChatInputBox = ({
 		delay: 2000,
 	});
 	const toast = useToast();
-
-	useEffect(() => {
-		setStyle("min-h-10");
-	}, []);
 
 	useEffect(() => {
 		if (!textRef.current) return;
@@ -64,7 +59,7 @@ const ChatInputBox = ({
 	}, [trigger]);
 
 	const sendMessage = async (input: string, type: MessageContentType = "text") => {
-		if (isBlocked) return;
+		if (isBlocked || isSystem) return;
 		const tempId = uuidv4();
 		tempIdsRef.current.add(tempId);
 
@@ -97,6 +92,8 @@ const ChatInputBox = ({
 			];
 		});
 
+		// frequent changing of react state is hurting performance I think
+		// TODO: maybe find a way to boost performance
 		const result = await insertMessageInDB(temp_msg);
 		if (!result.success && result.message) {
 			toast({ title: result.message, subtitle: "", mode: "negative" });
@@ -120,8 +117,10 @@ const ChatInputBox = ({
 			socket.emit("join", user.id); // joining the same user id room as the socket server on renderer.com shutdown within 15min of inactivity so the msg would never reach anywhere.
 			sendMessage(textRef.current?.value);
 			textRef.current.value = "";
-			setInput("");
-			setReplyToMsg(null);
+
+			// set input to "", input is not synced with textRef.current.value so need to manually check
+			if (input.trim() === "") setInput("");
+			if (replyToMsg) setReplyToMsg(null);
 		}
 	};
 
@@ -139,9 +138,9 @@ const ChatInputBox = ({
 	}, [replyToMsg]);
 
 	return (
-		<div className={clsx(isBlocked && "cursor-not-allowed", initialLoading && "pointer-events-none")}>
+		<div className={clsx((isBlocked || isSystem) && "cursor-not-allowed", initialLoading && "pointer-events-none")}>
 			<div
-				className={clsx("p-4 relative mb-3 ", isBlocked && "opacity-75 pointer-events-none")}
+				className={clsx("p-4 relative mb-3 ", (isBlocked || isSystem) && "opacity-75 pointer-events-none")}
 				data-tooltip-id={"typing-indicator"}
 			>
 				<TypingIndicator displayName={activePersons} />
@@ -168,18 +167,17 @@ const ChatInputBox = ({
 					)}
 
 					<TextareaAutosize
+						disabled={isBlocked || isSystem}
 						ref={textRef}
 						name="query"
 						id="chatbox-TextareaAutosize"
+						minRows={1}
 						maxRows={8}
 						placeholder="Write a message"
 						onKeyDown={handleKeyPress}
 						onFocus={() => setIsFocused(true)}
 						onBlur={() => setIsFocused(false)}
-						className={clsx(
-							"w-full resize-none bg-transparent text-text placeholder-muted border-none outline-none focus:outline-none focus:ring-0 relative",
-							style
-						)}
+						className="w-full resize-none bg-transparent text-text placeholder-muted border-none outline-none focus:outline-none focus:ring-0 relative"
 					/>
 
 					<ChatToolbar

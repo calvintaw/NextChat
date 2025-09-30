@@ -973,3 +973,10 @@ html {
 .register-section {
 	background: url("/auth_bg.svg");
 }
+
+
+
+.custom-scrollbar {
+  scrollbar-width: thin; /* options: auto, thin, none */
+  scrollbar-color: red rgba(255, 0, 0, 0.1); /* thumb color, track color */
+}

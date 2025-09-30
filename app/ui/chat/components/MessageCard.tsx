@@ -8,27 +8,22 @@ import { useChatProvider } from "../ChatBoxWrapper";
 import InputField from "../../form/InputField";
 import { MessageDropdownMenu } from "./MessageDropdown";
 import { addReactionToMSG, editMsg, getUsername, removeReactionFromMSG } from "@/app/lib/actions";
-import { HiArrowTurnUpRight } from "react-icons/hi2";
-import { flushSync } from "react-dom";
 import { useToast } from "@/app/lib/hooks/useToast";
 import { RxCross1, RxCross2 } from "react-icons/rx";
 import { IconWithSVG } from "../../general/Buttons";
-import { BiLoaderAlt } from "react-icons/bi";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Route } from "next";
 
 type MessageCardType = {
 	msg: MessageType;
 	isFirstGroup: boolean;
-	index: number;
 	onDelete: (id: string) => void;
 };
 
-const MessageCard = ({ msg, isFirstGroup, onDelete, index }: MessageCardType) => {
+const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 	const msg_date = getLocalTimeString(msg.createdAt, { hour: "numeric", minute: "numeric", hour12: true });
 	const editInputRef = useRef<HTMLInputElement | null>(null);
-	const { msgToEdit, messages, setMessages, setMsgToEdit, roomId, replyToMsg, topMsgRef } = useChatProvider();
+	const { msgToEdit, messages, setMessages, setMsgToEdit, roomId, replyToMsg } = useChatProvider();
 	const toast = useToast();
 
 	const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -135,7 +130,6 @@ const MessageCard = ({ msg, isFirstGroup, onDelete, index }: MessageCardType) =>
 
 	return (
 		<div
-			ref={index === 0 ? topMsgRef : null}
 			data-image-url={msg.sender_image}
 			data-displayname={msg.sender_display_name}
 			data-content={msg.content.slice(0, 200)}

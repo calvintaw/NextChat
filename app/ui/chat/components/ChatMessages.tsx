@@ -16,16 +16,25 @@ dayjs.extend(isYesterday);
 dayjs.extend(weekday);
 
 const ChatMessages = ({ messages, deleteMessage }: { messages: MessageType[]; deleteMessage: Function }) => {
-	const { isBlocked } = useChatProvider();
+	const { isBlocked, isSystem } = useChatProvider();
 
 	// relative min-h-[calc(100vh-400px)] h-full
 	return (
-		<div className={clsx("flex-1 flex flex-col relative")}>
+		<div className={clsx("flex-1 flex flex-col relative border")} >
 			{isBlocked && (
 				<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
 					<div className="bg-accent text-text px-4 py-2 rounded-lg flex items-center gap-2 max-w-[90vw] mx-3">
 						<HiExclamationCircle size={20} />
 						<span>You cannot send messages in this chat</span>
+					</div>
+				</div>
+			)}
+
+			{isSystem && (
+				<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+					<div className="bg-accent text-text px-4 py-2 rounded-lg flex items-center gap-2 max-w-[90vw] mx-3">
+						<HiExclamationCircle size={20} />
+						<span>Our AI assistant isn’t available right now — looks like the server is out of credits.</span>
 					</div>
 				</div>
 			)}
@@ -44,12 +53,11 @@ const ChatMessages = ({ messages, deleteMessage }: { messages: MessageType[]; de
 							{separateLogic && <MessageSeparator date={msg.createdAt} />}
 
 							<MessageCard
-								index={i}
 								msg={msg}
 								key={msg.id}
 								isFirstGroup={isFirstGroup}
 								onDelete={(id: string) => deleteMessage(id)}
-						></MessageCard>
+							></MessageCard>
 						</React.Fragment>
 					);
 				})}
@@ -78,12 +86,6 @@ const RefAnchor = () => {
 			scrollRef.current?.scrollIntoView({ behavior: "smooth" });
 		}
 	}, [messages]);
-
-	useLayoutEffect(() => {
-		if (scrollRef.current) {
-			scrollRef.current?.scrollIntoView({ behavior: "instant" });
-		}
-	}, []);
 
 	return <span ref={scrollRef}></span>;
 };

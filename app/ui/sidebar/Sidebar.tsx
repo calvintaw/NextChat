@@ -21,8 +21,8 @@ const Sidebar = async ({ className }: { className?: string }) => {
 			>
 				<OnlineIndicator name={user.displayName} userId={user.id}></OnlineIndicator>
 
-				<NavigationBar joined_servers={joined_servers} user={user}></NavigationBar>
-				<ChatPanel user={user} />
+				{/* <NavigationBar joined_servers={joined_servers} user={user}></NavigationBar> */}
+				{/* <ChatPanel user={user} /> */}
 
 				<UserPanel user={user}></UserPanel>
 			</nav>

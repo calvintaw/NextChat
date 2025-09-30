@@ -127,7 +127,7 @@ export type MessageContentType = "text" | "video" | "image" | "system" | "file" 
 export type MessageType = {
 	id: string;
 	sender_id: string;
-	sender_display_name: string;
+sender_display_name: string;
 	sender_image: string;
 	content: string;
 	createdAt: string;
@@ -176,3 +176,5 @@ export type NewsApiParams = {
 	pageSize?: number;
 	page?: number;
 };
+
+
