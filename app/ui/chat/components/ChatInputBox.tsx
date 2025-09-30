@@ -37,6 +37,7 @@ const ChatInputBox = ({
 }: ChatInputBoxProps) => {
 	const { input, setInput, replyToMsg, setReplyToMsg, textRef, isSystem } = useChatProvider();
 	const [isFocused, setIsFocused] = useState(false);
+	const [style, setStyle] = useState("!max-h-10");
 	const { canSendMessage } = useMessageLimiter(25, 60_000);
 	const { trigger, cancel } = useDebounce({
 		startCallback: () => socket.emit("typing started", roomId, user.displayName),
@@ -44,6 +45,10 @@ const ChatInputBox = ({
 		delay: 2000,
 	});
 	const toast = useToast();
+
+	useEffect(() => {
+		setStyle("!min-h-10");
+	}, []);
 
 	useEffect(() => {
 		if (!textRef.current) return;
@@ -177,7 +182,10 @@ const ChatInputBox = ({
 						onKeyDown={handleKeyPress}
 						onFocus={() => setIsFocused(true)}
 						onBlur={() => setIsFocused(false)}
-						className="w-full resize-none bg-transparent text-text placeholder-muted border-none outline-none focus:outline-none focus:ring-0 relative"
+						className={clsx(
+							"w-full resize-none bg-transparent text-text placeholder-muted border-none outline-none focus:outline-none focus:ring-0 relative",
+							style
+						)}
 					/>
 
 					<ChatToolbar
