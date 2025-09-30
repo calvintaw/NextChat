@@ -1,41 +1,28 @@
 "use client";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import {
-	FaThumbsUp,
-	FaLaughSquint,
-	FaReply,
-	FaArrowRight,
-	FaCopy,
-	FaThumbtack,
-	FaLink,
-	FaVolumeUp,
-} from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
+import { FaReply, FaArrowRight, FaCopy, FaThumbtack, FaLink, FaVolumeUp } from "react-icons/fa";
 import { IconWithSVG } from "../../general/Buttons";
 import { IoIosArrowBack } from "react-icons/io";
 import { HiDotsHorizontal } from "react-icons/hi";
-import { FaThumbsDown } from "react-icons/fa";
 import clsx from "clsx";
 import useToggle from "@/app/lib/hooks/useToggle";
 import { useState } from "react";
-import { AiFillHeart } from "react-icons/ai";
+import { AiOutlineReload } from "react-icons/ai";
 import { useChatProvider } from "../ChatBoxWrapper";
 import { FiEdit } from "react-icons/fi";
 import { addReactionToMSG, removeReactionFromMSG } from "@/app/lib/actions";
 import { MessageType } from "@/app/lib/definitions";
 import { HiReply } from "react-icons/hi";
-import { emoji } from "zod/v4";
-import { flushSync } from "react-dom";
 import { useToast } from "@/app/lib/hooks/useToast";
 import { ImBin } from "react-icons/im";
-import { RiDeleteBinFill } from "react-icons/ri";
 
 type Props = {
 	msg: MessageType;
+	sendMessage: (msg: MessageType) => void;
 	onDelete: (id: string) => void;
 };
 
-export function MessageDropdownMenu({ msg, onDelete }: Props) {
+export function MessageDropdownMenu({ msg, onDelete, sendMessage }: Props) {
 	const [open, toggleOpen] = useToggle(false);
 	const [copied, setCopied] = useState(false);
 	const { setMsgToEdit, messages, setMessages, user, roomId, setReplyToMsg } = useChatProvider();
@@ -96,7 +83,7 @@ export function MessageDropdownMenu({ msg, onDelete }: Props) {
 						`
 							hidden
 							group-hover:!flex
-							absolute bg-background dark:bg-surface z-40 -top-6.5 max-sm:right-5 right-20 rounded-lg border border-border/30 gap-1 items-center p-[0.2rem]
+							absolute bg-background dark:bg-surface z-40 -top-7 max-sm:-top-7.5 max-sm:right-5 right-30 rounded-lg border border-border/30 gap-1 items-center p-[0.2rem]
 							`,
 						open ? "!flex" : ""
 					)}
@@ -151,6 +138,17 @@ export function MessageDropdownMenu({ msg, onDelete }: Props) {
 					>
 						<ImBin className="!text-[20px]" />
 					</IconWithSVG>
+
+					{typeof msg.synced === "boolean" && !msg.synced && (
+						<IconWithSVG
+							data-tooltip-id="icon-message-dropdown-menu-id"
+							data-tooltip-content="Retry"
+							onClick={() => sendMessage(msg)}
+							className="icon-message-tooltip min-sm:hidden"
+						>
+							<AiOutlineReload />
+						</IconWithSVG>
+					)}
 
 					{msg.sender_id !== user.id && (
 						<IconWithSVG

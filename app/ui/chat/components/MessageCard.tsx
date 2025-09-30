@@ -3,16 +3,18 @@ import { getLocalTimeString } from "@/app/lib/utilities";
 import clsx from "clsx";
 import React, { useEffect, useRef, useState } from "react";
 import { Avatar } from "../../general/Avatar";
-import { MessageType } from "@/app/lib/definitions";
+import { MessageContentType, MessageType } from "@/app/lib/definitions";
 import { useChatProvider } from "../ChatBoxWrapper";
 import InputField from "../../form/InputField";
 import { MessageDropdownMenu } from "./MessageDropdown";
-import { addReactionToMSG, editMsg, getUsername, removeReactionFromMSG } from "@/app/lib/actions";
+import { addReactionToMSG, editMsg, getUsername, insertMessageInDB, removeReactionFromMSG } from "@/app/lib/actions";
 import { useToast } from "@/app/lib/hooks/useToast";
 import { RxCross1, RxCross2 } from "react-icons/rx";
 import { IconWithSVG } from "../../general/Buttons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { AiOutlineReload } from "react-icons/ai";
+import { uuidv4 } from "zod/v4";
 
 type MessageCardType = {
 	msg: MessageType;
@@ -126,7 +128,29 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 			editInputRef.current.focus();
 		}
 	}, [msgToEdit]);
-	const router = useRouter();
+
+	// duplicate fn copied from chat inputbox
+
+	const sendMessage = async (msg: MessageType) => {
+		setMessages((prev: MessageType[]) =>
+			prev.map((prevMsg) => (prevMsg.tempId === msg.tempId ? { ...prevMsg, synced: "pending" } : prevMsg))
+		);
+
+		// frequent changing of react state is hurting performance I think
+		// TODO: maybe find a way to boost performance
+		const { id, createdAt, ...localMsg } = msg;
+		const result = await insertMessageInDB({ room_id: roomId, ...localMsg });
+		if (!result.success && result.message) {
+			toast({ title: result.message, subtitle: "", mode: "negative" });
+			setMessages((prev: MessageType[]) =>
+				prev.map((prevMsg) => (prevMsg.tempId === msg.tempId ? { ...prevMsg, synced: false } : prevMsg))
+			);
+		} else if (result.success) {
+			setMessages((prev: MessageType[]) =>
+				prev.map((prevMsg) => (prevMsg.tempId === msg.tempId ? { ...prevMsg, synced: true } : prevMsg))
+			);
+		}
+	};
 
 	return (
 		<div
@@ -135,7 +159,7 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 			data-content={msg.content.slice(0, 200)}
 			id={msg.id}
 			className={clsx(
-				"flex flex-col w-full dark:hover:bg-background/75 hover:bg-accent/75 px-2 pl-3 py-2 max-sm:pb-1 relative ",
+				"flex flex-col w-full dark:hover:bg-background/75 hover:bg-accent/75 px-2 pr-0 pl-3 py-2 max-sm:pb-1 relative ",
 				msgToEdit === msg.id ? "dark:bg-background/75 bg-accent" : "group",
 
 				replyToMsg &&
@@ -221,24 +245,50 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 										)}
 										title={msg_date}
 									>
-										{msg_date} {typeof msg.synced === "boolean" && msg.synced && "✅"}
+										{msg_date}{" "}
+										{((typeof msg.synced === "boolean" && msg.synced) ||
+											(typeof msg.tempId === "undefined" && !msg.synced)) &&
+											"✅"}
 										{typeof msg.synced === "boolean" && !msg.synced && "❌"}
 										{msg.synced === "pending" && "⌛"}
 									</div>
 
+									{typeof msg.tempId === "undefined" && !msg.synced && (
+										<>
+											<p
+												className="
+												msg-synced-indicator
+											"
+											>
+												sent ✅
+											</p>
+										</>
+									)}
+
 									{msg.synced && (
-										<p
-											className="
-											max-sm:hidden
-											flex gap-0.5 items-center h-fit w-fit m-0 p-0 text-muted absolute -bottom-1 right-0
-										text-[11px] -z-50 group-hover:z-0
-										"
-										>
-											{typeof msg.synced === "boolean" && msg.synced && "sent ✅"}
-											{typeof msg.synced === "boolean" && !msg.synced && "failed ❌"}
-											{msg.synced === "pending" && "sending ⌛"}
-											{/* <BiLoaderAlt className="animate-spin"></BiLoaderAlt> */}
-										</p>
+										<>
+											<div
+												className="
+												msg-synced-indicator
+											"
+											>
+												<p>
+													{typeof msg.synced === "boolean" && msg.synced && "sent ✅"}
+													{typeof msg.synced === "boolean" && !msg.synced && "failed ❌"}
+													{msg.synced === "pending" && "sending ⌛"}
+												</p>
+												{typeof msg.synced === "boolean" && !msg.synced && (
+													<IconWithSVG
+														data-tooltip-id="icon-message-dropdown-menu-id"
+														data-tooltip-content="Retry"
+														onClick={() => sendMessage(msg)}
+														className="icon-small ml-1"
+													>
+														<AiOutlineReload />
+													</IconWithSVG>
+												)}
+											</div>
+										</>
 									)}
 								</div>
 							) : (
@@ -308,7 +358,12 @@ const MessageCard = ({ msg, isFirstGroup, onDelete }: MessageCardType) => {
 				</div>
 			</div>
 
-			<MessageDropdownMenu key={`${msg.id}-dropdownMenu`} msg={msg} onDelete={onDelete}></MessageDropdownMenu>
+			<MessageDropdownMenu
+				sendMessage={sendMessage}
+				key={`${msg.id}-dropdownMenu`}
+				msg={msg}
+				onDelete={onDelete}
+			></MessageDropdownMenu>
 		</div>
 	);
 };

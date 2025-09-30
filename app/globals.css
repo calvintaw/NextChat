@@ -553,6 +553,10 @@ html {
 	#sidebar.active {
 		@apply border-border/40 dark:border-border/25;
 	}
+
+	.msg-synced-indicator {
+		@apply max-sm:hidden flex gap-0.5 items-center h-fit w-fit m-0 p-0 text-muted absolute top-1/2 -translate-y-1/2 right-0 text-[11px] -z-50 group-hover:z-0;
+	}
 }
 
 /* --- Message Bubble Styles --- */
@@ -974,9 +978,7 @@ html {
 	background: url("/auth_bg.svg");
 }
 
-
-
 .custom-scrollbar {
-  scrollbar-width: thin; /* options: auto, thin, none */
-  scrollbar-color: red rgba(255, 0, 0, 0.1); /* thumb color, track color */
+	scrollbar-width: thin; /* options: auto, thin, none */
+	scrollbar-color: red rgba(255, 0, 0, 0.1); /* thumb color, track color */
 }

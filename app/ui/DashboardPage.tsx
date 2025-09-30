@@ -75,12 +75,15 @@ const DashboardPage = ({ initialUser, isOwnPage = true }: { initialUser: User; i
 				maxSizeMB: 0.2,
 				maxWidthOrHeight: 256,
 				useWebWorker: true,
+				fileType: "image/jpg",
 			};
 
 			const compressedFile = await imageCompression(selectedFile, options);
 
-			const filename = `${nanoid()}.${compressedFile.name.split(".").pop()}`;
-			const { data, error } = await supabase.storage.from("uploads").upload(filename, compressedFile);
+			const filename = `profile.jpg`;
+			const filePath = `${user.id}/${filename}`;
+
+			const { data, error } = await supabase.storage.from("uploads").upload(filePath, compressedFile, { upsert: true });
 			if (error) throw error;
 
 			const { data: publicData } = supabase.storage.from("uploads").getPublicUrl(data?.path || "");

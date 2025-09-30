@@ -257,6 +257,11 @@ async function enableRLSAndPolicies() {
 
 export async function GET() {
 	try {
+		await sql`
+  ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS bio VARCHAR(160);
+`;
+
 		return Response.json({ message: "Database policies set successfully" });
 	} catch (error) {
 		console.error("Policy setup failed:", error);

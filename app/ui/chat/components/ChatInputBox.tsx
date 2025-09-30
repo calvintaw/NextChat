@@ -97,9 +97,9 @@ const ChatInputBox = ({
 		const result = await insertMessageInDB(temp_msg);
 		if (!result.success && result.message) {
 			toast({ title: result.message, subtitle: "", mode: "negative" });
-			setMessages((prev) => prev.map((msg) => (msg.id === tempId ? { ...msg, synced: false } : msg)));
+			setMessages((prev) => prev.map((msg) => (msg.tempId === tempId ? { ...msg, synced: false } : msg)));
 		} else if (result.success) {
-			setMessages((prev) => prev.map((msg) => (msg.id === tempId ? { ...msg, synced: true } : msg)));
+			setMessages((prev) => prev.map((msg) => (msg.tempId === tempId ? { ...msg, synced: true } : msg)));
 		}
 	};
 
@@ -153,7 +153,7 @@ const ChatInputBox = ({
 						replyToMsg && "rounded-t-none !border-muted/25"
 					)}
 				>
-					<AttachmentDropdown handleFileUpload={handleFileUpload} />
+					<AttachmentDropdown roomId={roomId} handleFileUpload={handleFileUpload} />
 					{!isFocused && (
 						<div
 							className="max-[500px]:hidden absolute border top-1/2 -translate-y-1/2 right-15

@@ -11,10 +11,11 @@ import ImageUploadDialog from "./ImgUploadDialog";
 import { FileUploadBtn } from "./UploadButtons";
 
 type Props = {
+	roomId: string;
 	handleFileUpload: (url: string[], type: "image" | "video") => void;
 };
 
-export const AttachmentDropdown = ({ handleFileUpload }: Props) => {
+export const AttachmentDropdown = ({ roomId, handleFileUpload }: Props) => {
 	const [uploaded, setUploaded] = useState<string[]>([]); // array used for storing base64 encoded strings of imgs or videos url to display locally in browser
 	const [dialogOpen, setDialogOpen] = useState(false); // manually control dialog box Open State as UI has some special requirements
 	const [dropdownOpen, setDropdownOpen] = useState(false); // same with this dropdown
@@ -52,8 +53,9 @@ export const AttachmentDropdown = ({ handleFileUpload }: Props) => {
 					compress && type.startsWith("image/") ? await imageCompression(selectedFile, options) : selectedFile;
 
 				const filename = `${nanoid()}.${compressedFile.name.split(".").pop()}`;
+				const filePath = `${roomId}/${filename}`;
 
-				const { data, error } = await supabase.storage.from("uploads").upload(filename, compressedFile);
+				const { data, error } = await supabase.storage.from("uploads").upload(filePath, compressedFile);
 
 				if (error) throw error;
 
