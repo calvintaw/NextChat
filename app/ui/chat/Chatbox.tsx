@@ -257,7 +257,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		// prepend messages
 		const uniqueOlder = filterNewMessages(olderMessages);
 
-		setMessages((prev) => sortMessagesAsc([...uniqueOlder, ...prev]));
+		setMessages((prev) => [...sortMessagesAsc(uniqueOlder), ...prev]);
 		setIsLoadingOldMsg(false);
 	};
 

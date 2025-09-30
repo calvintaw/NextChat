@@ -48,11 +48,6 @@ const ChatMessages = ({ messages, deleteMessage }: { messages: MessageType[]; de
 						(!!prevMsg && dayjs(msg.createdAt).diff(dayjs(prevMsg.createdAt), "minute") >= 5);
 					const separateLogic = prevMsg && dayjs(msg.createdAt).diff(dayjs(prevMsg.createdAt), "day") >= 1;
 
-					if (i >= 1) {
-						const before_msg = messages[i - 1];
-						if (msg.id === before_msg.id) return;
-					}
-
 					return (
 						<React.Fragment key={msg.id}>
 							{separateLogic && <MessageSeparator date={msg.createdAt} />}
