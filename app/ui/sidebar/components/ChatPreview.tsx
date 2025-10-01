@@ -195,7 +195,14 @@ export const ChatPreview = ({
 					isSelected ? "bg-accent/50 hover:bg-accent/20" : "hover:bg-accent/25"
 				)}
 			>
-				<Avatar statusIndicator={false} id={chat.id} src={chat.image} size="size-8.5" displayName={chat.displayName} />
+				<Avatar
+					disableTooltip
+					statusIndicator={false}
+					id={chat.id}
+					src={chat.image}
+					size="size-8.5"
+					displayName={chat.displayName}
+				/>
 
 				<div className="text-sm font-medium text-text truncate">{chat.displayName}</div>
 

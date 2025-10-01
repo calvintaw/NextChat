@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { TbLogout } from "react-icons/tb";
 import { IoMdSettings } from "react-icons/io";
 import { DarkModeBtn, IconWithSVG } from "../../general/Buttons";
@@ -102,6 +102,12 @@ const Buttons = () => {
 		document.documentElement.classList.toggle("disable-stars-bg");
 		setEnabled(!document.documentElement.classList.contains("disable-stars-bg"));
 	};
+
+	useLayoutEffect(() => {
+		if (!enabled && typeof window !== "undefined") {
+			document.documentElement.classList.add("disable-stars-bg");
+		}
+	}, []);
 
 	return (
 		<>

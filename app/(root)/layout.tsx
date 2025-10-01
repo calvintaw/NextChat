@@ -49,15 +49,13 @@ export default async function RootLayout({
 	console.log("cookie STORE: ", theme);
 
 	return (
-		<html lang="en" className={theme + " h-full min-h-screen disable-stars-bg"}>
+		<html lang="en" className={theme + " h-full min-h-screen"}>
 			<body
 				className={`font-sans ${roboto.className} antialiased flex flex-col h-full min-h-screen w-full min-w-0 scroll-smooth`}
 			>
 				<div className="bg-animation !z-[1000]">
 					<div id="stars"></div>
 					<div id="stars2"></div>
-					<div id="stars3"></div>
-					<div id="stars4"></div>
 				</div>
 				<ProgressBar></ProgressBar>
 				<PathProvider>

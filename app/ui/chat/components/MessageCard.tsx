@@ -171,33 +171,29 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 			<div className="flex items-start gap-4 max-w-[95%]">
 				{(isFirstGroup || msg.replyTo) && (
 					<div className="min-w-11 flex justify-center max-sm:hidden">
-						<Link href={`/users/${msg.sender_id}`}>
-							<Avatar
-								size="size-10"
-								id={msg.sender_id}
-								src={msg.sender_image}
-								statusIndicator={false}
-								displayName={msg.sender_display_name}
-								parentClassName="cursor-pointer"
-							></Avatar>
-						</Link>
+						<Avatar
+							size="size-10"
+							id={msg.sender_id}
+							src={msg.sender_image}
+							statusIndicator={false}
+							displayName={msg.sender_display_name}
+							parentClassName="cursor-pointer"
+						></Avatar>
 					</div>
 				)}
 				<div className="flex flex-1 flex-col">
 					{/* User Name and MSG sent time */}
 					{(isFirstGroup || msg.replyTo) && (
 						<div className="text-sm text-muted flex items-center gap-2 mb-1">
-							<Link href={`/users/${msg.sender_id}`} className="min-sm:hidden ">
-								<Avatar
-									size="size-8"
-									id={msg.sender_id}
-									src={msg.sender_image}
-									statusIndicator={false}
-									fontSize="text-sm"
-									displayName={msg.sender_display_name}
-									parentClassName="cursor-pointer"
-								></Avatar>
-							</Link>
+							<Avatar
+								size="size-8"
+								id={msg.sender_id}
+								src={msg.sender_image}
+								statusIndicator={false}
+								fontSize="text-sm"
+								displayName={msg.sender_display_name}
+								parentClassName="cursor-pointer min-sm:hidden"
+							></Avatar>
 							<Link
 								className="no-underline font-semibold text-foreground hover:underline hover:cursor-pointer"
 								title={`Go to ${msg.sender_display_name}'s Profile`}
