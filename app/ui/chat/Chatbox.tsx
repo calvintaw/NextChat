@@ -131,18 +131,15 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	useEffect(() => {
 		if (isBlocked || isSystem) return;
 
-		const handleIncomingMsg = async (msg: { id: string; room_id: string; sender_id: string }) => {
+		const handleIncomingMsg = async (msg: MessageType) => {
 			// no need to add to msg array again as it is optimally added for quick UI feedback just as user sent the msg
 			if (msg.sender_id === user.id) return;
-
-			const newMsg = await getSpecificMessage(msg.id);
-			if (!newMsg) return;
 
 			// check duplicate
 			if (messageIdsRef.current.has(msg.id)) return;
 			messageIdsRef.current.add(msg.id);
 
-			setMessages((prev) => [...prev, newMsg]);
+			setMessages((prev) => [...prev, msg]);
 		};
 
 		const handleMessageDeleted = (id: string) => {

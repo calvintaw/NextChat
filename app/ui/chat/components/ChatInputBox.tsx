@@ -25,14 +25,7 @@ type ChatInputBoxProps = {
 	initialLoading: boolean;
 };
 
-const ChatInputBox = ({
-	activePersons,
-	roomId,
-	user,
-	setMessages,
-	initialLoading,
-	isBlocked,
-}: ChatInputBoxProps) => {
+const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading, isBlocked }: ChatInputBoxProps) => {
 	const { input, setInput, replyToMsg, setReplyToMsg, textRef, isSystem } = useChatProvider();
 	const [isFocused, setIsFocused] = useState(false);
 	const [style, setStyle] = useState("!max-h-10");
@@ -73,6 +66,7 @@ const ChatInputBox = ({
 			sender_display_name: user.displayName,
 			content: input,
 			replyTo: replyToMsg ? replyToMsg.id : null,
+			createdAt: new Date().toISOString(),
 			edited: false,
 			reactions: {},
 			type,
@@ -85,8 +79,6 @@ const ChatInputBox = ({
 				...prev,
 				{
 					...temp_msg,
-					content: `${temp_msg.content}`,
-					createdAt: new Date().toISOString(),
 					synced: "pending",
 				},
 			];
@@ -94,6 +86,7 @@ const ChatInputBox = ({
 
 		// frequent changing of react state is hurting performance I think
 		// TODO: maybe find a way to boost performance
+
 		const result = await insertMessageInDB(temp_msg);
 		if (!result.success && result.message) {
 			toast({ title: result.message, subtitle: "", mode: "negative" });

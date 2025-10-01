@@ -138,8 +138,7 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 
 		// frequent changing of react state is hurting performance I think
 		// TODO: maybe find a way to boost performance
-		const { createdAt, ...localMsg } = msg;
-		const result = await insertMessageInDB({ room_id: roomId, ...localMsg });
+		const result = await insertMessageInDB({ room_id: roomId, ...msg });
 		if (!result.success && result.message) {
 			toast({ title: result.message, subtitle: "", mode: "negative" });
 			setMessages((prev: MessageType[]) =>

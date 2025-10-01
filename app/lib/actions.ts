@@ -199,12 +199,18 @@ export async function getRecentMessages(room_id: string, options: GetMessagesOpt
   `) as MessageType[];
 }
 
-type LocalMessageType = Omit<MessageType, "createdAt"> & {
+type LocalMessageType = MessageType & {
 	room_id: string;
 };
 
 export async function insertMessageInDB(msg: LocalMessageType): Promise<{ success: boolean; message?: string }> {
 	try {
+		if (msg.room_id.startsWith("system-room")) {
+			socket.emit("system", msg);
+		} else {
+			socket.emit("message", msg);
+		}
+
 		//TODO: make socket better
 		await sql.begin(async (sql) => {
 			await sql`
@@ -212,14 +218,6 @@ export async function insertMessageInDB(msg: LocalMessageType): Promise<{ succes
 					VALUES (${msg.id}, ${msg.room_id}, ${msg.sender_id}, ${msg.content}, ${msg.type}, ${msg.replyTo})
 				`;
 		});
-
-		const insertedMsg = { id: msg.id, room_id: msg.room_id, sender_id: msg.sender_id };
-
-		if (msg.room_id.startsWith("system-room")) {
-			socket.emit("system", insertedMsg);
-		} else {
-			socket.emit("message", insertedMsg);
-		}
 
 		console.log("Sent:", { name: msg.sender_display_name, msg: msg.content });
 
