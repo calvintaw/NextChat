@@ -15,6 +15,7 @@ const ChatPanel = async ({ user }: { user: User }) => {
 		lg:rounded-tl-2xl
     absolute left-15.75
 		max-sm:left-13
+		[#sidebar.active_&]:max-lg:border-l-0
 		bottom-0
 		max-lg:border-border
 		-translate-x-[calc(100%+64px)]

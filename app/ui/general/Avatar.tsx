@@ -80,8 +80,8 @@ export const Avatar = ({
 
 	return (
 		<>
-			<UserLink id={id} disable={disableTooltip}>
-				{hasValidSrc && (
+			{hasValidSrc && (
+				<UserLink id={id} disable={disableTooltip}>
 					<div
 						onClick={onParentClick}
 						data-tooltip-id={disableTooltip ? undefined : "avatar-tooltip"}
@@ -132,9 +132,11 @@ export const Avatar = ({
 							</div>
 						)}
 					</div>
-				)}
+				</UserLink>
+			)}
 
-				{!hasValidSrc && (
+			{!hasValidSrc && (
+				<UserLink id={id} disable={disableTooltip}>
 					<div
 						onClick={onParentClick}
 						data-tooltip-id="avatar-tooltip"
@@ -158,8 +160,8 @@ export const Avatar = ({
 							</div>
 						)}
 					</div>
-				)}
-			</UserLink>
+				</UserLink>
+			)}
 		</>
 	);
 };
