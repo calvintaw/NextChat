@@ -126,6 +126,7 @@ Stay tuned for updates!`
 				<div className="bg-contrast min-w-80 w-fit gap-4 flex flex-col pt-5 px-2 sm:px-4 max-w-90 max-md:max-w-full max-md:w-full">
 					<div className="flex items-center gap-3">
 						<Avatar
+							disableTooltip
 							src={user.image}
 							displayName={user.displayName}
 							size="size-[clamp(32px,15vw,64px)]"

@@ -17,6 +17,7 @@ type AvatarProps = {
 	statusIndicator?: boolean;
 	radius?: string;
 	parentClassName?: string;
+	disableTooltip?: boolean;
 	onParentClick?: () => void;
 } & Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src" | "alt">; // Omit conflicting src type
 
@@ -32,6 +33,7 @@ export const Avatar = ({
 	statusIndicator = true,
 	status = false,
 	parentClassName = "",
+	disableTooltip = false,
 	...rest
 }: AvatarProps) => {
 	const hasValidSrc = typeof src === "string" && src.trim() !== "";
@@ -66,8 +68,8 @@ export const Avatar = ({
 			{hasValidSrc && (
 				<div
 					onClick={onParentClick}
-					data-tooltip-id="avatar-tooltip"
-					data-tooltip-content={`View ${displayName}'s profile`}
+					data-tooltip-id={disableTooltip ? undefined : "avatar-tooltip"}
+					data-tooltip-content={disableTooltip ? undefined : `View ${displayName}'s profile`}
 					className={clsx("relative", size, parentClassName)}
 				>
 					{!loaded && (
@@ -90,12 +92,13 @@ export const Avatar = ({
 						src={src}
 						alt={displayName.charAt(0) ?? "A"}
 						className={clsx(
-							"cursor-pointer relative shrink-0 z-0 object-cover flex items-center justify-center text-white",
+							" relative shrink-0 z-0 object-cover flex items-center justify-center text-white",
 							size,
 							radius,
 							border,
 							getBackgroundColorByInitial(displayName),
-							!loaded ? "opacity-0" : "opacity-100"
+							!loaded ? "opacity-0" : "opacity-100",
+							!disableTooltip && "cursor-pointer"
 						)}
 						loading="lazy"
 						onLoad={() => setLoaded(true)}

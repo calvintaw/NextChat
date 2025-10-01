@@ -42,7 +42,10 @@ const UserPanel = ({ user }: Props) => {
 		"
 		>
 			<div className="hidden [#sidebar.active_&]:!flex @min-[200px]:flex p-1 bg-surface rounded-lg border-2 border-contrast items-center gap-1">
-				<div className=" @min-[200px]:pl-1 @min-[200px]:w-fit w-full flex items-center justify-center">
+				<div
+					className=" @min-[200px]:pl-1 @min-[200px]:w-fit w-full flex items-center
+				flex-shrink-0 justify-center"
+				>
 					<Avatar id={user.id} status={isOnline} src={user.image} displayName={user.displayName}></Avatar>
 				</div>
 				<div
@@ -88,7 +91,7 @@ const UserPanel = ({ user }: Props) => {
 };
 
 const Buttons = () => {
-	const [enabled, setEnabled] = useLocalStorage("stars-background-enabled", true);
+	const [enabled, setEnabled] = useLocalStorage("stars-background-enabled");
 
 	useEffect(() => {
 		setEnabled(!document.documentElement.classList.contains("disable-stars-bg"));

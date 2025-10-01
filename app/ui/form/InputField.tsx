@@ -86,6 +86,7 @@ export function PasswordField({
 	const [zxcvbnScore, setZxcvbnScore] = useState<number | null>(null);
 
 	useEffect(() => {
+		if (hideRules) return;
 		const newScore = RULES.reduce((acc, rule) => (rule.regex.test(value) ? acc + 1 : acc), 0);
 		setScore(newScore);
 		if (value.trim() === "") {
@@ -94,11 +95,13 @@ export function PasswordField({
 		}
 		const result = zxcvbn(value);
 		setZxcvbnScore(result.score); // 0 - 4
-	}, [value]);
+	}, [value, hideRules]);
 
 	const toast = useToast();
 
 	useEffect(() => {
+		if (hideRules) return;
+
 		const inputEl = document.getElementById(name);
 		if (!inputEl) return;
 
@@ -121,7 +124,7 @@ export function PasswordField({
 		form.addEventListener("submit", handleSubmit);
 
 		return () => form.removeEventListener("submit", handleSubmit);
-	}, [value, name]);
+	}, [value, name, hideRules]);
 
 	return (
 		<fieldset className="mb-2">

@@ -203,12 +203,46 @@ type LocalMessageType = MessageType & {
 	room_id: string;
 };
 
+// client.ts
+
+function sendWithRetry(event: string, msg: any, retries = 3, delay = 2000) {
+	return new Promise((resolve, reject) => {
+		let attempts = 0;
+
+		const attempt = () => {
+			attempts++;
+			// console.log(`Sending attempt ${attempts} for event "${event}"`);
+
+			socket.timeout(5000).emit(event, msg, (err: any, response?: any) => {
+				if (err) {
+					// console.warn(`No ack from server for "${event}" (attempt ${attempts})`);
+
+					if (attempts < retries) {
+						setTimeout(attempt, delay); // retry after delay
+					} else {
+						reject(new Error(`Failed after ${retries} attempts`));
+					}
+				} else {
+					// console.log(`Ack received for "${event}":`, response);
+					resolve(response);
+				}
+			});
+		};
+
+		attempt();
+	});
+}
+
 export async function insertMessageInDB(msg: LocalMessageType): Promise<{ success: boolean; message?: string }> {
 	try {
 		if (msg.room_id.startsWith("system-room")) {
-			socket.emit("system", msg);
+			sendWithRetry("system", msg, 3, 2000)
+				.then((res) => console.log("System message delivered:", res))
+				.catch((err) => console.error("System message failed:", err));
 		} else {
-			socket.emit("message", msg);
+			sendWithRetry("message", msg, 3, 2000)
+				.then((res) => console.log("Message delivered:", res))
+				.catch((err) => console.error("Message failed:", err));
 		}
 
 		//TODO: make socket better
@@ -1062,7 +1096,6 @@ export async function editMsg({
 }): Promise<{ success: true; message: string } | { success: false; error: any; message: string }> {
 	return withCurrentUser(async (user: User) => {
 		try {
-			socket.emit("join", user.id);
 			await sql.begin(async (tx) => {
 				await tx`
 				UPDATE messages
@@ -1091,8 +1124,6 @@ export async function addReactionToMSG({
 	emoji: string;
 }): Promise<{ success: true; message: string } | { success: false; error: any; message: string }> {
 	try {
-		socket.emit("join", userId);
-
 		await sql.begin(async (tx) => {
 			await tx`
 				UPDATE messages
@@ -1133,8 +1164,6 @@ export async function removeReactionFromMSG({
 	emoji: string;
 }): Promise<{ success: true; message: string } | { success: false; error: any; message: string }> {
 	try {
-		socket.emit("join", userId);
-
 		await sql.begin(async (tx) => {
 			await tx`
 UPDATE messages

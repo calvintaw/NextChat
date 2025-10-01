@@ -1,6 +1,6 @@
 "use client";
 import { MessageContentType, MessageType } from "@/app/lib/definitions";
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 
 import dayjs from "dayjs";
 import isToday from "dayjs/plugin/isToday";
@@ -69,7 +69,7 @@ const RefAnchor = () => {
 		return textRef.current === document.activeElement;
 	};
 
-	useLayoutEffect(() => {
+	useEffect(() => {
 		// container ref is not really needed now as i added a much better solution of check if textarea has focus or cursor in it.
 		const container = containerRef.current;
 		if (!container) return;

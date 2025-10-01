@@ -72,7 +72,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 			type,
 		};
 
-		cancelTypingAnimation(1500); // stop the typing animation 1.5s after use has stopped typing
+		cancelTypingAnimation(750); // stop the typing animation 1.5s after use has stopped typing
 
 		setMessages((prev) => {
 			return [
@@ -161,6 +161,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 					)}
 
 					<TextareaAutosize
+						autoComplete="off"
 						disabled={isBlocked || isSystem}
 						ref={textRef}
 						name="query"

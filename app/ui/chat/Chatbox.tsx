@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { socket } from "../../lib/socket";
 import { MessageContentType, MessageType, Room, User } from "../../lib/definitions";
 import { checkIfBlocked, deleteMsg, getRecentMessages, getSpecificMessage } from "../../lib/actions";
@@ -187,7 +187,6 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		};
 
 		socket.on("message", handleIncomingMsg);
-
 		socket.on("message deleted", handleMessageDeleted);
 		socket.on("message edited", handleMessageEdited);
 		socket.on("add_reaction_msg", toggleReaction);
@@ -269,7 +268,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	}, [isTopVisible]);
 
 	// effect for keeping the same scroll position if any older msg are loaded
-	useLayoutEffect(() => {
+	useEffect(() => {
 		if (!containerRef.current || scrollHeightBefore.current === 0) return;
 
 		const container = containerRef.current;
@@ -280,7 +279,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 	// effect for setting scroll position to bottom of chat if firstRender
 	const isFirstRender = useRef(true);
-	useLayoutEffect(() => {
+	useEffect(() => {
 		if (containerRef.current && !initialLoading && messages.length !== 0 && isFirstRender.current) {
 			containerRef.current.scrollTop = containerRef.current.scrollHeight;
 			isFirstRender.current = false;
