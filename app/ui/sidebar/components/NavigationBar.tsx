@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { MdSpaceDashboard } from "react-icons/md";
-import { RiCompassDiscoverFill } from "react-icons/ri";
+import { RiCompassDiscoverFill, RiStarSFill } from "react-icons/ri";
 import Link from "next/link";
 import { IconWithSVG } from "../../general/Buttons";
 import { Tooltip } from "react-tooltip";
@@ -14,6 +14,7 @@ import { Avatar } from "../../general/Avatar";
 import { IconType } from "react-icons";
 import { Route } from "next";
 import useEventListener from "@/app/lib/hooks/useEventListener";
+import { FaStar } from "react-icons/fa";
 type ActionIcon = React.FC<{ user: User; className?: string }>;
 
 const NavigationSections = [
@@ -34,6 +35,13 @@ const NavigationSections = [
 		href: "/discover",
 		icon: RiCompassDiscoverFill,
 		description: "Discover",
+	},
+	{
+		name: "Star",
+		href: "https://github.com/calvintaw/discord_clone",
+		icon: FaStar,
+		description: "Star my repo ;)",
+		external: true,
 	},
 ];
 
@@ -61,6 +69,7 @@ const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: R
 
 						return (
 							<Link
+								target={icon.external ? "_blank" : "_self"}
 								href={icon.href as Route}
 								role="navigation"
 								key={index}
@@ -81,7 +90,8 @@ const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: R
 									<Icon
 										className={clsx(
 											"not-dark:group-hover:text-background text-[24px] max-sm:text-[20px]",
-											pathname === icon.href && "not-dark:!text-white"
+											pathname === icon.href && "not-dark:!text-white",
+											icon.external && "text-yellow-400"
 										)}
 									/>
 								</IconWithSVG>
