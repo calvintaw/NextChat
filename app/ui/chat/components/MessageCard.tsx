@@ -24,7 +24,7 @@ type MessageCardType = {
 const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 	const msg_date = getLocalTimeString(msg.createdAt, { hour: "numeric", minute: "numeric", hour12: true });
 	const editInputRef = useRef<HTMLInputElement | null>(null);
-	const { msgToEdit, messages, setMessages, setMsgToEdit, roomId, replyToMsg } = useChatProvider();
+	const { msgToEdit, messages, setMessages, setMsgToEdit, roomId, replyToMsg, user } = useChatProvider();
 	const toast = useToast();
 
 	const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -249,12 +249,13 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 										{((typeof msg.synced === "boolean" && msg.synced) ||
 											// msg is from server, then synced is undefine as there is no such column as synced on DB
 											typeof msg.synced === "undefined") &&
+											msg.sender_id === user.id &&
 											"✅"}
-										{typeof msg.synced === "boolean" && !msg.synced && "❌"}
-										{msg.synced === "pending" && "⌛"}
+										{typeof msg.synced === "boolean" && !msg.synced && msg.sender_id === user.id && "❌"}
+										{msg.synced === "pending" && msg.sender_id === user.id && "⌛"}
 									</div>
 
-									{typeof msg.synced === "undefined" && (
+									{typeof msg.synced === "undefined" && msg.sender_id === user.id && (
 										<>
 											<p
 												className="
@@ -266,7 +267,7 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 										</>
 									)}
 
-									{msg.synced && (
+									{msg.synced && msg.sender_id === user.id && (
 										<>
 											<div
 												className="
@@ -369,12 +370,13 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 								{((typeof msg.synced === "boolean" && msg.synced) ||
 									// msg is from server, then synced is undefine as there is no such column as synced on DB
 									typeof msg.synced === "undefined") &&
+									msg.sender_id === user.id &&
 									"✅"}
-								{typeof msg.synced === "boolean" && !msg.synced && "❌"}
-								{msg.synced === "pending" && "⌛"}
+								{typeof msg.synced === "boolean" && !msg.synced && msg.sender_id === user.id && "❌"}
+								{msg.synced === "pending" && msg.sender_id === user.id && "⌛"}
 							</div>
 
-							{typeof msg.synced === "undefined" && (
+							{typeof msg.synced === "undefined" && msg.sender_id === user.id && (
 								<>
 									<p
 										className="
@@ -386,7 +388,7 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 								</>
 							)}
 
-							{msg.synced && (
+							{msg.synced && msg.sender_id === user.id && (
 								<>
 									<div
 										className="
