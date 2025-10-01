@@ -1,4 +1,4 @@
-# Discord Clone
+# Discord Clone (README outdated (new features added) | working on updating this doc)
 
 A full-stack **Discord-inspired chat app** built with [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com/), [React](https://react.dev/), [postgres.js](https://github.com/porsager/postgres), and [Supabase](https://supabase.com/) DB.
 
