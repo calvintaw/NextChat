@@ -11,17 +11,17 @@ import { AiOutlineReload } from "react-icons/ai";
 import { useChatProvider } from "../ChatBoxWrapper";
 import { FiEdit } from "react-icons/fi";
 import { addReactionToMSG, removeReactionFromMSG } from "@/app/lib/actions";
-import { MessageContentType, MessageType } from "@/app/lib/definitions";
+import { MessageType } from "@/app/lib/definitions";
 import { HiReply } from "react-icons/hi";
 import { useToast } from "@/app/lib/hooks/useToast";
 import { ImBin } from "react-icons/im";
 
 type Props = {
 	msg: MessageType;
-	sendMessage: (msg: MessageType) => void;
+	retrySendingMessage: (msg: MessageType) => void;
 };
 
-export function MessageDropdownMenu({ msg, sendMessage }: Props) {
+export function MessageDropdownMenu({ msg, retrySendingMessage }: Props) {
 	const [open, toggleOpen] = useToggle(false);
 	const [copied, setCopied] = useState(false);
 	const { setMsgToEdit, messages, setMessages, user, roomId, setReplyToMsg, deleteMessage } = useChatProvider();
@@ -143,7 +143,7 @@ export function MessageDropdownMenu({ msg, sendMessage }: Props) {
 						<IconWithSVG
 							data-tooltip-id="icon-message-dropdown-menu-id"
 							data-tooltip-content="Retry"
-							onClick={() => sendMessage(msg)}
+							onClick={() => retrySendingMessage(msg)}
 							className="icon-message-tooltip min-sm:hidden"
 						>
 							<AiOutlineReload />

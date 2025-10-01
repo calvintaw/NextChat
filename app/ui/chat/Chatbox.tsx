@@ -2,7 +2,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { socket } from "../../lib/socket";
 import { MessageContentType, MessageType, Room, User } from "../../lib/definitions";
-import { checkIfBlocked, deleteMsg, getRecentMessages } from "../../lib/actions";
+import { checkIfBlocked, deleteMsg, getRecentMessages, getSpecificMessage } from "../../lib/actions";
 import dayjs from "dayjs";
 import isToday from "dayjs/plugin/isToday";
 import isYesterday from "dayjs/plugin/isYesterday";
@@ -34,7 +34,6 @@ type ChatboxProps = { recipient: User | Room; user: User; roomId: string; type: 
 export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	const [messages, setMessages] = useState<MessageType[]>([]);
 	const [activePersons, setActivePersons] = useState<string[]>([]);
-	const tempIdsRef = useRef<Set<string>>(new Set());
 	const [initialLoading, setInitialLoading] = useState(true);
 	const [isBlocked, setIsBlocked] = useState(false);
 	const [isSystem, setIsSystem] = useState(false);
@@ -109,7 +108,12 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		fetchMessages();
 
 		const handleTypingStart = (displayName: string) => {
-			setActivePersons((prev) => [...prev, displayName]);
+			setActivePersons((prev) => {
+				if (!prev.includes(displayName)) {
+					return [...prev, displayName];
+				}
+				return prev;
+			});
 		};
 
 		const handleTypingStop = () => setActivePersons([]);
@@ -127,28 +131,18 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	useEffect(() => {
 		if (isBlocked || isSystem) return;
 
-		const handleIncomingMsg = (msg: MessageType) => {
-			setMessages((prev) => {
-				if (messageIdsRef.current.has(msg.id)) return prev;
+		const handleIncomingMsg = async (msg: { id: string; room_id: string; sender_id: string }) => {
+			// no need to add to msg array again as it is optimally added for quick UI feedback just as user sent the msg
+			if (msg.sender_id === user.id) return;
 
-				messageIdsRef.current.add(msg.id);
-				if (msg.sender_id !== user.id) {
-					// msgReceivedSound.current.volume = 0.25;
-					// msgReceivedSound.current.currentTime = 0;
-					// msgReceivedSound.current.play().catch((err) => console.error(err));
-					return [...prev, msg];
-				}
+			const newMsg = await getSpecificMessage(msg.id);
+			if (!newMsg) return;
 
-				const index = prev.findIndex((item) => item.tempId && tempIdsRef.current.has(item.tempId));
-				if (index === -1) return [...prev, msg];
+			// check duplicate
+			if (messageIdsRef.current.has(msg.id)) return;
+			messageIdsRef.current.add(msg.id);
 
-				const updated = [...prev];
-
-				if (msg.tempId) tempIdsRef.current.delete(msg.tempId);
-				updated[index] = { ...msg, tempId: undefined };
-
-				return updated;
-			});
+			setMessages((prev) => [...prev, newMsg]);
 		};
 
 		const handleMessageDeleted = (id: string) => {
@@ -345,7 +339,6 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 					<ChatInputBox
 						initialLoading={initialLoading}
 						isBlocked={isBlocked}
-						tempIdsRef={tempIdsRef}
 						setMessages={setMessages}
 						roomId={roomId}
 						user={user}

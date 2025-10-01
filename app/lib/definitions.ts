@@ -135,7 +135,6 @@ sender_display_name: string;
 	edited: boolean;
 	reactions: Record<string, string[]>;
 	replyTo: string | null;
-	tempId?: string;
 	synced?: boolean | "pending";
 };
 

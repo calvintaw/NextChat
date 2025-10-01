@@ -130,23 +130,24 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 
 	// duplicate fn copied from chat inputbox
 
-	const sendMessage = async (msg: MessageType) => {
+	// fn for resending the msg to db if the original operation fails
+	const retrySendingMessage = async (msg: MessageType) => {
 		setMessages((prev: MessageType[]) =>
-			prev.map((prevMsg) => (prevMsg.tempId === msg.tempId ? { ...prevMsg, synced: "pending" } : prevMsg))
+			prev.map((prevMsg) => (prevMsg.id === msg.id ? { ...prevMsg, synced: "pending" } : prevMsg))
 		);
 
 		// frequent changing of react state is hurting performance I think
 		// TODO: maybe find a way to boost performance
-		const { id, createdAt, ...localMsg } = msg;
+		const { createdAt, ...localMsg } = msg;
 		const result = await insertMessageInDB({ room_id: roomId, ...localMsg });
 		if (!result.success && result.message) {
 			toast({ title: result.message, subtitle: "", mode: "negative" });
 			setMessages((prev: MessageType[]) =>
-				prev.map((prevMsg) => (prevMsg.tempId === msg.tempId ? { ...prevMsg, synced: false } : prevMsg))
+				prev.map((prevMsg) => (prevMsg.id === msg.id ? { ...prevMsg, synced: false } : prevMsg))
 			);
 		} else if (result.success) {
 			setMessages((prev: MessageType[]) =>
-				prev.map((prevMsg) => (prevMsg.tempId === msg.tempId ? { ...prevMsg, synced: true } : prevMsg))
+				prev.map((prevMsg) => (prevMsg.id === msg.id ? { ...prevMsg, synced: true } : prevMsg))
 			);
 		}
 	};
@@ -158,9 +159,9 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 			data-content={msg.content.slice(0, 200)}
 			id={msg.id}
 			className={clsx(
-				"flex flex-col w-full dark:hover:bg-background/75 hover:bg-accent/75 px-2 pr-0 pl-3 py-2 max-sm:pb-1 relative ",
+				"flex flex-col w-full dark:hover:bg-background/75 hover:bg-accent/75 px-2 pr-0 pl-3 py-2  relative ",
 				msgToEdit === msg.id ? "dark:bg-background/75 bg-accent" : "group",
-
+				msg.type === "image" || msg.type === "video" ? "!pb-5" : "max-sm:pb-1",
 				replyToMsg &&
 					replyToMsg.id === msg.id &&
 					"bg-primary/20 border-3 border-b-0 border-t-0 border-primary hover:!bg-primary/10"
@@ -225,7 +226,7 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 
 						{msg.type === "text" &&
 							(msgToEdit !== msg.id ? (
-								<div className="w-full flex max-sm:justify-between relative">
+								<div className="w-full flex max-sm:justify-between relative border">
 									<div
 										className={clsx(
 											"relative max-w-full break-words break-all whitespace-pre-wrap text-sm",
@@ -240,19 +241,20 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 									<div
 										className={clsx(
 											"min-sm:hidden w-11 h-auto font-mono text-center whitespace-nowrap text-nowrap flex items-center justify-center text-[11px] text-muted -z-50 group-hover:z-0",
-											isFirstGroup && "hidden"
+											isFirstGroup && "justify-end"
 										)}
 										title={msg_date}
 									>
-										{msg_date}{" "}
+										{isFirstGroup ? null : msg_date}{" "}
 										{((typeof msg.synced === "boolean" && msg.synced) ||
-											(typeof msg.tempId === "undefined" && !msg.synced)) &&
+											// msg is from server, then synced is undefine as there is no such column as synced on DB
+											typeof msg.synced === "undefined") &&
 											"✅"}
 										{typeof msg.synced === "boolean" && !msg.synced && "❌"}
 										{msg.synced === "pending" && "⌛"}
 									</div>
 
-									{typeof msg.tempId === "undefined" && !msg.synced && (
+									{typeof msg.synced === "undefined" && (
 										<>
 											<p
 												className="
@@ -280,7 +282,7 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 													<IconWithSVG
 														data-tooltip-id="icon-message-dropdown-menu-id"
 														data-tooltip-content="Retry"
-														onClick={() => sendMessage(msg)}
+														onClick={() => retrySendingMessage(msg)}
 														className="icon-small ml-1"
 													>
 														<AiOutlineReload />
@@ -315,7 +317,7 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 						{(msg.type === "image" || msg.type === "video") && (
 							<div
 								className={clsx(
-									"max-w-120 grid gap-2 rounded-md img-upload-scrollbar",
+									"max-w-105 w-full grid gap-2 rounded-md img-upload-scrollbar relative",
 									isFirstGroup && "max-sm:mt-2 max-sm:pl-3"
 								)}
 							>
@@ -330,7 +332,7 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 									return (
 										<div
 											key={`${src}-${i}`}
-											className="rounded-lg max-h-70 flex items-center justify-center bg-accent"
+											className="rounded-2xl w-full max-h-65 flex items-center justify-center bg-accent"
 											style={{
 												gridColumn: `span ${colSpan}`,
 												gridRow: `span ${rowSpan}`,
@@ -354,11 +356,68 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 						)}
 					</div>
 					<ReactionsRow msg={msg} isFirstGroup={isFirstGroup}></ReactionsRow>
+					{(msg.type == "image" || msg.type == "video") && (
+						<div className="absolute right-5 max-sm:right-4 bottom-1 flex gap-1 items-center">
+							<div
+								className={clsx(
+									"min-sm:hidden w-11 h-auto font-mono text-center whitespace-nowrap text-nowrap flex items-center justify-center text-[11px] text-muted -z-50 group-hover:z-0",
+									isFirstGroup && "justify-end"
+								)}
+								title={msg_date}
+							>
+								{msg_date}{" "}
+								{((typeof msg.synced === "boolean" && msg.synced) ||
+									// msg is from server, then synced is undefine as there is no such column as synced on DB
+									typeof msg.synced === "undefined") &&
+									"✅"}
+								{typeof msg.synced === "boolean" && !msg.synced && "❌"}
+								{msg.synced === "pending" && "⌛"}
+							</div>
+
+							{typeof msg.synced === "undefined" && (
+								<>
+									<p
+										className="
+												msg-synced-indicator static
+											"
+									>
+										sent ✅
+									</p>
+								</>
+							)}
+
+							{msg.synced && (
+								<>
+									<div
+										className="
+												msg-synced-indicator static
+											"
+									>
+										<p>
+											{typeof msg.synced === "boolean" && msg.synced && "sent ✅"}
+											{typeof msg.synced === "boolean" && !msg.synced && "failed ❌"}
+											{msg.synced === "pending" && "sending ⌛"}
+										</p>
+										{typeof msg.synced === "boolean" && !msg.synced && (
+											<IconWithSVG
+												data-tooltip-id="icon-message-dropdown-menu-id"
+												data-tooltip-content="Retry"
+												onClick={() => retrySendingMessage(msg)}
+												className="icon-small ml-1"
+											>
+												<AiOutlineReload />
+											</IconWithSVG>
+										)}
+									</div>
+								</>
+							)}
+						</div>
+					)}
 				</div>
 			</div>
 
 			<MessageDropdownMenu
-				sendMessage={sendMessage}
+				retrySendingMessage={retrySendingMessage}
 				key={`${msg.id}-dropdownMenu`}
 				msg={msg}
 			></MessageDropdownMenu>
@@ -420,7 +479,9 @@ const ReactionsRow = ({ msg, isFirstGroup }: { msg: MessageType; isFirstGroup: b
 	if (!msg.reactions) return null;
 
 	return (
-		<div className={clsx("mt-1 h-fit w-fit flex gap-1 flex-wrap", !isFirstGroup && !msg.replyTo && "ml-15")}>
+		<div
+			className={clsx("mt-1 h-fit w-fit flex gap-1 flex-wrap max-sm:pl-3", !isFirstGroup && !msg.replyTo && "ml-15")}
+		>
 			{Object.entries(msg.reactions).map(([emoji, users], idx) => {
 				if (users.length === 0) return null;
 				return (

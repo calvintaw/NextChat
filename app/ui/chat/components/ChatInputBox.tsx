@@ -21,7 +21,6 @@ type ChatInputBoxProps = {
 	roomId: string;
 	user: User;
 	setMessages: React.Dispatch<React.SetStateAction<MessageType[]>>;
-	tempIdsRef: React.MutableRefObject<Set<string>>;
 	isBlocked: boolean;
 	initialLoading: boolean;
 };
@@ -32,14 +31,13 @@ const ChatInputBox = ({
 	user,
 	setMessages,
 	initialLoading,
-	tempIdsRef,
 	isBlocked,
 }: ChatInputBoxProps) => {
 	const { input, setInput, replyToMsg, setReplyToMsg, textRef, isSystem } = useChatProvider();
 	const [isFocused, setIsFocused] = useState(false);
 	const [style, setStyle] = useState("!max-h-10");
 	const { canSendMessage } = useMessageLimiter(25, 60_000);
-	const { trigger, cancel } = useDebounce({
+	const { trigger: triggerTypingAnimation, cancel: cancelTypingAnimation } = useDebounce({
 		startCallback: () => socket.emit("typing started", roomId, user.displayName),
 		endCallback: () => socket.emit("typing stopped", roomId),
 		delay: 2000,
@@ -53,7 +51,7 @@ const ChatInputBox = ({
 	useEffect(() => {
 		if (!textRef.current) return;
 
-		const handleInput = () => trigger();
+		const handleInput = () => triggerTypingAnimation();
 
 		const textarea = textRef.current;
 		textarea.addEventListener("input", handleInput);
@@ -61,27 +59,26 @@ const ChatInputBox = ({
 		return () => {
 			textarea.removeEventListener("input", handleInput);
 		};
-	}, [trigger]);
+	}, []);
 
 	const sendMessage = async (input: string, type: MessageContentType = "text") => {
 		if (isBlocked || isSystem) return;
 		const tempId = uuidv4();
-		tempIdsRef.current.add(tempId);
 
 		const temp_msg = {
-			tempId: tempId,
+			id: tempId,
 			room_id: roomId,
 			sender_id: user.id,
 			sender_image: user.image ?? null,
 			sender_display_name: user.displayName,
 			content: input,
-			type,
 			replyTo: replyToMsg ? replyToMsg.id : null,
 			edited: false,
 			reactions: {},
+			type,
 		};
 
-		cancel(750); // stop the typing animation
+		cancelTypingAnimation(1500); // stop the typing animation 1.5s after use has stopped typing
 
 		setMessages((prev) => {
 			return [
@@ -89,8 +86,6 @@ const ChatInputBox = ({
 				{
 					...temp_msg,
 					content: `${temp_msg.content}`,
-					type,
-					id: tempId,
 					createdAt: new Date().toISOString(),
 					synced: "pending",
 				},
@@ -102,14 +97,15 @@ const ChatInputBox = ({
 		const result = await insertMessageInDB(temp_msg);
 		if (!result.success && result.message) {
 			toast({ title: result.message, subtitle: "", mode: "negative" });
-			setMessages((prev) => prev.map((msg) => (msg.tempId === tempId ? { ...msg, synced: false } : msg)));
+			setMessages((prev) => prev.map((msg) => (msg.id === tempId ? { ...msg, synced: false } : msg)));
 		} else if (result.success) {
-			setMessages((prev) => prev.map((msg) => (msg.tempId === tempId ? { ...msg, synced: true } : msg)));
+			setMessages((prev) => prev.map((msg) => (msg.id === tempId ? { ...msg, synced: true } : msg)));
 		}
 	};
 
 	const handleFileUpload = (url: string[], type: "image" | "video") => {
-		sendMessage(JSON.stringify(url), type); // turn url to json as there can be multiple images or videos uploaded at the same time so URL is ARRAY type
+		sendMessage(JSON.stringify(url), type);
+		// turn url to json as there can be multiple images or videos uploaded at the same time so URL is ARRAY type
 	};
 
 	// function that calls sendMessage and is triggered when user click ENTER

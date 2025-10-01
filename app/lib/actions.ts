@@ -111,9 +111,7 @@ export async function deleteMsg(
 				return { success: false, message: "Invalid message format" };
 			}
 
-			const { error } = await supabase.storage
-				.from("uploads") 
-				.remove(files);
+			const { error } = await supabase.storage.from("uploads").remove(files);
 
 			if (error) {
 				console.error("Error deleting file:", error.message);
@@ -201,30 +199,29 @@ export async function getRecentMessages(room_id: string, options: GetMessagesOpt
   `) as MessageType[];
 }
 
-type LocalMessageType = Omit<MessageType, "id" | "createdAt"> & {
+type LocalMessageType = Omit<MessageType, "createdAt"> & {
 	room_id: string;
 };
 
 export async function insertMessageInDB(msg: LocalMessageType): Promise<{ success: boolean; message?: string }> {
 	try {
+		//TODO: make socket better
 		await sql.begin(async (sql) => {
-			const results = await sql`
-					INSERT INTO messages (room_id, sender_id, content, type, replyTo)
-					VALUES (${msg.room_id}, ${msg.sender_id}, ${msg.content}, ${msg.type}, ${msg.replyTo})
-					RETURNING id, created_at
+			await sql`
+					INSERT INTO messages (id, room_id, sender_id, content, type, replyTo)
+					VALUES (${msg.id}, ${msg.room_id}, ${msg.sender_id}, ${msg.content}, ${msg.type}, ${msg.replyTo})
 				`;
-
-			const { id, created_at: createdAt } = results[0];
-			const insertedMsg = { ...msg, id, createdAt, synced: true };
-
-			if (msg.room_id.startsWith("system-room")) {
-				socket.emit("system", insertedMsg);
-			} else {
-				socket.emit("message", insertedMsg);
-			}
-
-			console.log("Sent:", { name: msg.sender_display_name, msg: msg.content });
 		});
+
+		const insertedMsg = { id: msg.id, room_id: msg.room_id, sender_id: msg.sender_id };
+
+		if (msg.room_id.startsWith("system-room")) {
+			socket.emit("system", insertedMsg);
+		} else {
+			socket.emit("message", insertedMsg);
+		}
+
+		console.log("Sent:", { name: msg.sender_display_name, msg: msg.content });
 
 		return { success: true };
 	} catch (error) {
@@ -234,6 +231,28 @@ export async function insertMessageInDB(msg: LocalMessageType): Promise<{ succes
 			message: "Failed to send message. Please try again.",
 		};
 	}
+}
+
+export async function getSpecificMessage(id: string): Promise<MessageType | null> {
+	const result: MessageType[] = await sql`
+    SELECT 
+		m.id,
+      users.image AS "sender_image",
+      m.sender_id, 
+      users.display_name AS "sender_display_name", 
+      m.content, 
+      m.created_at AS "createdAt",
+      m.type,
+      m.edited,
+      m.reactions,
+      m.replyTo AS "replyTo"
+    FROM messages m
+    JOIN users ON m.sender_id = users.id
+    WHERE m.id = ${id}
+    LIMIT 1
+  `;
+
+	return result[0] ?? null;
 }
 
 export async function getServer(id: string): Promise<Room[]> {
