@@ -115,18 +115,18 @@ const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTa
 						</div>
 
 						<Tabs.Trigger value="all" asChild>
-							<Button className="bg-accent/25 border-transparent text-text hover:bg-accent/50 data-[state=active]:bg-accent/50 data-[state=active]:cursor-default">
+							<Button className="bg-accent/15 border-transparent text-text hover:bg-accent/80 data-[state=active]:bg-accent/80 data-[state=active]:cursor-default">
 								All
 							</Button>
 						</Tabs.Trigger>
 
-						{(friendRequests.sent.length > 0 || friendRequests.incoming.length > 0) && (
-							<Tabs.Trigger value="request" asChild>
-								<Button className="bg-accent/25 border-transparent text-text hover:bg-accent/50 data-[state=active]:bg-accent/50 data-[state=active]:cursor-default">
-									Pending
-								</Button>
-							</Tabs.Trigger>
-						)}
+						{/* {(friendRequests.sent.length > 0 || friendRequests.incoming.length > 0) && ( */}
+						<Tabs.Trigger value="request" asChild>
+							<Button className="bg-accent/15 border-transparent text-text hover:bg-accent/80 data-[state=active]:bg-accent/80 data-[state=active]:cursor-default">
+								Pending
+							</Button>
+						</Tabs.Trigger>
+						{/* )} */}
 
 						<Tabs.Trigger
 							value="add"
@@ -486,6 +486,14 @@ const RequestTab = ({ user, friendRequests, setFriendRequests, setContacts }: Re
 							))}
 						</div>
 					</>
+				)}
+
+				{(friendRequests.sent.length === 0 || friendRequests.incoming.length === 0) && (
+					<div className="flex flex-1 items-center justify-center">
+						<p className="text-muted">
+							There are no pending friend requests. Click "Add Friend" to send friend requests
+						</p>
+					</div>
 				)}
 			</div>
 		</>
