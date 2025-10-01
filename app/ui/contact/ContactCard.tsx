@@ -45,11 +45,11 @@ export const ContactPreviewContainer = ({ user, contacts }: { user: User; contac
 	const [error, setError] = useState("");
 	const [pendingDeletes, setPendingDeletes] = useState<Set<string>>(new Set());
 
-	const handleRemove = async (friend: MinimalUserType) => {
+	const handleRemove = async (friend: MinimalUserType, type: "incoming" | "sent" | "friend") => {
 		setPendingDeletes((prev) => new Set(prev).add(friend.id));
 
 		try {
-			const result = await removeFriendshipRequest(friend);
+			const result = await removeFriendshipRequest(friend, type);
 			if (!result.success) {
 				setError(result.message);
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
@@ -92,7 +92,7 @@ export const ContactPreview = ({
 	contact,
 	isPending,
 }: {
-	handleRemove: (friend: MinimalUserType) => void;
+	handleRemove: (friend: MinimalUserType, type: "incoming" | "sent" | "friend") => void;
 	user: User;
 	isPending: boolean;
 	contact: ContactType;
@@ -180,10 +180,13 @@ export const ContactPreview = ({
 							e.preventDefault();
 							e.stopPropagation();
 
-							handleRemove({
-								id: contact.id,
-								username: contact.username,
-							});
+							handleRemove(
+								{
+									id: contact.id,
+									username: contact.username,
+								},
+								"friend"
+							);
 						}}
 						data-tooltip-id={`tooltip-${contact.id}`}
 						data-tooltip-content="Remove Friend"

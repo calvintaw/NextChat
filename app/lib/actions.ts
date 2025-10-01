@@ -902,7 +902,8 @@ type MinimalUserType = {
 };
 
 export async function removeFriendshipRequest(
-	targetUser: MinimalUserType
+	targetUser: MinimalUserType,
+	type: "incoming" | "sent" | "friend"
 ): Promise<{ success: boolean; message: string }> {
 	return withCurrentUser(async (currentUser: User) => {
 		try {
@@ -910,6 +911,21 @@ export async function removeFriendshipRequest(
 			console.log("Starting friendship cancel.");
 
 			const [user1_id, user2_id] = [targetUser.id, currentUser.id].sort((a, b) => a.localeCompare(b));
+
+			if (type === "sent") {
+				const existing = await sql`
+          SELECT status FROM friends
+          WHERE user1_id = ${user1_id} AND user2_id = ${user2_id}
+          LIMIT 1
+        `;
+
+				if (existing.length > 0 && existing[0].status === "accepted") {
+					return {
+						success: false,
+						message: `${targetUser.username} has already accepted your request.`,
+					};
+				}
+			}
 
 			await sql.begin(async (tx) => {
 				await tx`

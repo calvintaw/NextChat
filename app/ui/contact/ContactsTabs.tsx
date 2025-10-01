@@ -282,7 +282,7 @@ const RequestTab = ({ user, friendRequests, setFriendRequests, setContacts }: Re
 	const handleRemove = async (friend: User, type: "incoming" | "sent") => {
 		handlePending(friend.id, true);
 		try {
-			const result = await removeFriendshipRequest(friend);
+			const result = await removeFriendshipRequest(friend, type);
 			if (!result.success) {
 				setError(result.message);
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });

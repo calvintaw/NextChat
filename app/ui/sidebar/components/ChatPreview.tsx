@@ -130,7 +130,7 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 									className="DropdownMenuItem"
 									onClick={async (e) => {
 										e.preventDefault();
-										const result = await removeFriendshipRequest(selectedChat);
+										const result = await removeFriendshipRequest(selectedChat, "friend");
 
 										if (result.success) {
 											router.refresh();

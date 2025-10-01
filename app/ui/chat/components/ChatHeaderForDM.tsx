@@ -66,7 +66,13 @@ export function DirectMessageCard({
 		<div className="bg-contrast text-white pt-2 px-4 pb-2 rounded-lg max-w-full">
 			<div className="flex items-center justify-between mb-4">
 				<div className="flex items-center gap-3">
-					<Avatar id={user.id} size={"size-12"} displayName={user.username} src={user.image} statusIndicator={false}></Avatar>
+					<Avatar
+						id={user.id}
+						size={"size-12"}
+						displayName={user.username}
+						src={user.image}
+						statusIndicator={false}
+					></Avatar>
 					<div>
 						<h2 className="text-xl font-semibold">{user.displayName}</h2>
 						<div role="contentinfo" className="text-sm text-gray-400 cursor-pointer" data-tooltip-id={user.username}>
@@ -109,7 +115,7 @@ export function DirectMessageCard({
 					<button
 						className="btn btn-secondary"
 						onClick={async () => {
-							const result = await removeFriendshipRequest({ username: user.username, id: user.id });
+							const result = await removeFriendshipRequest({ username: user.username, id: user.id }, "friend");
 							if (result.success) {
 								router.refresh();
 								socket.emit("refresh-contacts-page", currentUserId, user.id);
