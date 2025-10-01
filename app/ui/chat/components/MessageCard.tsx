@@ -225,7 +225,7 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 
 						{msg.type === "text" &&
 							(msgToEdit !== msg.id ? (
-								<div className="w-full flex max-sm:justify-between relative border">
+								<div className="w-full flex max-sm:justify-between relative">
 									<div
 										className={clsx(
 											"relative max-w-full break-words break-all whitespace-pre-wrap text-sm",
