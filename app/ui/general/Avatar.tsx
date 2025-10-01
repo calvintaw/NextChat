@@ -81,13 +81,13 @@ export const Avatar = ({
 	return (
 		<>
 			{hasValidSrc && (
-				<UserLink id={id} disable={disableTooltip}>
-					<div
-						onClick={onParentClick}
-						data-tooltip-id={disableTooltip ? undefined : "avatar-tooltip"}
-						data-tooltip-content={disableTooltip ? undefined : `View ${displayName}'s profile`}
-						className={clsx("relative", size, parentClassName)}
-					>
+				<div
+					onClick={onParentClick}
+					data-tooltip-id={disableTooltip ? undefined : "avatar-tooltip"}
+					data-tooltip-content={disableTooltip ? undefined : `View ${displayName}'s profile`}
+					className={clsx("relative", size, parentClassName)}
+				>
+					<UserLink id={id} disable={disableTooltip}>
 						{!loaded && (
 							<div
 								className={clsx(
@@ -131,18 +131,18 @@ export const Avatar = ({
 								)}
 							</div>
 						)}
-					</div>
-				</UserLink>
+					</UserLink>
+				</div>
 			)}
 
 			{!hasValidSrc && (
-				<UserLink id={id} disable={disableTooltip}>
-					<div
-						onClick={onParentClick}
-						data-tooltip-id="avatar-tooltip"
-						data-tooltip-content={`View ${displayName}'s profile`}
-						className={clsx("relative", size, parentClassName)}
-					>
+				<div
+					onClick={onParentClick}
+					data-tooltip-id="avatar-tooltip"
+					data-tooltip-content={`View ${displayName}'s profile`}
+					className={clsx("relative", size, parentClassName)}
+				>
+					<UserLink id={id} disable={disableTooltip}>
 						<div
 							className={clsx(
 								"relative shrink-0  z-0 flex items-center justify-center text-white",
@@ -159,8 +159,8 @@ export const Avatar = ({
 								<div className={clsx(onlineStatusBulb, status ? "bg-emerald-500" : "bg-red-400")} />
 							</div>
 						)}
-					</div>
-				</UserLink>
+					</UserLink>
+				</div>
 			)}
 		</>
 	);
