@@ -146,6 +146,7 @@ export const ContactPreview = ({
 				{/* Avatar */}
 				<div className="h-full flex flex-row py-2.5">
 					<Avatar
+						disableTooltip
 						id={contact.id}
 						src={contact.image}
 						size="size-8.5"

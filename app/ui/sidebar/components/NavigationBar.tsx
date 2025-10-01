@@ -1,7 +1,7 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { MdSpaceDashboard } from "react-icons/md";
-import { RiCompassDiscoverFill, RiStarSFill } from "react-icons/ri";
+import { RiCompassDiscoverFill } from "react-icons/ri";
 import Link from "next/link";
 import { IconWithSVG } from "../../general/Buttons";
 import { Tooltip } from "react-tooltip";
@@ -15,6 +15,7 @@ import { IconType } from "react-icons";
 import { Route } from "next";
 import useEventListener from "@/app/lib/hooks/useEventListener";
 import { FaStar } from "react-icons/fa";
+import { HiDotsHorizontal } from "react-icons/hi";
 type ActionIcon = React.FC<{ user: User; className?: string }>;
 
 const NavigationSections = [
@@ -130,34 +131,40 @@ const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: R
 					}
 				})}
 
+				{/* <SeeMoreBtn /> */}
 				{joined_servers &&
 					joined_servers.length > 0 &&
-					joined_servers.map((server) => (
-						<Link
-							href={`/chat/server/${server.id}`}
-							role="navigation"
-							key={server.id}
-							className={"px-2 max-sm:px-1.5 sm:min-h-13 relative flex items-center justify-center"}
-						>
-							<hr
-								className={clsx(
-									"absolute",
-									pathname === `/chat/server/${server.id}` &&
-										"bg-foreground w-0.5 rounded-r-2xl border-foreground max-sm:border-1 border-2 top-1/2 -translate-y-1/2 h-[65%] left-0"
-								)}
-							/>
-							<Avatar
-								size="size-11.5"
-								radius="rounded-xl"
-								src={server.profile ?? ""}
-								displayName={server.name}
-								statusIndicator={false}
-								data-tooltip-id={"navigation-bar-tooltips"}
-								data-tooltip-content={server.name}
-								border={pathname === `/chat/server/${server.id}` ? "border-2 border-primary" : ""}
-							></Avatar>
-						</Link>
-					))}
+					joined_servers.map((server, idx) => {
+						if (idx === 4) return <SeeMoreBtn />;
+						if (idx > 4) return null;
+
+						return (
+							<Link
+								href={`/chat/server/${server.id}`}
+								role="navigation"
+								key={server.id}
+								className={"px-2 max-sm:px-1.5 sm:min-h-13 relative flex items-center justify-center"}
+							>
+								<hr
+									className={clsx(
+										"absolute",
+										pathname === `/chat/server/${server.id}` &&
+											"bg-foreground w-0.5 rounded-r-2xl border-foreground max-sm:border-1 border-2 top-1/2 -translate-y-1/2 h-[65%] left-0"
+									)}
+								/>
+								<Avatar
+									size="size-11.5"
+									radius="rounded-xl"
+									src={server.profile ?? ""}
+									displayName={server.name}
+									statusIndicator={false}
+									data-tooltip-id={"navigation-bar-tooltips"}
+									data-tooltip-content={server.name}
+									border={pathname === `/chat/server/${server.id}` ? "border-2 border-primary" : ""}
+								></Avatar>
+							</Link>
+						);
+					})}
 			</aside>
 
 			<Tooltip className="my-tooltip" id={`navigation-bar-tooltips`} border={`var(--tooltip-border)`} place="right" />
@@ -202,3 +209,99 @@ const DashboardBtn = () => {
 };
 
 export default NavigationBar;
+
+const SeeMoreBtn = () => {
+	const nav_icon_styles =
+		"group hover:bg-primary not-dark:hover:bg-foreground border-2 border-transparent max-sm:!rounded-lg !rounded-xl max-sm:!size-10 !size-11.5";
+
+	return (
+		<Link
+			href={"/discover?joined=true"}
+			data-tooltip-id={`navigation-bar-tooltips`}
+			data-tooltip-content={"View all joined servers"}
+			role="navigation"
+			key={"nav-see-more-btn"}
+			className={"px-2 max-sm:px-1.5 sm:min-h-13 relative flex items-center justify-center no-underline"}
+		>
+			<IconWithSVG className={nav_icon_styles}>
+				<HiDotsHorizontal className="not-dark:group-hover:text-background text-[24px] max-sm:text-[20px]" />
+			</IconWithSVG>
+		</Link>
+	);
+};
+
+// test rooms
+// const rooms: Room[] = [
+// 	{
+// 		id: "room1",
+// 		owner_id: "user1",
+// 		name: "General Chat",
+// 		description: "A place for everyone to hang out",
+// 		type: "public",
+// 		created_at: "2025-10-01T10:00:00Z",
+// 		online_members: 12,
+// 		total_members: 50,
+// 		banner: "https://example.com/banners/general.png",
+// 		profile: "https://example.com/profiles/general.png",
+// 	},
+// 	{
+// 		id: "room2",
+// 		owner_id: "user2",
+// 		name: "Gaming Zone",
+// 		description: "Discuss the latest games",
+// 		type: "private",
+// 		created_at: "2025-09-28T15:30:00Z",
+// 		online_members: 8,
+// 		total_members: 25,
+// 		banner: "https://example.com/banners/gaming.png",
+// 		profile: "https://example.com/profiles/gaming.png",
+// 	},
+// 	{
+// 		id: "room3",
+// 		owner_id: "user3",
+// 		name: "Study Group",
+// 		description: "Collaborate on projects and assignments",
+// 		type: "public",
+// 		created_at: "2025-10-01T08:45:00Z",
+// 		online_members: 5,
+// 		total_members: 20,
+// 		banner: "https://example.com/banners/study.png",
+// 		profile: "https://example.com/profiles/study.png",
+// 	},
+// 	{
+// 		id: "room4",
+// 		owner_id: "user4",
+// 		name: "Music Lovers",
+// 		description: "Share and discuss your favorite music",
+// 		type: "public",
+// 		created_at: "2025-09-25T12:00:00Z",
+// 		online_members: 7,
+// 		total_members: 30,
+// 		banner: "https://example.com/banners/music.png",
+// 		profile: "https://example.com/profiles/music.png",
+// 	},
+// 	{
+// 		id: "room5",
+// 		owner_id: "user5",
+// 		name: "Fitness Club",
+// 		description: "Talk about workouts and healthy living",
+// 		type: "private",
+// 		created_at: "2025-09-30T09:15:00Z",
+// 		online_members: 3,
+// 		total_members: 15,
+// 		banner: "https://example.com/banners/fitness.png",
+// 		profile: "https://example.com/profiles/fitness.png",
+// 	},
+// 	{
+// 		id: "room6",
+// 		owner_id: "user6",
+// 		name: "Tech Talk",
+// 		description: "Discuss the latest in technology and coding",
+// 		type: "public",
+// 		created_at: "2025-10-01T07:30:00Z",
+// 		online_members: 10,
+// 		total_members: 40,
+// 		banner: "https://example.com/banners/tech.png",
+// 		profile: "https://example.com/profiles/tech.png",
+// 	},
+// ];

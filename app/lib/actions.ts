@@ -293,16 +293,30 @@ export async function getServer(id: string): Promise<Room[]> {
   `;
 }
 
-export async function getAllServers() {
-	return (await sql`
-SELECT r.*, COUNT(rm.room_id) AS total_members
-FROM rooms r
-LEFT JOIN room_members rm ON r.id = rm.room_id
-WHERE r.type != 'dm'
-GROUP BY r.id
-;
-	`) as Room[];
+export async function getAllServers(userId?: string) {
+	if (userId) {
+		// Only return servers that the user has joined
+		return (await sql<Room[]>`
+      SELECT r.*, COUNT(rm.room_id) AS total_members
+      FROM rooms r
+      JOIN room_members rm2 ON r.id = rm2.room_id
+      LEFT JOIN room_members rm ON r.id = rm.room_id
+      WHERE r.type != 'dm'
+        AND rm2.user_id = ${userId}
+      GROUP BY r.id
+    `) as Room[];
+	} else {
+		// Return all servers
+		return (await sql<Room[]>`
+      SELECT r.*, COUNT(rm.room_id) AS total_members
+      FROM rooms r
+      LEFT JOIN room_members rm ON r.id = rm.room_id
+      WHERE r.type != 'dm'
+      GROUP BY r.id
+    `) as Room[];
+	}
 }
+
 
 export async function editProfile(user: User, formData: FormData) {
 	const parsedFormSchema = z.object({
