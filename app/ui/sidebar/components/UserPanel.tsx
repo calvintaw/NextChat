@@ -46,7 +46,13 @@ const UserPanel = ({ user }: Props) => {
 					className=" @min-[200px]:pl-1 @min-[200px]:w-fit w-full flex items-center
 				flex-shrink-0 justify-center"
 				>
-					<Avatar id={user.id} status={isOnline} src={user.image} displayName={user.displayName}></Avatar>
+					<Avatar
+						disableTooltip
+						id={user.id}
+						status={isOnline}
+						src={user.image}
+						displayName={user.displayName}
+					></Avatar>
 				</div>
 				<div
 					className="hidden [#sidebar.active_&]:!flex @min-[200px]:flex flex-1
@@ -68,7 +74,13 @@ const UserPanel = ({ user }: Props) => {
 			<DropdownMenu.Root modal={false}>
 				<DropdownMenu.Trigger asChild className="@min-[200px]:hidden [#sidebar.active_&]:!hidden">
 					<button className="flex items-center justify-center w-full -mt-12.5 bg-transparent  p-0">
-						<Avatar id={user.id} status={isOnline} src={user.image} displayName={user.displayName}></Avatar>
+						<Avatar
+							disableTooltip
+							id={user.id}
+							status={isOnline}
+							src={user.image}
+							displayName={user.displayName}
+						></Avatar>
 					</button>
 				</DropdownMenu.Trigger>
 

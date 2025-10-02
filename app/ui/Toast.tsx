@@ -14,7 +14,7 @@ const Toaster = () => {
 			{list.map((props) => (
 				<SingleToast {...props} key={props.id} />
 			))}
-			<Toast.Viewport className="fixed bottom-0 right-0 flex flex-col p-8 gap-3 min-w-85 max-w-screen m-0 list-none !z-[999] outline-none " />
+			<Toast.Viewport className="fixed bottom-0 right-0 flex flex-col p-8 gap-3 min-w-80 max-w-125 m-0 list-none !z-[999] outline-none " />
 		</Toast.Provider>
 	);
 };

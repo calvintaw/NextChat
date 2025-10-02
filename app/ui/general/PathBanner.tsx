@@ -19,10 +19,6 @@ export const PathBanner = () => {
 			return pathDisplayNameMap[pathname];
 		}
 
-		if (pathname.includes("@me:")) {
-			return "Chat with friends";
-		}
-
 		return path === "" ? "Explore" : path;
 	};
 
