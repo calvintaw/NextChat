@@ -279,21 +279,11 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	}, [messages]);
 
 	// effect for setting scroll position to bottom of chat if firstRender
-	// effect for displaying a notice to user
-	// effect for setting the dashboard navbar name
 
 	const isFirstRender = useRef(true);
 
 	useEffect(() => {
-		if (isFirstRender.current) {
-			toast({
-				title: "Notice",
-				mode: "info",
-				subtitle:
-					"Real-time messaging is currently unavailable due to a server issue. We're working to restore it as soon as possible.",
-				infinite: true,
-			});
-		}
+		
 
 		if (containerRef.current && !initialLoading && messages.length !== 0 && isFirstRender.current) {
 			containerRef.current.scrollTop = containerRef.current.scrollHeight;
