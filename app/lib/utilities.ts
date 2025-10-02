@@ -10,6 +10,7 @@ export function getDMRoom(a: string, b?: string) {
 	return `@me:${u1}:${u2}`;
 }
 
+
 export function formatNumber(num?: number) {
 	if (!num) return "0";
 	if (num >= 1_000_000_000) return (num / 1_000_000_000).toFixed(1) + "B";

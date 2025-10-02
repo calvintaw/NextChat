@@ -46,10 +46,10 @@ export default async function RootLayout({
 }>) {
 	const cookieStore = await cookies();
 	const theme = cookieStore.get("theme")?.value || "dark";
-	console.log("cookie STORE: ", theme);
+	const starsBackgroundEnabled = cookieStore.get("starsBackgroundEnabled")?.value || "disable-stars-bg";
 
 	return (
-		<html lang="en" className={theme + " h-full min-h-screen"}>
+		<html lang="en" className={`${theme} h-full min-h-screen ${starsBackgroundEnabled}`}>
 			<body
 				className={`font-sans ${roboto.className} antialiased flex flex-col h-full min-h-screen w-full min-w-0 scroll-smooth`}
 			>
