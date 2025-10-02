@@ -55,7 +55,7 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 		if (!selectedChat) return;
 
 		const previousChats = [...localChats];
-		// local update
+		// local ui instant updates
 		setLocalChats((prev) => prev.filter((chat) => chat.id !== selectedChat.id));
 
 		try {
@@ -133,6 +133,8 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 										const result = await removeFriendshipRequest(selectedChat, "friend");
 
 										if (result.success) {
+											router.refresh();
+											socket.emit("refresh-contacts-page", user.id, selectedChat.id);
 											toast({
 												title: "",
 												mode: "positive",

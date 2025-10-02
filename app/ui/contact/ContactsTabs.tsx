@@ -51,6 +51,7 @@ type RequestTabProps = {
 
 type AllContactsTabProps = {
 	friendsCount: number;
+	setContacts: React.Dispatch<React.SetStateAction<ContactType[]>>;
 	contacts: ContactType[];
 	user: User;
 };
@@ -94,6 +95,9 @@ const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTa
 			setContacts(newContacts);
 			setFriendRequests(newRequests);
 		}
+
+		// the code can be refactored to be more efficient, for example, sending the new info via socket instead of fetching from db or fetching from db but only the required ones
+		// TODO task (maybe)
 		socket.on(`refresh-contacts-page`, refrechContactsPage);
 		return () => {
 			socket.off(`refresh-contacts-page`, refrechContactsPage);
@@ -140,7 +144,7 @@ const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTa
 					</Tabs.List>
 
 					<Tabs.Content value="all" asChild>
-						<AllContactsTab friendsCount={friendsCount} contacts={contacts} user={user} />
+						<AllContactsTab setContacts={setContacts} friendsCount={friendsCount} contacts={contacts} user={user} />
 					</Tabs.Content>
 
 					<Tabs.Content value="request" asChild>
@@ -364,7 +368,13 @@ const RequestTab = ({ user, friendRequests, setFriendRequests, setContacts }: Re
 								>
 									{/* Avatar */}
 									<div className="h-full mr-1 flex flex-row py-3">
-										<Avatar id={friend.id} src={friend.image} size="size-8" displayName={friend.displayName} />
+										<Avatar
+											statusIndicator={false}
+											id={friend.id}
+											src={friend.image}
+											size="size-8"
+											displayName={friend.displayName}
+										/>
 									</div>
 
 									<div className="text-sm h-full flex flex-col justify-center flex-1 font-medium text-text truncate leading-tight">
@@ -435,7 +445,13 @@ const RequestTab = ({ user, friendRequests, setFriendRequests, setContacts }: Re
 								>
 									{/* Avatar */}
 									<div className="h-full mr-1 flex flex-row py-3">
-										<Avatar id={friend.id} src={friend.image} size="size-8" displayName={friend.displayName} />
+										<Avatar
+											statusIndicator={false}
+											id={friend.id}
+											src={friend.image}
+											size="size-8"
+											displayName={friend.displayName}
+										/>
 									</div>
 
 									<div className="text-sm h-full flex flex-col justify-center flex-1 font-medium text-text truncate leading-tight">
@@ -487,7 +503,7 @@ const RequestTab = ({ user, friendRequests, setFriendRequests, setContacts }: Re
 					</>
 				)}
 
-				{(friendRequests.sent.length === 0 || friendRequests.incoming.length === 0) && (
+				{friendRequests.sent.length === 0 && friendRequests.incoming.length === 0 && (
 					<div className="flex flex-1 items-center justify-center">
 						<p className="text-muted">
 							There are no pending friend requests. Click "Add Friend" to send friend requests
@@ -499,7 +515,7 @@ const RequestTab = ({ user, friendRequests, setFriendRequests, setContacts }: Re
 	);
 };
 
-const AllContactsTab = ({ friendsCount, contacts, user }: AllContactsTabProps) => {
+const AllContactsTab = ({ friendsCount, contacts, user, setContacts }: AllContactsTabProps) => {
 	const [input, setInput] = useState("");
 	const filteredContacts = contacts.filter(
 		(s) =>
@@ -515,7 +531,7 @@ const AllContactsTab = ({ friendsCount, contacts, user }: AllContactsTabProps) =
 				<hr className="hr-separator !m-0" />
 			</div>
 
-			<ContactPreviewContainer user={user} contacts={filteredContacts} />
+			<ContactPreviewContainer setContacts={setContacts} user={user} contacts={filteredContacts} />
 		</div>
 	);
 };

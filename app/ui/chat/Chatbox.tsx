@@ -310,7 +310,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 				>
 					<div
 						ref={containerRef}
-						className="flex-1 h-full flex flex-col overflow-y-scroll py-4 px-1 pb-10 has-scroll-container relative "
+						className="flex-1 h-full flex flex-col overflow-y-auto py-4 px-1 pb-10 has-scroll-container relative "
 						// className="flex-1 min-h-0 flex flex-col overflow-y-auto py-4 pb-10"
 					>
 						{type === "dm" && recipient && (

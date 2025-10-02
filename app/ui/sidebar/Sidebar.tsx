@@ -13,19 +13,17 @@ const Sidebar = async () => {
 	const joined_servers = await getJoinedServers(user.id);
 
 	return (
-		<>
-			<nav
-				id="sidebar"
-				className="relative max-w-86  h-full flex flex-row items-start w-min border-contrast lg:border-r bg-background"
-			>
-				<OnlineIndicator name={user.displayName} userId={user.id}></OnlineIndicator>
+		<nav
+			id="sidebar"
+			className="relative max-w-86  h-full flex flex-row items-start w-min border-contrast lg:border-r bg-background"
+		>
+			<OnlineIndicator name={user.displayName} userId={user.id}></OnlineIndicator>
 
-				<NavigationBar joined_servers={joined_servers} user={user}></NavigationBar>
-				<ChatPanel user={user} />
+			<NavigationBar joined_servers={joined_servers} user={user}></NavigationBar>
+			<ChatPanel user={user} />
 
-				<UserPanel user={user}></UserPanel>
-			</nav>
-		</>
+			<UserPanel user={user}></UserPanel>
+		</nav>
 	);
 };
 

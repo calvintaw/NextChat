@@ -879,6 +879,7 @@ export async function removeFriendshipRequest(
 
 			const [user1_id, user2_id] = [targetUser.id, currentUser.id].sort((a, b) => a.localeCompare(b));
 
+			// prevent the sender from cancelling friend request if user has already accepted the request
 			if (type === "sent") {
 				const existing = await sql`
           SELECT status FROM friends

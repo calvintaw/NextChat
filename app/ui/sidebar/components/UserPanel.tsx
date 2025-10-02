@@ -80,6 +80,7 @@ const UserPanel = ({ user }: Props) => {
 							status={isOnline}
 							src={user.image}
 							displayName={user.displayName}
+							parentClassName="flex-shrink-0"
 						></Avatar>
 					</button>
 				</DropdownMenu.Trigger>
@@ -90,7 +91,7 @@ const UserPanel = ({ user }: Props) => {
 						align="center"
 						sideOffset={10}
 						collisionPadding={8}
-						className="w-full bg-surface rounded-md p-2 shadow-lg shadow-foreground/20 dark:shadow-foreground/5 border-2 border-border"
+						className="w-full bg-surface rounded-md p-2 shadow-lg shadow-foreground/20 dark:shadow-foreground/5 border-2 border-border lg:!hidden"
 					>
 						<div className="flex items-center gap-2">
 							<Buttons />

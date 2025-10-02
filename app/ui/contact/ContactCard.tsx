@@ -16,13 +16,18 @@ import { useRouter } from "next/navigation";
 import clsx from "clsx";
 
 type MinimalUserType = { id: string; username: string };
+type Props = {
+	user: User;
+	contacts: ContactType[];
+	setContacts: React.Dispatch<React.SetStateAction<ContactType[]>>;
+};
 
-export const ContactPreviewContainer = ({ user, contacts }: { user: User; contacts: ContactType[] }) => {
-	const [localContacts, setLocalContacts] = useState<ContactType[]>(contacts);
+export const ContactPreviewContainer = ({ setContacts, user, contacts }: Props) => {
+	const [cona] = useState<ContactType[]>(contacts);
 
 	useEffect(() => {
 		function handleStatusChange(userId: string, online: boolean) {
-			setLocalContacts((prev) => {
+			setContacts((prev) => {
 				const index = prev.findIndex((chat) => chat.id.includes(userId));
 
 				if (index === -1) return prev;
@@ -57,7 +62,7 @@ export const ContactPreviewContainer = ({ user, contacts }: { user: User; contac
 				socket.emit("refresh-contacts-page", user.id, friend.id);
 
 				// local update
-				setLocalContacts((prev) => prev.filter((req) => req.id !== friend.id));
+				setContacts((prev) => prev.filter((req) => req.id !== friend.id));
 				toast({ title: "Success!", mode: "positive", subtitle: result.message });
 			}
 		} catch (err) {
@@ -75,7 +80,7 @@ export const ContactPreviewContainer = ({ user, contacts }: { user: User; contac
 	return (
 		<section className="flex flex-col flex-1">
 			{error && <p className="text-sm text-error my-2">{error}</p>}
-			{localContacts.map((contact) => (
+			{cona.map((contact) => (
 				<ContactPreview
 					isPending={pendingDeletes.has(contact.id)}
 					user={user}
