@@ -75,7 +75,7 @@ const RefAnchor = () => {
 		if (!container) return;
 
 		const isAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
-		// "100px tolerance" for near-bottom
+		// "100px tolerance" for near-bottom - only activates if user A receives a msg from other users
 
 		if (isAtBottom || isFocused()) {
 			scrollRef.current?.scrollIntoView({ behavior: "smooth" });

@@ -10,8 +10,8 @@ import { Avatar } from "../../general/Avatar";
 import { ServerList } from "../Chatbox";
 import { usePathProvider } from "@/app/lib/PathContext";
 import clsx from "clsx";
-import { socket } from "@/app/lib/socket";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/app/lib/hooks/useToast";
 
 export function DirectMessageCard({
 	roomId,
@@ -28,7 +28,7 @@ export function DirectMessageCard({
 	const [commonServers, setCommonServers] = useState<Room[]>([]);
 	const [isPending, setIsPending] = useState(true);
 	const { setPath } = usePathProvider();
-	const router = useRouter();
+	const toast = useToast();
 
 	useEffect(() => {
 		setPath(`@${user.username}`);
@@ -117,8 +117,7 @@ export function DirectMessageCard({
 						onClick={async () => {
 							const result = await removeFriendshipRequest({ username: user.username, id: user.id }, "friend");
 							if (result.success) {
-								router.refresh();
-								socket.emit("refresh-contacts-page", currentUserId, user.id);
+								toast({ title: result.message, mode: "positive", subtitle: "" });
 							}
 						}}
 					>

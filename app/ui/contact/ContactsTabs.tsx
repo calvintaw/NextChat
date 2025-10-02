@@ -63,6 +63,7 @@ const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTa
 			const result = await requestFriendship(prevState, formData);
 			if (result.success && result.targetUser) {
 				socket.emit("refresh-contacts-page", user.id, result.targetUser.id);
+				// local update
 				setFriendRequests((prev) => ({
 					incoming: [...prev.incoming],
 					sent: [...prev.sent, { ...result.targetUser! }],
@@ -89,10 +90,7 @@ const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTa
 	useEffect(() => {
 		socket.emit("join", user.id);
 		async function refrechContactsPage() {
-			console.log("revcieved socket! refresh-contacts-page");
-			// console.log("refetching contacts");
 			const [newContacts, newRequests] = await Promise.all([getContacts(user.id), getFriendRequests(user.id)]);
-			// console.log("newContacts: ", newContacts);
 			setContacts(newContacts);
 			setFriendRequests(newRequests);
 		}
@@ -255,13 +253,14 @@ const RequestTab = ({ user, friendRequests, setFriendRequests, setContacts }: Re
 				setError(result.message);
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
-				// local ui instant updates
-
 				socket.emit("refresh-contacts-page", user.id, friend.id);
 				const { createdAt, ...contact } = friend;
+
+				// local update
 				setContacts((prev) => {
-					return [...prev, { ...contact, online: "loading" }];
+					return [...prev, { ...contact, online: "loading" }]; // online is set to loading as we don't know the user status yet. Online will be turned on if our socket listener on ContactCard file catches "online" event
 				});
+				// local update
 				setFriendRequests((prev) => ({
 					...prev,
 					incoming: prev.incoming.filter((req) => req.id !== friend.id),
@@ -287,8 +286,8 @@ const RequestTab = ({ user, friendRequests, setFriendRequests, setContacts }: Re
 				setError(result.message);
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
-				// local ui instant updates
 				socket.emit("refresh-contacts-page", user.id, friend.id);
+				// local update
 				setFriendRequests((prev) => ({
 					...prev,
 					[type]: prev[type].filter((req) => req.id !== friend.id),

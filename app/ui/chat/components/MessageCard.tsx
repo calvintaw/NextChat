@@ -36,6 +36,8 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 		if (!newContent) return;
 
 		const originalMsgs = [...messages];
+
+		// local update
 		setMessages((prev: MessageType[]) => {
 			const index = prev.findIndex((msg) => msg.id === msgToEdit);
 			if (index === -1) return prev;
@@ -333,7 +335,7 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 									const isEven = JSON.parse(msg.content).length % 2 === 0;
 									const total = JSON.parse(msg.content).length;
 
-								// if only 1 item in array, take full width
+									// if only 1 item in array, take full width
 									const colSpan = total === 1 ? 4 : !isEven && i === 0 ? 2 : 1; // even ? then all images have 1x1, if not even, give 1st img 2x2 and then rest 1x1
 									const rowSpan = total === 1 ? 2 : !isEven && i === 0 ? 2 : 1;
 

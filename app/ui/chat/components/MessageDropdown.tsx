@@ -32,6 +32,8 @@ export function MessageDropdownMenu({ msg, retrySendingMessage }: Props) {
 	const toggleReaction = async (emoji: string) => {
 		const originalMsg = [...messages];
 		let didChange = false; // track if reaction changed
+
+		// local update
 		setMessages((prev: MessageType[]) => {
 			const index = prev.findIndex((tx) => tx.id === msg.id);
 			if (index === -1) return prev;
@@ -61,6 +63,7 @@ export function MessageDropdownMenu({ msg, retrySendingMessage }: Props) {
 			};
 			return newMsg;
 		});
+		
 		const result = didChange
 			? await addReactionToMSG({ id: msg.id, roomId, userId: user.id, emoji })
 			: await removeReactionFromMSG({ id: msg.id, roomId, userId: user.id, emoji });

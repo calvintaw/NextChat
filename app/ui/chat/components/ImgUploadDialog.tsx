@@ -100,6 +100,11 @@ const ImageUploadDialog = ({
 								Compress File
 							</label>
 						</div>
+						{!compress && (
+							<p className="text-sm text-muted p-2 rounded-md bg-background flex gap-2 items-center">
+								<span>⚠️</span>Sending uncompressed images may slow down chats and take longer to upload.
+							</p>
+						)}
 					</div>
 
 					<div className="flex justify-end gap-3 mt-auto">

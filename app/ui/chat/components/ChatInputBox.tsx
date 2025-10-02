@@ -33,7 +33,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 	const { canSendMessage } = useMessageLimiter(25, 60_000);
 	const { trigger: triggerTypingAnimation, cancel: cancelTypingAnimation } = useDebounce({
 		startCallback: () => socket.emit("typing started", roomId, user.displayName),
-		endCallback: () => socket.emit("typing stopped", roomId),
+		endCallback: () => socket.emit("typing stopped", roomId, user.displayName),
 		delay: 2000,
 	});
 	const toast = useToast();
@@ -118,7 +118,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 			if (textRef.current.value.trim() === "") return;
 			if (!canSendMessage()) return;
 
-			socket.emit("join", user.id); // joining the same user id room as the socket server on renderer.com shutdown within 15min of inactivity so the msg would never reach anywhere.
+			socket.emit("join", roomId); // joining the same user id room as the socket server on renderer.com shutdown within 15min of inactivity so the msg would never reach anywhere.
 			sendMessage(textRef.current?.value);
 			textRef.current.value = "";
 

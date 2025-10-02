@@ -55,6 +55,8 @@ export const ContactPreviewContainer = ({ user, contacts }: { user: User; contac
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
 				socket.emit("refresh-contacts-page", user.id, friend.id);
+
+				// local update
 				setLocalContacts((prev) => prev.filter((req) => req.id !== friend.id));
 				toast({ title: "Success!", mode: "positive", subtitle: result.message });
 			}

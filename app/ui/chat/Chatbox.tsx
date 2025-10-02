@@ -116,7 +116,9 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 			});
 		};
 
-		const handleTypingStop = () => setActivePersons([]);
+		const handleTypingStop = (displayName: string) => {
+			setActivePersons((prev) => prev.filter((name) => name !== displayName));
+		};
 
 		socket.on("typing started", handleTypingStart);
 		socket.on("typing stopped", handleTypingStop);
@@ -133,6 +135,8 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 		const handleIncomingMsg = async (msg: MessageType) => {
 			// no need to add to msg array again as it is optimally added for quick UI feedback just as user sent the msg
+			// the below line can be removed as socket will only send to all other users in the room except the sender itself now
+			// but keeping it for extra safety
 			if (msg.sender_id === user.id) return;
 
 			// check duplicate
@@ -193,6 +197,8 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		socket.on("add_reaction_msg", toggleReaction);
 		socket.on("remove_reaction_msg", toggleReaction);
 
+		console.log("ROOM ID: ", roomId);
+
 		return () => {
 			socket.off("message", handleIncomingMsg);
 			socket.off("message deleted", handleMessageDeleted);
@@ -216,6 +222,8 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		if (isBlocked || isSystem) return;
 
 		const originalMsg = [...messages];
+
+		// local update
 		setMessages((prev) => prev.filter((tx) => tx.id != id));
 		const result = await deleteMsg(id, type, content);
 		if (!result.success) {
