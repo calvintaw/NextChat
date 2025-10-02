@@ -73,7 +73,7 @@ const DashboardPage = ({ initialUser, isOwnPage = true }: { initialUser: User; i
 		try {
 			const options = {
 				maxSizeMB: 0.2,
-				maxWidthOrHeight: 256,
+				maxWidthOrHeight: 128,
 				useWebWorker: true,
 				fileType: "image/jpg",
 			};

@@ -38,10 +38,10 @@ export const AttachmentDropdown = ({ roomId, handleFileUpload }: Props) => {
 		setIsUploading(true);
 		try {
 			const options = {
-				maxSizeMB: 0.6,
-				maxWidthOrHeight: 1280,
+				maxSizeMB: 0.25,
+				maxWidthOrHeight: 600,
+				initialQuality: 0.7,
 				useWebWorker: true,
-				initialQuality: 0.8,
 			};
 
 			const imgArray = [];

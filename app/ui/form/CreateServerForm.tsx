@@ -84,8 +84,8 @@ export default function CreateServerFormDialog({ className, user }: { className:
 
 		try {
 			const options = {
-				maxSizeMB: 0.5,
-				maxWidthOrHeight: 500,
+				maxSizeMB: 0.25,
+				maxWidthOrHeight: 128,
 				useWebWorker: true,
 				fileType: "image/jpg",
 			};
@@ -95,7 +95,7 @@ export default function CreateServerFormDialog({ className, user }: { className:
 			const filename = `profile.jpg`;
 			const filePath = `${server_name}/${filename}`;
 
-			const { data, error } = await supabase.storage.from("uploads").upload(filePath, compressedFile, {upsert: true});
+			const { data, error } = await supabase.storage.from("uploads").upload(filePath, compressedFile, { upsert: true });
 			if (error) throw error;
 
 			const { data: publicData } = supabase.storage.from("uploads").getPublicUrl(data?.path || "");
