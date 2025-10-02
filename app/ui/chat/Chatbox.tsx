@@ -286,6 +286,14 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		}
 	}, [initialLoading, messages]);
 
+	toast({
+		title: "Notice",
+		mode: "info",
+		subtitle:
+			"Real-time messaging is currently unavailable due to a server issue. We're working to restore it as soon as possible.",
+		infinite: true,
+	});
+
 	return (
 		<>
 			<div
