@@ -1,20 +1,19 @@
 "use client";
-import { getLocalTimeString } from "@/app/lib/utilities";
+import { getLocalTimeString, sendWithRetry } from "@/app/lib/utilities";
 import clsx from "clsx";
 import React, { useEffect, useRef, useState } from "react";
 import { Avatar } from "../../general/Avatar";
-import { MessageContentType, MessageType } from "@/app/lib/definitions";
+import { MessageType } from "@/app/lib/definitions";
 import { useChatProvider } from "../ChatBoxWrapper";
 import InputField from "../../form/InputField";
 import { MessageDropdownMenu } from "./MessageDropdown";
-import { addReactionToMSG, editMsg, getUsername, insertMessageInDB, removeReactionFromMSG } from "@/app/lib/actions";
+import { editMsg, getUsername, insertMessageInDB, removeReactionFromMSG } from "@/app/lib/actions";
 import { useToast } from "@/app/lib/hooks/useToast";
-import { RxCross1, RxCross2 } from "react-icons/rx";
+import { RxCross2 } from "react-icons/rx";
 import { IconWithSVG } from "../../general/Buttons";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { AiOutlineReload } from "react-icons/ai";
-import { uuidv4 } from "zod/v4";
+import { socket } from "@/app/lib/socket";
 
 type MessageCardType = {
 	msg: MessageType;
@@ -53,11 +52,13 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 			return updatedMessages;
 		});
 
-		const result = await editMsg({ id: msg.id, roomId, content: newContent });
+		const result = await editMsg({ id: msg.id, content: newContent });
 		if (!result.success) {
 			setMessages(originalMsgs);
 			toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			console.log(result.error);
+		} else {
+			socket.emit("edit message", msg.id, roomId, newContent);
 		}
 	};
 
@@ -145,6 +146,17 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 				prev.map((prevMsg) => (prevMsg.id === msg.id ? { ...prevMsg, synced: false } : prevMsg))
 			);
 		} else if (result.success) {
+			// if errors, it console logs but need to be fixed if the goal is to make sure the receiver receives the msg
+			if (roomId.startsWith("system-room")) {
+				sendWithRetry("system", msg, 3, 2000)
+					.then((res) => console.log("System message delivered:", res))
+					.catch((err) => console.error("System message failed:", err));
+			} else {
+				sendWithRetry("message", msg, 3, 2000)
+					.then((res) => console.log("Message delivered:", res))
+					.catch((err) => console.error("Message failed:", err));
+			}
+
 			setMessages((prev: MessageType[]) =>
 				prev.map((prevMsg) => (prevMsg.id === msg.id ? { ...prevMsg, synced: true } : prevMsg))
 			);

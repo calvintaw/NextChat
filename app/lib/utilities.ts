@@ -1,4 +1,5 @@
 import { NewsArticle } from "./definitions";
+import { socket } from "./socket";
 
 export function getDMRoom(a: string, b?: string) {
 	if (typeof b === "undefined") {
@@ -86,4 +87,32 @@ export function getBannerColor(char: string) {
 	if ("YZ".includes(initial)) return "bg-lime-600";
 
 	return "bg-secondary";
+}
+
+export function sendWithRetry(event: string, msg: any, retries = 3, delay = 2000) {
+	return new Promise((resolve, reject) => {
+		let attempts = 0;
+
+		const attempt = () => {
+			attempts++;
+			// console.log(`Sending attempt ${attempts} for event "${event}"`);
+
+			socket.timeout(5000).emit(event, msg, (err: any, response?: any) => {
+				if (err) {
+					// console.warn(`No ack from server for "${event}" (attempt ${attempts})`);
+
+					if (attempts < retries) {
+						setTimeout(attempt, delay); // retry after delay
+					} else {
+						reject(new Error(`Failed after ${retries} attempts`));
+					}
+				} else {
+					// console.log(`Ack received for "${event}":`, response);
+					resolve(response);
+				}
+			});
+		};
+
+		attempt();
+	});
 }

@@ -217,10 +217,12 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 		const originalMsg = [...messages];
 		setMessages((prev) => prev.filter((tx) => tx.id != id));
-		const result = await deleteMsg(id, roomId, type, content);
+		const result = await deleteMsg(id, type, content);
 		if (!result.success) {
 			setMessages(originalMsg);
 			toast({ title: "Error!", mode: "negative", subtitle: result.message });
+		} else {
+			socket.emit("delete message", id, roomId);
 		}
 		messageIdsRef.current.delete(id);
 	};
@@ -283,8 +285,6 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	const isFirstRender = useRef(true);
 
 	useEffect(() => {
-		
-
 		if (containerRef.current && !initialLoading && messages.length !== 0 && isFirstRender.current) {
 			containerRef.current.scrollTop = containerRef.current.scrollHeight;
 			isFirstRender.current = false;

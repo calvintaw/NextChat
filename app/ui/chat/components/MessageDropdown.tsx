@@ -15,6 +15,7 @@ import { MessageType } from "@/app/lib/definitions";
 import { HiReply } from "react-icons/hi";
 import { useToast } from "@/app/lib/hooks/useToast";
 import { ImBin } from "react-icons/im";
+import { socket } from "@/app/lib/socket";
 
 type Props = {
 	msg: MessageType;
@@ -39,9 +40,13 @@ export function MessageDropdownMenu({ msg, retrySendingMessage }: Props) {
 
 			const currentReactors = new Set(newMsg[index].reactions?.[emoji] || []);
 			const hasReacted = currentReactors.has(user.id);
+
+			// if user already has the same emoji, then remove it (set didChange to false)
 			if (hasReacted) {
 				currentReactors.delete(user.id);
 				didChange = false; // user removed reaction
+
+				// else user already has the same emoji, then add it (set didChange to true)
 			} else {
 				currentReactors.add(user.id);
 				didChange = true; // user added reaction
@@ -62,6 +67,9 @@ export function MessageDropdownMenu({ msg, retrySendingMessage }: Props) {
 		if (!result.success) {
 			setMessages(originalMsg);
 			toast({ title: "Error!", mode: "negative", subtitle: result.message });
+		} else {
+			if (didChange) socket.emit("add_reaction_msg", msg.id, user.id, roomId, emoji);
+			if (!didChange) socket.emit("remove_reaction_msg", msg.id, user.id, roomId, emoji);
 		}
 	};
 

@@ -89,7 +89,6 @@ export async function getServersInCommon(currentUserId: string, targetUserId: st
 
 export async function deleteMsg(
 	id: string,
-	roomId: string,
 	type: MessageContentType,
 	content: string
 ): Promise<{ success: true; message: string } | { success: false; message: string }> {
@@ -118,8 +117,6 @@ export async function deleteMsg(
 				return { success: false, message: "Failed to delete the message. Please try again!" };
 			}
 		}
-
-		socket.emit("delete message", id, roomId);
 
 		return { success: true, message: "Message deleted successfully." };
 	} catch (error) {
@@ -203,48 +200,8 @@ type LocalMessageType = MessageType & {
 	room_id: string;
 };
 
-// client.ts
-
-function sendWithRetry(event: string, msg: any, retries = 3, delay = 2000) {
-	return new Promise((resolve, reject) => {
-		let attempts = 0;
-
-		const attempt = () => {
-			attempts++;
-			// console.log(`Sending attempt ${attempts} for event "${event}"`);
-
-			socket.timeout(5000).emit(event, msg, (err: any, response?: any) => {
-				if (err) {
-					// console.warn(`No ack from server for "${event}" (attempt ${attempts})`);
-
-					if (attempts < retries) {
-						setTimeout(attempt, delay); // retry after delay
-					} else {
-						reject(new Error(`Failed after ${retries} attempts`));
-					}
-				} else {
-					// console.log(`Ack received for "${event}":`, response);
-					resolve(response);
-				}
-			});
-		};
-
-		attempt();
-	});
-}
-
 export async function insertMessageInDB(msg: LocalMessageType): Promise<{ success: boolean; message?: string }> {
 	try {
-		if (msg.room_id.startsWith("system-room")) {
-			sendWithRetry("system", msg, 3, 2000)
-				.then((res) => console.log("System message delivered:", res))
-				.catch((err) => console.error("System message failed:", err));
-		} else {
-			sendWithRetry("message", msg, 3, 2000)
-				.then((res) => console.log("Message delivered:", res))
-				.catch((err) => console.error("Message failed:", err));
-		}
-
 		//TODO: make socket better
 		await sql.begin(async (sql) => {
 			await sql`
@@ -254,7 +211,6 @@ export async function insertMessageInDB(msg: LocalMessageType): Promise<{ succes
 		});
 
 		console.log("Sent:", { name: msg.sender_display_name, msg: msg.content });
-
 		return { success: true };
 	} catch (error) {
 		console.error("insertMessageInDB ERROR:", error);
@@ -316,7 +272,6 @@ export async function getAllServers(userId?: string) {
     `) as Room[];
 	}
 }
-
 
 export async function editProfile(user: User, formData: FormData) {
 	const parsedFormSchema = z.object({
@@ -860,7 +815,6 @@ export async function requestFriendship(
 ): Promise<{ success: boolean; message: string; targetUser?: User }> {
 	return withCurrentUser(async (currentUser: User) => {
 		try {
-			socket.emit("join", currentUser.id);
 			const username = z.string().min(1).parse(formData.get("username"));
 			console.log("Sarting friendship request. Console log");
 
@@ -921,7 +875,6 @@ export async function removeFriendshipRequest(
 ): Promise<{ success: boolean; message: string }> {
 	return withCurrentUser(async (currentUser: User) => {
 		try {
-			socket.emit("join", currentUser.id);
 			console.log("Starting friendship cancel.");
 
 			const [user1_id, user2_id] = [targetUser.id, currentUser.id].sort((a, b) => a.localeCompare(b));
@@ -1023,7 +976,6 @@ export async function unblockFriendship(
 export async function acceptFriendshipRequest(targetUser: User): Promise<{ success: boolean; message: string }> {
 	return withCurrentUser(async (currentUser: User) => {
 		try {
-			socket.emit("join", currentUser.id);
 			console.log("Starting friendship accept...");
 
 			const room_id = getDMRoom(targetUser.id, currentUser.id);
@@ -1117,11 +1069,9 @@ export async function mockFetchNews() {
 
 export async function editMsg({
 	id,
-	roomId,
 	content,
 }: {
 	id: string;
-	roomId: string;
 	content: string;
 }): Promise<{ success: true; message: string } | { success: false; error: any; message: string }> {
 	return withCurrentUser(async (user: User) => {
@@ -1133,7 +1083,6 @@ export async function editMsg({
 				WHERE id = ${id} AND sender_id = ${user.id}
 			`;
 			});
-			socket.emit("edit message", id, roomId, content);
 			return { success: true, message: "Message edited successfully." };
 		} catch (error) {
 			console.log("error in edit msg: ", error);
@@ -1173,7 +1122,6 @@ export async function addReactionToMSG({
 			`;
 		});
 
-		socket.emit("add_reaction_msg", id, userId, roomId, emoji);
 		return { success: true, message: "Reaction added successfully." };
 	} catch (error) {
 		console.log("error in add reactiont to msg: ", error);
@@ -1213,7 +1161,6 @@ WHERE id = ${id};
 
 			`;
 		});
-		socket.emit("remove_reaction_msg", id, userId, roomId, emoji);
 		return { success: true, message: "Reaction removed successfully." };
 	} catch (error) {
 		console.log("error in remove reaction msg: ", error);

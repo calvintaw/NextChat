@@ -15,6 +15,7 @@ import { v4 as uuidv4 } from "uuid";
 import useEventListener from "@/app/lib/hooks/useEventListener";
 import { insertMessageInDB } from "@/app/lib/actions";
 import { useToast } from "@/app/lib/hooks/useToast";
+import { sendWithRetry } from "@/app/lib/utilities";
 
 type ChatInputBoxProps = {
 	activePersons: string[];
@@ -92,6 +93,15 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 			toast({ title: result.message, subtitle: "", mode: "negative" });
 			setMessages((prev) => prev.map((msg) => (msg.id === tempId ? { ...msg, synced: false } : msg)));
 		} else if (result.success) {
+			if (roomId.startsWith("system-room")) {
+				sendWithRetry("system", temp_msg, 3, 2000)
+					.then((res) => console.log("System message delivered:", res))
+					.catch((err) => console.error("System message failed:", err));
+			} else {
+				sendWithRetry("message", temp_msg, 3, 2000)
+					.then((res) => console.log("Message delivered:", res))
+					.catch((err) => console.error("Message failed:", err));
+			}
 			setMessages((prev) => prev.map((msg) => (msg.id === tempId ? { ...msg, synced: true } : msg)));
 		}
 	};
