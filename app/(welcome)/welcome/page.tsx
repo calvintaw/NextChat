@@ -35,17 +35,17 @@ export default function Page() {
 					</div>
 				</section>
 
-				{/* Features Section */}
+				{/* // Features Section */}
 				<section id="features" className="py-24 px-6 md:px-20 bg-[#0F1525]">
 					<h2 className="text-4xl md:text-5xl font-bold text-center mb-16 text-white">Features</h2>
 					<div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
 						{[
 							"Instant Messaging",
 							"Real-time Presence",
-							"Authentication with Supabase",
+							"Auth (NextAuth.js)",
 							"Dark Mode",
-							"CRUD Operations",
 							"Media Upload & Reactions",
+							"Dynamic Starry Background",
 						].map((feature) => (
 							<div
 								key={feature}
@@ -53,7 +53,22 @@ export default function Page() {
 							>
 								<h3 className="text-2xl font-semibold text-white mb-3">{feature}</h3>
 								<p className="text-gray-400 text-base">
-									Lorem ipsum dolor sit amet, consectetur adipiscing elit. Explore {feature} with ease.
+									{(() => {
+										switch (feature) {
+											case "Instant Messaging":
+												return "Send messages instantly to friends and servers in real-time.";
+											case "Real-time Presence":
+												return "See who is online or offline at a glance.";
+											case "Auth (NextAuth.js)":
+												return "Secure login and registration powered by NextAuth.js";
+											case "Dark Mode":
+												return "Toggle between light and dark themes seamlessly.";
+											case "Media Upload & Reactions":
+												return "Upload images and react to messages with emojis.";
+											case "Dynamic Starry Background":
+												return "Enjoy an animated starry background on the landing page.";
+										}
+									})()}
 								</p>
 							</div>
 						))}
@@ -77,7 +92,6 @@ export default function Page() {
 						))}
 					</div>
 				</section>
-
 				{/* Call to Action */}
 				<section className="py-24 px-6 md:px-20 text-center bg-[#0F1525]">
 					<h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">Get Started Today</h2>
@@ -93,7 +107,6 @@ export default function Page() {
 						Clone on GitHub
 					</a>
 				</section>
-
 				{/* Star Repo Section */}
 				<section className="py-20 px-6 sm:px-20 text-center bg-[#0A0F1C] border-t border-[#1A1F2C]">
 					<h2 className="text-3xl sm:text-5xl font-bold mb-6 text-white">Like this project?</h2>
