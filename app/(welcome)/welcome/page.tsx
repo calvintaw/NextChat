@@ -25,12 +25,13 @@ export default function Page() {
 							Explore Features
 						</a>
 						<a
-							href="https://github.com/calvintaw/discord_clone"
+							// href="https://github.com/calvintaw/discord_clone"
+							href="https://next-chat-discord-clone.vercel.app/"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="no-underline px-8 py-4 rounded-full border-2 border-[#00FFFF] text-[#00FFFF] text-lg font-semibold hover:bg-[#00FFFF] hover:text-black transition-all"
 						>
-							View on GitHub
+							View Live Demo
 						</a>
 					</div>
 				</section>
