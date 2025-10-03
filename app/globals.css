@@ -435,7 +435,7 @@ html {
 		!border-none;
 	}
 
-	.form-input_custom__input{
+	.form-input_custom__input {
 		@apply flex-1
 		!bg-transparent
 		text-text

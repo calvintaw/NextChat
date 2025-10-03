@@ -10,6 +10,7 @@
 		"lint:fix": "eslint --fix"
 	},
 	"dependencies": {
+		"@next/font": "^14.2.15",
 		"@radix-ui/react-dialog": "^1.1.14",
 		"@radix-ui/react-dropdown-menu": "^2.1.15",
 		"@radix-ui/react-tabs": "^1.1.12",
@@ -22,6 +23,7 @@
 		"browser-image-compression": "^2.0.2",
 		"clsx": "^2.1.1",
 		"dayjs": "^1.11.13",
+		"google-fonts": "^1.0.0",
 		"idb-keyval": "^6.2.2",
 		"jotai": "^2.14.0",
 		"jotai-immer": "^0.4.1",
