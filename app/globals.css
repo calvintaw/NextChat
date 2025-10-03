@@ -435,6 +435,22 @@ html {
 		!border-none;
 	}
 
+	.form-input_custom__input{
+		@apply flex-1
+		!bg-transparent
+		text-text
+		placeholder-muted
+		transition
+		outline-0
+		border-0
+		ring-0
+		text-base
+		!outline-none
+		outline-transparent
+		border-transparent
+		!border-none;
+	}
+
 	.form-textarea_custom {
 		@apply w-full
         p-3

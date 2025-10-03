@@ -1,45 +1,47 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { updateOnlineStatus } from "../lib/actions";
-import { getSocket, socket } from "../lib/socket";
+import { getSocket } from "../lib/socket";
 
-const OnlineIndicator = ({ name, userId }: { name: string,userId: string }) => {
-	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-	const hasRun = useRef(false)
+// refs exist here to prevent emitting socket events if the component remounts
+// BUT if user does full page reload, the events will fire as the js context is reset
+// TODO: fix the above err
+
+const OnlineIndicator = ({ name, userId }: { name: string; userId: string }) => {
+	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+	const hasRun = useRef(false);
+	const Once = useRef(false);
+	const socketRef = useRef(getSocket({ auth: { name, id: userId } }));
 
 	useEffect(() => {
 		if (!hasRun.current) {
-			hasRun.current = true
-			updateOnlineStatus(true, userId)
+			hasRun.current = true;
+			updateOnlineStatus(true, userId);
 		}
 
-		if (intervalRef.current) clearInterval(intervalRef.current)
+		if (intervalRef.current) clearInterval(intervalRef.current);
 
-		const socket = getSocket({
-			auth: { name, id: userId }
-		});
-			
-		socket.emit("online");
+		socketRef.current.emit("online");
 		intervalRef.current = setInterval(() => {
-			socket.emit("online")
-		}, 1000 * 15)
+			socketRef.current.emit("online");
+		}, 1000 * 15);
 
 		return () => {
 			if (intervalRef.current) {
 				clearInterval(intervalRef.current);
 			}
-			socket.disconnect();
-			};
+			socketRef.current.disconnect();
+		};
 	}, [name, userId]);
 
 	useEffect(() => {
-		socket.emit("join", userId)
-	}, [])
+		if (!Once.current) {
+			socketRef.current.emit("join", userId);
+			Once.current = true;
+		}
+	}, []);
 
-		
 	return null;
 };
-
-
 
 export default OnlineIndicator;
