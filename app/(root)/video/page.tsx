@@ -1,6 +1,7 @@
 "use client";
 
 import { useToast } from "@/app/lib/hooks/useToast";
+import { socket } from "@/app/lib/socket";
 import { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 
@@ -12,16 +13,15 @@ export default function Page() {
 	const [incomingCalls, setIncomingCalls] = useState<string[]>([]);
 	const [isRoomCreator, setIsRoomCreator] = useState(false);
 	const [remoteSocketId, setRemoteSocketId] = useState<string | null>(null);
+	const [callActive, setCallActive] = useState(false);
 
 	const localVideoRef = useRef<HTMLVideoElement>(null);
 	const remoteVideoRef = useRef<HTMLVideoElement>(null);
 	const peerRef = useRef<RTCPeerConnection | null>(null);
 	const toast = useToast();
-	const socketRef = useRef<Socket | null>(null);
+	const socketRef = useRef<Socket>(socket);
 
 	useEffect(() => {
-		socketRef.current = io();
-
 		peerRef.current = new RTCPeerConnection({
 			iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
 		});
@@ -40,8 +40,6 @@ export default function Page() {
 				remoteVideoRef.current.srcObject = event.streams[0];
 			}
 		};
-
-		startVideoStream();
 
 		// Socket.io event listeners
 		socketRef.current.on("join-request", (requesterUserId: string) => {
@@ -69,17 +67,30 @@ export default function Page() {
 		socketRef.current.on("offer-request", async (data: { from: string; offer: RTCSessionDescriptionInit }) => {
 			if (!peerRef.current) return;
 
-			await peerRef.current.setRemoteDescription(new RTCSessionDescription(data.offer));
-			const answer = await peerRef.current.createAnswer();
-			await peerRef.current.setLocalDescription(answer);
+			try {
+				// 1️⃣ Get local media
+				const myStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+				if (localVideoRef.current) localVideoRef.current.srcObject = myStream;
 
-			socketRef.current?.emit("offer-answer", { answere: answer, to: data.from });
-			setRemoteSocketId(data.from);
+				// 2️⃣ Add tracks before creating answer
+				myStream.getTracks().forEach((track) => peerRef.current?.addTrack(track, myStream));
 
-			toast({ title: "Offer Received", mode: "info", subtitle: `From: ${data.from}` });
+				// 3️⃣ Set remote description (incoming offer)
+				await peerRef.current.setRemoteDescription(new RTCSessionDescription(data.offer));
 
-			const myStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-			myStream.getTracks().forEach((track) => peerRef.current?.addTrack(track, myStream));
+				// 4️⃣ Create answer
+				const answer = await peerRef.current.createAnswer();
+				await peerRef.current.setLocalDescription(answer);
+
+				// 5️⃣ Send answer back to caller
+				socketRef.current?.emit("offer-answer", { answere: answer, to: data.from });
+
+				setRemoteSocketId(data.from);
+				toast({ title: "Offer Received", mode: "info", subtitle: `From: ${data.from}` });
+			} catch (err) {
+				toast({ title: "Error handling offer", mode: "negative", subtitle: String(err) });
+				console.error(err);
+			}
 		});
 
 		socketRef.current.on("offer-answer", async (data: { offer: RTCSessionDescriptionInit }) => {
@@ -117,7 +128,7 @@ export default function Page() {
 
 	const joinRoom = () => {
 		if (!joinRoomId) return toast({ subtitle: "", title: "Enter a room ID", mode: "negative" });
-		socketRef.current?.emit("join-room", joinRoomId);
+		socketRef.current?.emit("join-video-room", joinRoomId);
 	};
 
 	const approveJoinRequest = (requesterUserId: string) => {
@@ -135,10 +146,59 @@ export default function Page() {
 		setRemoteSocketId(targetSocketId);
 		if (!peerRef.current) return;
 
-		const localOffer = await peerRef.current.createOffer();
-		await peerRef.current.setLocalDescription(localOffer);
-		socketRef.current?.emit("offer-request", { fromOffer: localOffer, to: targetSocketId });
-		toast({ title: "Peer Connection Started", mode: "info", subtitle: `Connecting to ${targetSocketId}` });
+		try {
+			// 1️⃣ Get local media
+			const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+			if (localVideoRef.current) localVideoRef.current.srcObject = localStream;
+
+			// 2️⃣ Add tracks before creating offer
+			localStream.getTracks().forEach((track) => peerRef.current?.addTrack(track, localStream));
+
+			// 3️⃣ Create offer
+			const localOffer = await peerRef.current.createOffer();
+			await peerRef.current.setLocalDescription(localOffer);
+
+			// 4️⃣ Emit offer to remote peer
+			socketRef.current?.emit("offer-request", { fromOffer: localOffer, to: targetSocketId });
+
+			setCallActive(true);
+			toast({ title: "Peer Connection Started", mode: "info", subtitle: `Connecting to ${targetSocketId}` });
+		} catch (err) {
+			toast({ title: "Error initializing call", mode: "negative", subtitle: String(err) });
+			console.error(err);
+		}
+	};
+
+	const closeCall = () => {
+		if (!peerRef.current || !socketRef.current) return;
+
+		// Stop tracks & close peer
+		peerRef.current.getSenders().forEach((sender) => sender.track?.stop());
+		peerRef.current.close();
+
+		// Re-initialize peer connection with listeners
+		peerRef.current = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+
+		peerRef.current.onicecandidate = (event) => {
+			if (event.candidate && remoteSocketId) {
+				socketRef.current?.emit("peer-updated", { candidate: event.candidate, to: remoteSocketId });
+			}
+		};
+
+		peerRef.current.ontrack = (event) => {
+			if (remoteVideoRef.current && !remoteVideoRef.current.srcObject) {
+				remoteVideoRef.current.srcObject = event.streams[0];
+			}
+		};
+
+		// Clear remote video
+		if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
+
+		// Notify other peer
+		if (remoteSocketId) socketRef.current.emit("call-ended", remoteSocketId);
+
+		setCallActive(false);
+		toast({ title: "Call Ended", mode: "info", subtitle: "" });
 	};
 
 	return (
@@ -191,6 +251,9 @@ export default function Page() {
 					>
 						Join existing room
 					</button>
+					<button className="btn-inverted" onClick={closeCall}>
+						Close Call
+					</button>
 				</div>
 
 				<div className="relative overflow-x-auto">
@@ -230,12 +293,16 @@ export default function Page() {
 			</div>
 
 			<div className="grid grid-cols-2 gap-4">
-				<div>
-					<video ref={localVideoRef} autoPlay muted className="w-full rounded-lg" />
-				</div>
-				<div>
-					<video ref={remoteVideoRef} autoPlay className="w-full rounded-lg" />
-				</div>
+				{callActive && (
+					<>
+						<div>
+							<video ref={localVideoRef} autoPlay muted className="w-full rounded-lg" />
+						</div>
+						<div>
+							<video ref={remoteVideoRef} autoPlay className="w-full rounded-lg" />
+						</div>
+					</>
+				)}
 			</div>
 		</>
 	);
