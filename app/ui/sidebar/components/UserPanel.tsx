@@ -9,7 +9,6 @@ import { User } from "@/app/lib/definitions";
 import { signOut } from "next-auth/react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import useStarsBg from "@/app/lib/hooks/useStarsBg";
-import useDarkMode from "@/app/lib/hooks/useDarkMode";
 
 type Props = {
 	user: User;
@@ -106,14 +105,13 @@ const UserPanel = ({ user }: Props) => {
 
 const Buttons = () => {
 	const [enabled, toggleStarsBg] = useStarsBg();
-	const [darkMode] = useDarkMode();
 
 	return (
 		<>
 			<span data-tooltip-id="tooltip-darkmode">
 				<DarkModeBtn className="!size-9 group dark:hover:!bg-background" />
 				<Tooltip offset={15} className="my-tooltip" id="tooltip-darkmode" place="top" border={`var(--tooltip-border)`}>
-					<span>Toggle {darkMode ? "light" : "dark"} mode</span>
+					<span>Switch Theme</span>
 				</Tooltip>
 			</span>
 
