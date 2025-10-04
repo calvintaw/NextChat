@@ -343,7 +343,17 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 			"
 			>
 				<ChatProvider
-					config={{ setMessages, messages, roomId, user, containerRef, isBlocked, isSystem, deleteMessage }}
+					config={{
+						setMessages,
+						messages,
+						roomId,
+						user,
+						containerRef,
+						isBlocked,
+						isSystem,
+						deleteMessage,
+						setActivePersons,
+					}}
 				>
 					<div
 						ref={containerRef}

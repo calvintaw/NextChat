@@ -31,7 +31,7 @@ type ChatInputBoxProps = {
 };
 
 const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading, isBlocked }: ChatInputBoxProps) => {
-	const { input, setInput, replyToMsg, setReplyToMsg, textRef, isSystem } = useChatProvider();
+	const { input, setInput, replyToMsg, setReplyToMsg, textRef, isSystem, setActivePersons } = useChatProvider();
 	const [isFocused, setIsFocused] = useState(false);
 	const [style, setStyle] = useState("!max-h-10");
 	const [isPending, setIsPending] = useState(false);
@@ -63,6 +63,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 	const sendMessage = async (input: string, type: MessageContentType = "text") => {
 		const tempId = uuidv4();
 		setIsPending(true);
+		if (roomId.startsWith("system-room")) setActivePersons((prev: string[]) => [...prev, "system"]);
 
 		const temp_msg = {
 			id: tempId,
@@ -135,6 +136,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 			setMessages((prev) => prev.map((msg) => (msg.id === tempId ? { ...msg, synced: true } : msg)));
 		}
 		setIsPending(false);
+		setActivePersons((prev: string[]) => prev.filter((name) => name != "system"));
 	};
 
 	const handleFileUpload = (url: string[], type: "image" | "video") => {
@@ -301,10 +303,11 @@ const TypingIndicator = ({ displayName }: { displayName: string[] }) => {
         absolute
         -bottom-2
         left-5
-        w-fit
-        max-w-sm
         flex
+        w-full
+        max-w-lg
         overflow-hidden
+				
       "
 			style={{
 				// Apply a fade-out mask from fully visible to transparent
@@ -324,7 +327,9 @@ const TypingIndicator = ({ displayName }: { displayName: string[] }) => {
 					<span className="typing-dot w-1.5 h-1.5 rounded-full bg-text" />
 					<span className="typing-dot w-1.5 h-1.5 rounded-full bg-text" />
 					<span className="typing-dot w-1.5 h-1.5 rounded-full bg-text" />
-					<span className="font-semibold tracking-wide">{name} is typing</span>
+					<span className="font-semibold tracking-wide">
+						{name !== "system" && name} {name !== "system" ? "is typing" : "Crafting a response"}
+					</span>
 				</div>
 			))}
 		</span>
