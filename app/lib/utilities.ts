@@ -10,6 +10,7 @@ export function getDMRoom(a: string, b?: string) {
 	return `@me:${u1}:${u2}`;
 }
 
+export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export function formatNumber(num?: number) {
 	if (!num) return "0";

@@ -14,16 +14,16 @@ import { useChatProvider } from "../ChatBoxWrapper";
 type Props = {
 	roomId: string;
 	handleFileUpload: (url: string[], type: "image" | "video") => void;
+	isDisabled: boolean;
 };
 
-export const AttachmentDropdown = ({ roomId, handleFileUpload }: Props) => {
+export const AttachmentDropdown = ({ roomId, handleFileUpload, isDisabled }: Props) => {
 	const [uploaded, setUploaded] = useState<string[]>([]); // array used for storing base64 encoded strings of imgs or videos url to display locally in browser
 	const [dialogOpen, setDialogOpen] = useState(false); // manually control dialog box Open State as UI has some special requirements
 	const [dropdownOpen, setDropdownOpen] = useState(false); // same with this dropdown
 	const [compress, setCompress] = useState(true); // compress images option YES/NO
 	const [isUploading, setIsUploading] = useState(false);
 	const [selectedFiles, setSelectedFiles] = useState<File[]>([]); // the data actually used to store images in database
-	const { isSystem } = useChatProvider();
 
 	const handleUpload = async () => {
 		if (isUploading) {
@@ -99,9 +99,9 @@ export const AttachmentDropdown = ({ roomId, handleFileUpload }: Props) => {
 				Toggle Dialog
 			</button> */}
 			<DropdownMenu.Root open={dropdownOpen} onOpenChange={(open) => setDropdownOpen(open)}>
-				<DropdownMenu.Trigger asChild disabled={isSystem}>
+				<DropdownMenu.Trigger asChild disabled={isDisabled}>
 					<IconWithSVG
-						title={isSystem ? "Sorry, this feature is not available yet." : ""}
+						title={isDisabled ? "Sorry, this feature is not available yet." : ""}
 						className="
                      !size-7.5
                      group

@@ -55,13 +55,13 @@ export default function ErrorPage({
 					href="/"
 					className="
         no-underline
-				flex items-center px-3 py-1 gap-2 btn bg-primary rounded-lg shadow text-white hover:bg-primary/90 transition
+				flex items-center px-3 py-1 gap-2 btn bg-primary rounded-lg shadow text-white hover:bg-primary/90 transition h-9
         "
 				>
 					<MdArrowBack className="text-xl " />
 					<span>Back to Home</span>
 				</Link>
-				<Button className="btn-third" onClick={() => reset()}>
+				<Button className="btn-third h-9" onClick={() => reset()}>
 					Reload
 				</Button>
 			</div>

@@ -28,6 +28,14 @@ import { cookies } from "next/headers";
 import { io } from "socket.io-client";
 import { supabase } from "./supabase";
 
+const SYSTEM_USER: User = {
+	id: process.env.SYSTEM_USER_ID!,
+	username: process.env.SYSTEM_USER_USERNAME!,
+	email: process.env.SYSTEM_USER_EMAIL!,
+	displayName: process.env.SYSTEM_USER_DISPLAY_NAME!,
+	image: process.env.SYSTEM_USER_IMAGE!,
+};
+
 // Utility for easy access to the currently authenticated user.
 // Functions using this tool could be refactored to not depend on it if needed.
 async function withCurrentUser(callback: Function) {
@@ -238,12 +246,11 @@ export async function getReplyFromBot(
 		}
 
 		const data = await res.json();
-		const bot = await getUser("system-room");
 
 		return {
 			success: true,
 			message: data.reply, // reply from Flask bot
-			bot: bot,
+			bot: SYSTEM_USER,
 		};
 	} catch (error) {
 		console.error("getReplyFromBot ERROR:", error);
@@ -636,9 +643,7 @@ export async function registerUser(formData: FormData): Promise<FormState> {
 				returning id;
 			`;
 
-			const result = await getUserIdByUsername("system");
-			if (!result.success) return;
-			const systemUserId = result.id!;
+			const systemUserId = process.env.SYSTEM_USER_ID!;
 			const [user1_id, user2_id] = [id, systemUserId].sort((a, b) => a.localeCompare(b));
 			const roomId = `system-room-${systemUserId}:${id}`;
 
@@ -863,9 +868,7 @@ export async function requestFriendship(
 			}
 
 			if (username === "system") {
-				const system = await getUser("system-room");
-				if (!system) throw new Error("can't fetch user");
-				return acceptFriendshipRequest(currentUser, system);
+				return acceptFriendshipRequest(currentUser, SYSTEM_USER);
 			}
 
 			const [targetUser] = await sql`SELECT 

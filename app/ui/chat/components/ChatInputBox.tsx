@@ -15,7 +15,11 @@ import { v4 as uuidv4 } from "uuid";
 import useEventListener from "@/app/lib/hooks/useEventListener";
 import { getReplyFromBot, insertMessageInDB } from "@/app/lib/actions";
 import { useToast } from "@/app/lib/hooks/useToast";
-import { sendWithRetry } from "@/app/lib/utilities";
+import { sendWithRetry, sleep } from "@/app/lib/utilities";
+import { FaArrowUp } from "react-icons/fa";
+import { IoArrowUp } from "react-icons/io5";
+import { GrStatusDisabledSmall } from "react-icons/gr";
+import { GoSquareFill } from "react-icons/go";
 
 type ChatInputBoxProps = {
 	activePersons: string[];
@@ -30,6 +34,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 	const { input, setInput, replyToMsg, setReplyToMsg, textRef, isSystem } = useChatProvider();
 	const [isFocused, setIsFocused] = useState(false);
 	const [style, setStyle] = useState("!max-h-10");
+	const [isPending, setIsPending] = useState(false);
 	const { canSendMessage } = useMessageLimiter(25, 60_000);
 	const { trigger: triggerTypingAnimation, cancel: cancelTypingAnimation } = useDebounce({
 		startCallback: () => socket.emit("typing started", roomId, user.displayName),
@@ -56,8 +61,8 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 	}, []);
 
 	const sendMessage = async (input: string, type: MessageContentType = "text") => {
-		if (isBlocked || (isSystem && isBlocked)) return;
 		const tempId = uuidv4();
+		setIsPending(true);
 
 		const temp_msg = {
 			id: tempId,
@@ -129,9 +134,11 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 			}
 			setMessages((prev) => prev.map((msg) => (msg.id === tempId ? { ...msg, synced: true } : msg)));
 		}
+		setIsPending(false);
 	};
 
 	const handleFileUpload = (url: string[], type: "image" | "video") => {
+		if (isBlocked || (isBlocked && isSystem) || isSystem) return;
 		sendMessage(JSON.stringify(url), type);
 		// turn url to json as there can be multiple images or videos uploaded at the same time so URL is ARRAY type
 	};
@@ -140,6 +147,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 	const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 		if (e.key === "Enter" && !e.shiftKey && textRef.current) {
 			e.preventDefault(); // prevents new line from being written
+			if (isBlocked || (isSystem && isBlocked) || isPending) return;
 			if (textRef.current.value.trim() === "") return;
 			if (!canSendMessage()) return;
 
@@ -169,15 +177,12 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 	return (
 		<div
 			className={clsx(
-				(isBlocked || (isSystem && isBlocked)) && "cursor-not-allowed",
-				initialLoading && "pointer-events-none"
+				(isBlocked || (isSystem && isBlocked)) && "cursor-not-allowed"
+				// initialLoading && "pointer-events-none"
 			)}
 		>
 			<div
-				className={clsx(
-					"p-4 relative mb-3 ",
-					(isBlocked || (isSystem && isBlocked)) && "opacity-75 pointer-events-none"
-				)}
+				className={clsx("p-4 relative mb-3 ", (isBlocked || (isSystem && isBlocked)) && "pointer-events-none")}
 				data-tooltip-id={"typing-indicator"}
 			>
 				<TypingIndicator displayName={activePersons} />
@@ -190,11 +195,14 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 						replyToMsg && "rounded-t-none !border-muted/25"
 					)}
 				>
-					<AttachmentDropdown roomId={roomId} handleFileUpload={handleFileUpload} />
-
+					<AttachmentDropdown
+						isDisabled={isBlocked || (isSystem && isBlocked) || isPending}
+						roomId={roomId}
+						handleFileUpload={handleFileUpload}
+					/>
 					{!isFocused && (
 						<div
-							className="max-[500px]:hidden absolute border top-1/2 -translate-y-1/2 right-15
+							className="max-[500px]:hidden absolute border top-1/2 -translate-y-1/2 right-22
 							text-sm bg-black/25  not-dark:text-black text-white rounded-md p-1.5 py-1 border-background
 							z-[1]
 							opacity-50
@@ -203,7 +211,6 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 							Press Ctrl + / to type
 						</div>
 					)}
-
 					<TextareaAutosize
 						autoComplete="off"
 						disabled={isBlocked || (isSystem && isBlocked)}
@@ -221,7 +228,6 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 							style
 						)}
 					/>
-
 					<ChatToolbar
 						setEmoji={(emoji: string) => {
 							if (!textRef.current) return;
@@ -238,6 +244,17 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 							textarea.selectionStart = textarea.selectionEnd = cursorPos;
 						}}
 					/>
+					<IconWithSVG
+						title="Send message"
+						className={clsx(
+							"icon-chatbox group my-auto animate-none border bg-foreground !rounded-full",
+							!isFocused || (isSystem && isBlocked) || isBlocked ? "opacity-50" : "opacity-100",
+							isPending && "dark:!bg-background/75 !bg-black/25 border-0"
+						)}
+					>
+						{!isPending && <IoArrowUp className="text-xs text-background"></IoArrowUp>}{" "}
+						{isPending && <GoSquareFill className="text-xs text-foreground"></GoSquareFill>}
+					</IconWithSVG>
 				</div>
 			</div>
 		</div>
