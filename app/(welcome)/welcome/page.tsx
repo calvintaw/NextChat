@@ -33,7 +33,7 @@ export default function Page() {
 							rel="noopener noreferrer"
 							className="w-full no-underline sm:w-auto px-6 py-3 sm:px-8 sm:py-4 rounded-full border-2 border-[#00FFFF] text-[#00FFFF] text-xl font-semibold hover:bg-[#00FFFF] hover:text-black transition-all"
 						>
-							Start Chatting
+							Start Chatting Now
 						</a>
 					</div>
 				</section>
@@ -191,7 +191,7 @@ export function Navbar() {
 					href="https://github.com/calvintaw/discord_clone"
 					target="_blank"
 					rel="noopener noreferrer"
-					className="text-gray-200 hover:text-[#00FFFF] transition-colors no-underline py-2 text-lg no-underline"
+					className="text-gray-200 hover:text-[#00FFFF] transition-colors py-2 text-lg no-underline"
 					onClick={() => setOpen(false)}
 				>
 					GitHub

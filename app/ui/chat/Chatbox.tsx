@@ -78,7 +78,8 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		}
 
 		if (roomId.startsWith("system-room")) {
-			setIsSystem(true);
+			// setIsSystem(true); //
+			// setIsBlocked(true);
 			setInitialLoading(false);
 		}
 	}, [type, recipient, user.id]);
@@ -87,7 +88,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 	// fetching msgs at startup and add listeners for typing event
 	useEffect(() => {
-		if (isBlocked || isSystem) {
+		if (isBlocked || (isSystem && isBlocked)) {
 			setInitialLoading(false);
 			setHasMore(false);
 			return;
@@ -158,7 +159,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 	// handle incoming msg sockets from server / handle msg delete sockets
 	useEffect(() => {
-		if (isBlocked || isSystem) return;
+		if (isBlocked || (isSystem && isBlocked)) return;
 
 		const handleIncomingMsg = async (msg: MessageType) => {
 			// no need to add to msg array again as it is optimally added for quick UI feedback just as user sent the msg
@@ -246,7 +247,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	const toast = useToast();
 
 	const deleteMessage = async (id: string, type: MessageContentType = "text", content: string) => {
-		if (isBlocked || isSystem) return;
+		if (isBlocked || (isSystem && isBlocked)) return;
 
 		const originalMsg = [...messages];
 
@@ -358,6 +359,8 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 						{type === "server" && isServerRoom(roomId) && recipient && (
 							<ServerCardHeader isBlocked={isBlocked} user={user} server={recipient as Room} />
 						)}
+						<hr className="hr-separator bg-contrast"></hr>
+
 						{isLoadingOldMsg && (
 							<div className="flex items-center justify-center w-full py-2">
 								<span>Loading</span>

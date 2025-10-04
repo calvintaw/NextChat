@@ -100,7 +100,7 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 						displayName={reply_displayName}
 						parentClassName="ml-1"
 					/>
-					<Link title={`Go to ${msg.sender_display_name}'s Profile`} href={`/users/${msg.sender_id}`}>
+					<Link className="no-underline" title={`Go to ${reply_displayName}'s Profile`} href={`/users/${msg.replyTo}`}>
 						<span className="text-muted">@{reply_displayName}</span>
 					</Link>{" "}
 					<a
@@ -150,9 +150,10 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 		} else if (result.success) {
 			// if errors, it console logs but need to be fixed if the goal is to make sure the receiver receives the msg
 			if (roomId.startsWith("system-room")) {
-				sendWithRetry("system", msg, 3, 2000)
-					.then((res) => console.log("System message delivered:", res))
-					.catch((err) => console.error("System message failed:", err));
+				// TODO: FIX BOT
+				// sendWithRetry("system", msg, 3, 2000)
+				// 	.then((res) => console.log("System message delivered:", res))
+				// 	.catch((err) => console.error("System message failed:", err));
 			} else {
 				sendWithRetry("message", msg, 3, 2000)
 					.then((res) => console.log("Message delivered:", res))

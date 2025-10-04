@@ -30,7 +30,7 @@ const ChatMessages = ({ messages }: { messages: MessageType[] }) => {
 				</div>
 			)}
 
-			{isSystem && (
+			{isSystem && isBlocked && (
 				<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
 					<div className="bg-accent text-text px-4 py-2 rounded-lg flex items-center gap-2 max-w-[90vw] mx-3">
 						<HiExclamationCircle size={20} />

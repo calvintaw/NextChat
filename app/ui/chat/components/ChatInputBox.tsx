@@ -13,7 +13,7 @@ import { IconWithSVG } from "../../general/Buttons";
 import { useMessageLimiter } from "@/app/lib/hooks/useMsgLimiter";
 import { v4 as uuidv4 } from "uuid";
 import useEventListener from "@/app/lib/hooks/useEventListener";
-import { insertMessageInDB } from "@/app/lib/actions";
+import { getReplyFromBot, insertMessageInDB } from "@/app/lib/actions";
 import { useToast } from "@/app/lib/hooks/useToast";
 import { sendWithRetry } from "@/app/lib/utilities";
 
@@ -56,7 +56,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 	}, []);
 
 	const sendMessage = async (input: string, type: MessageContentType = "text") => {
-		if (isBlocked || isSystem) return;
+		if (isBlocked || (isSystem && isBlocked)) return;
 		const tempId = uuidv4();
 
 		const temp_msg = {
@@ -94,9 +94,34 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 			setMessages((prev) => prev.map((msg) => (msg.id === tempId ? { ...msg, synced: false } : msg)));
 		} else if (result.success) {
 			if (roomId.startsWith("system-room")) {
-				sendWithRetry("system", temp_msg, 3, 2000)
-					.then((res) => console.log("System message delivered:", res))
-					.catch((err) => console.error("System message failed:", err));
+				// TODO: FIX BOT
+
+				const botReply = await getReplyFromBot(temp_msg);
+
+				if (botReply.success && botReply.message && botReply.bot) {
+					const botMsg: MessageType & { room_id: string } = {
+						id: uuidv4(),
+						room_id: roomId,
+						sender_id: botReply.bot.id,
+						sender_image: botReply.bot.image,
+						sender_display_name: botReply.bot.displayName,
+						content: botReply.message,
+						replyTo: temp_msg.id,
+						createdAt: new Date().toISOString(),
+						edited: false,
+						reactions: {},
+						type: "text",
+					};
+
+					const botInsert = await insertMessageInDB(botMsg);
+					if (botInsert.success) {
+						setMessages((prev) => [...prev, { ...botMsg, synced: true }]);
+					}
+				}
+
+				// sendWithRetry("system", temp_msg, 3, 2000)
+				// 	.then((res) => console.log("System message delivered:", res))
+				// 	.catch((err) => console.error("System message failed:", err));
 			} else {
 				sendWithRetry("message", temp_msg, 3, 2000)
 					.then((res) => console.log("Message delivered:", res))
@@ -142,9 +167,17 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 	}, [replyToMsg]);
 
 	return (
-		<div className={clsx((isBlocked || isSystem) && "cursor-not-allowed", initialLoading && "pointer-events-none")}>
+		<div
+			className={clsx(
+				(isBlocked || (isSystem && isBlocked)) && "cursor-not-allowed",
+				initialLoading && "pointer-events-none"
+			)}
+		>
 			<div
-				className={clsx("p-4 relative mb-3 ", (isBlocked || isSystem) && "opacity-75 pointer-events-none")}
+				className={clsx(
+					"p-4 relative mb-3 ",
+					(isBlocked || (isSystem && isBlocked)) && "opacity-75 pointer-events-none"
+				)}
 				data-tooltip-id={"typing-indicator"}
 			>
 				<TypingIndicator displayName={activePersons} />
@@ -158,6 +191,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 					)}
 				>
 					<AttachmentDropdown roomId={roomId} handleFileUpload={handleFileUpload} />
+
 					{!isFocused && (
 						<div
 							className="max-[500px]:hidden absolute border top-1/2 -translate-y-1/2 right-15
@@ -172,7 +206,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 
 					<TextareaAutosize
 						autoComplete="off"
-						disabled={isBlocked || isSystem}
+						disabled={isBlocked || (isSystem && isBlocked)}
 						ref={textRef}
 						name="query"
 						id="chatbox-TextareaAutosize"

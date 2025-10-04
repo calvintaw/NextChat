@@ -12,6 +12,7 @@ import { usePathProvider } from "@/app/lib/PathContext";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/app/lib/hooks/useToast";
+import { useChatProvider } from "../ChatBoxWrapper";
 
 export function DirectMessageCard({
 	roomId,
@@ -28,6 +29,7 @@ export function DirectMessageCard({
 	const [commonServers, setCommonServers] = useState<Room[]>([]);
 	const [isPending, setIsPending] = useState(true);
 	const { setPath } = usePathProvider();
+	const { isSystem } = useChatProvider();
 	const toast = useToast();
 
 	useEffect(() => {
@@ -132,7 +134,7 @@ export function DirectMessageCard({
 				) : (
 					<ServerList servers={commonServers} />
 				))}
-			{roomId.startsWith("system-room") && (
+			{roomId.startsWith("system-room") && isBlocked && isSystem && (
 				<p>Due to difficulties in finding free apis and hosting own llms, the AI chatbot does not work 😢</p>
 			)}
 		</div>

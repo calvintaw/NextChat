@@ -221,6 +221,39 @@ export async function insertMessageInDB(msg: LocalMessageType): Promise<{ succes
 	}
 }
 
+export async function getReplyFromBot(
+	msg: LocalMessageType
+): Promise<{ success: boolean; message?: string; bot?: User | null }> {
+	try {
+		const botUrl = process.env.BOT_URL || "http://localhost:5001/chat";
+
+		const res = await fetch(botUrl, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ message: msg.content }),
+		});
+
+		if (!res.ok) {
+			throw new Error(`Bot server error: ${res.status}`);
+		}
+
+		const data = await res.json();
+		const bot = await getUser("system-room");
+
+		return {
+			success: true,
+			message: data.reply, // reply from Flask bot
+			bot: bot,
+		};
+	} catch (error) {
+		console.error("getReplyFromBot ERROR:", error);
+		return {
+			success: false,
+			message: "Bot is unavailable. Please try again later.",
+		};
+	}
+}
+
 export async function getSpecificMessage(id: string): Promise<MessageType | null> {
 	const result: MessageType[] = await sql`
     SELECT 
@@ -815,14 +848,24 @@ export async function requestFriendship(
 ): Promise<{ success: boolean; message: string; targetUser?: User }> {
 	return withCurrentUser(async (currentUser: User) => {
 		try {
-			const username = z.string().min(1).parse(formData.get("username"));
+			let username = z.string().min(1).parse(formData.get("username"));
 			console.log("Sarting friendship request. Console log");
+
+			if (username.startsWith("@")) {
+				username = username.slice(1);
+			}
 
 			if (username === currentUser.username) {
 				return {
 					success: false,
 					message: "Well, you can't add yourself as a friend.",
 				};
+			}
+
+			if (username === "system") {
+				const system = await getUser("system-room");
+				if (!system) throw new Error("can't fetch user");
+				return acceptFriendshipRequest(currentUser, system);
 			}
 
 			const [targetUser] = await sql`SELECT 
@@ -974,13 +1017,18 @@ export async function unblockFriendship(
 	}
 }
 
-export async function acceptFriendshipRequest(targetUser: User): Promise<{ success: boolean; message: string }> {
+export async function acceptFriendshipRequest(
+	targetUser: User,
+	system?: User
+): Promise<{ success: boolean; message: string }> {
 	return withCurrentUser(async (currentUser: User) => {
 		try {
 			console.log("Starting friendship accept...");
 
-			const room_id = getDMRoom(targetUser.id, currentUser.id);
-			const [user1_id, user2_id] = [currentUser.id, targetUser.id].sort((a, b) => a.localeCompare(b));
+			const room_id = system ? getDMRoom(targetUser.id, system.id) : getDMRoom(targetUser.id, currentUser.id);
+			const [user1_id, user2_id] = system
+				? [currentUser.id, system.id].sort((a, b) => a.localeCompare(b))
+				: [currentUser.id, targetUser.id].sort((a, b) => a.localeCompare(b));
 
 			await sql.begin(async (tx) => {
 				await tx`

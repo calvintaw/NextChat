@@ -9,6 +9,7 @@ import { nanoid } from "nanoid";
 import { useState } from "react";
 import ImageUploadDialog from "./ImgUploadDialog";
 import { FileUploadBtn } from "./UploadButtons";
+import { useChatProvider } from "../ChatBoxWrapper";
 
 type Props = {
 	roomId: string;
@@ -22,6 +23,7 @@ export const AttachmentDropdown = ({ roomId, handleFileUpload }: Props) => {
 	const [compress, setCompress] = useState(true); // compress images option YES/NO
 	const [isUploading, setIsUploading] = useState(false);
 	const [selectedFiles, setSelectedFiles] = useState<File[]>([]); // the data actually used to store images in database
+	const { isSystem } = useChatProvider();
 
 	const handleUpload = async () => {
 		if (isUploading) {
@@ -97,8 +99,9 @@ export const AttachmentDropdown = ({ roomId, handleFileUpload }: Props) => {
 				Toggle Dialog
 			</button> */}
 			<DropdownMenu.Root open={dropdownOpen} onOpenChange={(open) => setDropdownOpen(open)}>
-				<DropdownMenu.Trigger asChild>
+				<DropdownMenu.Trigger asChild disabled={isSystem}>
 					<IconWithSVG
+						title={isSystem ? "Sorry, this feature is not available yet." : ""}
 						className="
                      !size-7.5
                      group
@@ -113,6 +116,7 @@ export const AttachmentDropdown = ({ roomId, handleFileUpload }: Props) => {
 
                      hover:bg-foreground
                      data-[state=open]:bg-foreground
+										 disabled:opacity-75
                   "
 					>
 						<FaPlus

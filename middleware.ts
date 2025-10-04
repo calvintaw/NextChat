@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 const freeRoutes = ["/login", "/register", "/terms_and_services"];
-const blockedRoutes = ["/welcome", "/portfolio", "/video"];
+const blockedRoutes = ["/welcome", "/video", "/api/seed", "/api/theme", "/api/stars", "/api/auth"];
 
 const isProd = process.env.NODE_ENV === "production";
 
