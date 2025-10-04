@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
 	typescript: {
 		ignoreBuildErrors: true,
 	},
+	experimental: {
+		globalNotFound: true,
+	},
 };
 
 export default nextConfig;

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 const freeRoutes = ["/login", "/register", "/terms_and_services"];
+const blockedRoutes = ["/welcome", "/portfolio", "/video"];
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -23,6 +24,12 @@ export async function middleware(request: NextRequest) {
 	// Normalize pathname to avoid trailing slash issues
 	const normalizedPathname = pathname.endsWith("/") && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
 	// console.log("Normalized pathname:", normalizedPathname);
+
+	// block routes
+	const isBlockedRoute = blockedRoutes.includes(normalizedPathname);
+	if (isBlockedRoute) {
+		return NextResponse.rewrite(new URL("/404", request.url));
+	}
 
 	const isFreeRoute = freeRoutes.includes(normalizedPathname);
 	// console.log("Is free route:", isFreeRoute);

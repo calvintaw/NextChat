@@ -35,7 +35,7 @@ export const metadata: Metadata = {
 	description:
 		"NextChat - A Discord-inspired chat app with real-time messaging, servers, reactions, image uploads, and profile customization. | Created By calvintaw",
 	icons: {
-		icon: "/logo.svg",
+		icon: "/logo.ico",
 	},
 };
 

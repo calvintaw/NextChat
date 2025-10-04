@@ -139,9 +139,9 @@ export const AttachmentDropdown = ({ roomId, handleFileUpload }: Props) => {
 						/>
 					</DropdownMenu.Item>
 
-					<DropdownMenu.Item className="DropdownMenuItem">
+					<DropdownMenu.Item className="DropdownMenuItem cursor-not-allowed opacity-75">
 						<BsFileEarmarkTextFill />
-						Document
+						Document {`(Unavailable)`}
 					</DropdownMenu.Item>
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>
