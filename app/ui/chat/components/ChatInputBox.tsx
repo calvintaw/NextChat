@@ -248,8 +248,10 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 						title="Send message"
 						className={clsx(
 							"icon-chatbox group my-auto animate-none border bg-foreground !rounded-full",
-							!isFocused || (isSystem && isBlocked) || isBlocked ? "opacity-50" : "opacity-100",
-							isPending && "dark:!bg-background/75 !bg-black/25 border-0"
+							!isPending && ((!isFocused && !isPending) || (isSystem && isBlocked) || isBlocked)
+								? "opacity-50"
+								: "opacity-100",
+							isPending && "dark:!bg-background/75 !opacity-100 !bg-black/25 border-0"
 						)}
 					>
 						{!isPending && <IoArrowUp className="text-xs text-background"></IoArrowUp>}{" "}
