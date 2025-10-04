@@ -94,26 +94,27 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		}
 
 		const fetchMessages = async () => {
-			try {
-				const cached: MessageType[] | undefined = await getCache(getRoomMessagesKey(roomId));
-				if (cached && cached.length > 0) {
-					console.log(" ");
-					console.log(" ");
-					console.log(" ");
-					console.log("FROM CACHE: ", cached);
-					console.log(" ");
-					console.log(" ");
-					console.log(" ");
-					offsetRef.current = cached.length;
-					lastBatchLength.current = cached.length;
-					oldestMsgCreatedAt.current = cached[cached.length - 1].createdAt;
-					setMessages(cached);
-					setInitialLoading(false);
-					return;
-				}
-			} catch (err) {
-				console.error("IDB load error:", err);
-			}
+			// cache feature: disabled as I do not know how to sync msgs if the other users change the msg
+			// try {
+			// 	const cached: MessageType[] | undefined = await getCache(getRoomMessagesKey(roomId));
+			// 	if (cached && cached.length > 0) {
+			// 		console.log(" ");
+			// 		console.log(" ");
+			// 		console.log(" ");
+			// 		console.log("FROM CACHE: ", cached);
+			// 		console.log(" ");
+			// 		console.log(" ");
+			// 		console.log(" ");
+			// 		offsetRef.current = cached.length;
+			// 		lastBatchLength.current = cached.length;
+			// 		oldestMsgCreatedAt.current = cached[cached.length - 1].createdAt;
+			// 		setMessages(cached);
+			// 		setInitialLoading(false);
+			// 		return;
+			// 	}
+			// } catch (err) {
+			// 	console.error("IDB load error:", err);
+			// }
 
 			try {
 				const recent = await getRecentMessages(roomId);
