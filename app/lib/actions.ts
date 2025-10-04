@@ -233,7 +233,7 @@ export async function getReplyFromBot(
 	msg: LocalMessageType
 ): Promise<{ success: boolean; message?: string; bot?: User | null }> {
 	try {
-		const botUrl = process.env.BOT_URL || "http://localhost:5001/chat";
+		const botUrl = process.env.SYSTEM_CHATBOT_URL!;
 
 		const res = await fetch(botUrl, {
 			method: "POST",
