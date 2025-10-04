@@ -27,7 +27,7 @@ export async function middleware(request: NextRequest) {
 
 	// block routes
 	const isBlockedRoute = blockedRoutes.includes(normalizedPathname);
-	if (isBlockedRoute) {
+	if (isBlockedRoute && isProd) {
 		return NextResponse.rewrite(new URL("/404", request.url));
 	}
 

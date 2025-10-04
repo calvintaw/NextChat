@@ -38,7 +38,8 @@ export default function Page() {
 
 				{/* // Features Section */}
 				<section id="features" className="py-24 px-6 md:px-20 bg-[#0F1525]">
-					<h2 className="text-4xl md:text-5xl font-bold text-center mb-16 text-white">Features</h2>
+					<h2 className="text-4xl md:text-5xl font-bold text-center mb-16 text-white">✨ Features</h2>
+
 					<div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
 						{[
 							"Instant Messaging",
@@ -50,7 +51,7 @@ export default function Page() {
 						].map((feature) => (
 							<div
 								key={feature}
-								className="p-8 rounded-2xl border border-[#1A2238] bg-[#12192E] hover:border-[#39FF14] hover:shadow-[0_0_25px_#39FF14] transition-all"
+								className="p-8 rounded-2xl border border-[#1A2238] bg-[#12192E] hover:border-[#39FF14] hover:shadow-[0_0_10px_#39FF14] transition-all"
 							>
 								<h3 className="text-2xl font-semibold text-white mb-3">{feature}</h3>
 								<p className="text-gray-400 text-base">
@@ -81,7 +82,7 @@ export default function Page() {
 					id="tech-stack"
 					className="py-24 px-6 md:px-20 bg-gradient-to-br from-[#0A0F1C] via-[#10182F] to-[#0A0F1C] text-center"
 				>
-					<h2 className="text-4xl md:text-5xl font-bold mb-16 text-white">Tech Stack</h2>
+					<h2 className="text-4xl md:text-5xl font-bold mb-16 text-white">🛠️ Tech Stack</h2>
 					<div className="flex flex-wrap justify-center gap-6">
 						{["Next.js", "React", "Tailwind CSS", "Supabase", "Postgres.js", "NextAuth.js"].map((tech) => (
 							<div
@@ -93,38 +94,21 @@ export default function Page() {
 						))}
 					</div>
 				</section>
-				{/* Call to Action */}
-				<section className="py-24 px-6 md:px-20 text-center bg-[#0F1525]">
-					<h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">Get Started Today</h2>
-					<p className="text-gray-300 text-lg max-w-2xl mx-auto mb-10">
-						Clone the repo, set up your Supabase project, and start chatting instantly with your team.
-					</p>
-					<a
-						href="https://github.com/calvintaw/discord_clone"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="no-underline px-10 py-5 rounded-full border-2 border-[#00FFFF] text-[#00FFFF] text-xl font-bold hover:bg-[#00FFFF] hover:text-black transition-all"
-					>
-						Clone on GitHub
-					</a>
-				</section>
+
 				{/* Star Repo Section */}
 				<section className="py-20 px-6 sm:px-20 text-center bg-[#0A0F1C] border-t border-[#1A1F2C]">
-					<h2 className="text-3xl sm:text-5xl font-bold mb-6 text-white">Like this project?</h2>
+					<h2 className="text-3xl sm:text-5xl font-bold mb-6 text-white">⭐ Like this project?</h2>{" "}
 					<p className="text-gray-300 text-base sm:text-lg max-w-2xl mx-auto mb-10">
-						If you find this useful or inspiring, consider giving it a ⭐ on GitHub —{" "}
+						If you find this useful or inspiring, consider giving it a star on GitHub —{" "}
 						{"(It doesn't matter but I just like to see the numbers go up)"}
 					</p>
 					<a
 						href="https://github.com/calvintaw/discord_clone"
 						target="_blank"
 						rel="noopener noreferrer"
-						className="px-8 sm:px-10 py-4 sm:py-5 rounded-full border-2 border-[#39FF14] text-[#39FF14] text-lg sm:text-xl font-bold hover:bg-[#39FF14] hover:text-black transition-all inline-flex items-center gap-3 no-underline"
+						className="no-underline px-8 py-4 rounded-full border-2 border-[#00FFFF] text-[#00FFFF] text-lg font-semibold hover:bg-[#00FFFF] hover:text-black transition-all"
 					>
-						<span>Star on GitHub</span>
-						<span role="img" aria-label="star">
-							⭐
-						</span>
+						Star on Github
 					</a>
 				</section>
 			</main>
@@ -145,73 +129,6 @@ import { IconWithSVG, MenuIcon } from "@/app/ui/general/Buttons";
 import clsx from "clsx";
 import { useState } from "react";
 import { FiMenu, FiX } from "react-icons/fi";
-
-// export function Navbar() {
-// 	const [open, setOpen] = useState(false);
-
-// 	return (
-// 		<header className="w-full py-4 px-6 md:px-12 flex justify-between items-center bg-[#0A0F1C] border-b border-[#1A1F2C] sticky top-0 z-50">
-// 			{/* Logo */}
-// 			<div className="text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#39FF14] to-[#00FFFF]">
-// 				NextChat
-// 			</div>
-
-// 			{/* Desktop Nav */}
-// 			<nav className="hidden md:flex gap-6 text-lg font-medium">
-// 				{["Features", "Tech Stack"].map((item) => (
-// 					<a
-// 						key={item}
-// 						href={`#${item.toLowerCase().replace(" ", "-")}`}
-// 						className="text-gray-200 hover:text-[#39FF14] transition-colors no-underline"
-// 					>
-// 						{item}
-// 					</a>
-// 				))}
-// 				<a
-// 					href="https://github.com/calvintaw/discord_clone"
-// 					target="_blank"
-// 					rel="noopener noreferrer"
-// 					className="text-gray-200 hover:text-[#00FFFF] transition-colors no-underline"
-// 				>
-// 					GitHub
-// 				</a>
-// 			</nav>
-
-// 			{/* Mobile Hamburger */}
-// 			<IconWithSVG
-// 				className="md:hidden text-gray-200 hover:text-[#39FF14] focus:outline-none"
-// 				onClick={() => setOpen(!open)}
-// 			>
-// 				{open ? <FiX size={28} /> : <FiMenu size={28} />}
-// 			</IconWithSVG>
-
-// 			{/* Mobile Menu */}
-// 			{open && (
-// 				<div className="absolute top-full left-0 w-full bg-[#0A0F1C] border-t border-[#1A1F2C] flex flex-col items-center py-6 md:hidden">
-// 					{["Features", "Tech Stack"].map((item) => (
-// 						<a
-// 							key={item}
-// 							href={`#${item.toLowerCase().replace(" ", "-")}`}
-// 							className="text-gray-200 hover:text-[#39FF14] transition-colors no-underline py-2 text-lg"
-// 							onClick={() => setOpen(false)}
-// 						>
-// 							{item}
-// 						</a>
-// 					))}
-// 					<a
-// 						href="https://github.com/calvintaw/discord_clone"
-// 						target="_blank"
-// 						rel="noopener noreferrer"
-// 						className="text-gray-200 hover:text-[#00FFFF] transition-colors no-underline py-2 text-lg"
-// 						onClick={() => setOpen(false)}
-// 					>
-// 						GitHub
-// 					</a>
-// 				</div>
-// 			)}
-// 		</header>
-// 	);
-// }
 
 export function Navbar() {
 	const [open, setOpen] = useState(false);
