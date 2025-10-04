@@ -8,70 +8,72 @@ export default function Page() {
 
 			<main className="flex-1 flex flex-col">
 				{/* Hero Section */}
-				<section className="relative flex flex-col items-center justify-center text-center py-32 md:py-40 bg-gradient-to-br from-[#0A0F1C] via-[#10182F] to-[#0A0F1C]">
-					<h1 className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#39FF14] to-[#00FFFF] mb-6 leading-tight">
-						Discord Clone
+				<section className="relative flex flex-col items-center justify-center text-center py-20 sm:py-32 md:py-40 px-4 md:px-0 bg-gradient-to-br from-[#0A0F1C] via-[#10182F] to-[#0A0F1C]">
+					<h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#39FF14] to-[#00FFFF] mb-4 md:mb-6 leading-snug md:leading-tight">
+						Where Friends Meet
 					</h1>
-					<p className="text-lg md:text-2xl text-gray-300 max-w-3xl px-6 md:px-0 mb-10">
-						A modern, full-stack chat app built with <span className="text-[#39FF14] font-semibold">Next.js</span>,{" "}
-						<span className="text-[#00FFFF] font-semibold">Supabase</span> & Postgres — inspired by Discord, reimagined
-						for devs.
+
+					<p className="text-lg sm:text-xl md:text-2xl text-gray-300 max-w-2xl md:max-w-3xl mb-1">
+						Connect with friends and communities in real-time
 					</p>
-					<div className="flex flex-wrap justify-center gap-6">
+					<p className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-100 max-w-2xl md:max-w-3xl mb-20">
+						💬 Chat, share media, and stay updated effortlessly.
+					</p>
+
+					<div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
 						<a
 							href="#features"
-							className="no-underline px-8 py-4 rounded-full border-2 border-[#39FF14] text-[#39FF14] text-lg font-semibold hover:bg-[#39FF14] hover:text-black transition-all"
+							className="w-full no-underline sm:w-auto px-6 py-3 sm:px-8 sm:py-4 rounded-full border-2 border-[#39FF14] text-[#39FF14] text-xl font-semibold hover:bg-[#39FF14] hover:text-black transition-all"
 						>
 							Explore Features
 						</a>
 						<a
-							// href="https://github.com/calvintaw/discord_clone"
 							href="https://next-chat-discord-clone.vercel.app/"
 							target="_blank"
 							rel="noopener noreferrer"
-							className="no-underline px-8 py-4 rounded-full border-2 border-[#00FFFF] text-[#00FFFF] text-lg font-semibold hover:bg-[#00FFFF] hover:text-black transition-all"
+							className="w-full no-underline sm:w-auto px-6 py-3 sm:px-8 sm:py-4 rounded-full border-2 border-[#00FFFF] text-[#00FFFF] text-xl font-semibold hover:bg-[#00FFFF] hover:text-black transition-all"
 						>
-							View Live Demo
+							Start Chatting
 						</a>
 					</div>
 				</section>
 
-				{/* // Features Section */}
+				{/* Features Section */}
 				<section id="features" className="py-24 px-6 md:px-20 bg-[#0F1525]">
-					<h2 className="text-4xl md:text-5xl font-bold text-center mb-16 text-white">✨ Features</h2>
-
+					<h2 className="text-4xl md:text-5xl font-bold text-center mb-16 text-white">✨ Features You’ll Love</h2>
 					<div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
 						{[
-							"Instant Messaging",
-							"Real-time Presence",
-							"Auth (NextAuth.js)",
-							"Dark Mode",
-							"Media Upload & Reactions",
-							"Dynamic Starry Background",
+							{
+								title: "Instant Messaging",
+								desc: "💬 Chat with friends and communities in real-time — never miss a message.",
+							},
+							{
+								title: "Real-time Presence",
+								desc: "👀 See who’s online or offline instantly and jump into conversations.",
+							},
+							{
+								title: "Media Sharing",
+								desc: "📸 Upload images, GIFs, and react to messages with fun emojis.",
+							},
+							{
+								title: "Auth & Security",
+								desc: "🔒 Safe and secure login, protecting your conversations.",
+							},
+							{
+								title: "Dark Mode",
+								desc: "🌙 Toggle between light and dark themes for comfort anytime.",
+							},
+							{
+								title: "Dynamic Background",
+								desc: "✨ Enjoy a visually engaging starry background while chatting.",
+							},
 						].map((feature) => (
 							<div
-								key={feature}
+								key={feature.title}
 								className="p-8 rounded-2xl border border-[#1A2238] bg-[#12192E] hover:border-[#39FF14] hover:shadow-[0_0_10px_#39FF14] transition-all"
 							>
-								<h3 className="text-2xl font-semibold text-white mb-3">{feature}</h3>
-								<p className="text-gray-400 text-base">
-									{(() => {
-										switch (feature) {
-											case "Instant Messaging":
-												return "Send messages instantly to friends and servers in real-time.";
-											case "Real-time Presence":
-												return "See who is online or offline at a glance.";
-											case "Auth (NextAuth.js)":
-												return "Secure login and registration powered by NextAuth.js";
-											case "Dark Mode":
-												return "Toggle between light and dark themes seamlessly.";
-											case "Media Upload & Reactions":
-												return "Upload images and react to messages with emojis.";
-											case "Dynamic Starry Background":
-												return "Enjoy an animated starry background on the landing page.";
-										}
-									})()}
-								</p>
+								<h3 className="text-2xl font-semibold text-white mb-3">{feature.title}</h3>
+								<p className="text-gray-400 text-base">{feature.desc}</p>
 							</div>
 						))}
 					</div>
