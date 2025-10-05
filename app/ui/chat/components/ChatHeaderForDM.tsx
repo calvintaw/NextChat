@@ -10,8 +10,8 @@ import { Avatar } from "../../general/Avatar";
 import { ServerList } from "../Chatbox";
 import { usePathProvider } from "@/app/lib/PathContext";
 import clsx from "clsx";
-import { useRouter } from "next/navigation";
 import { useToast } from "@/app/lib/hooks/useToast";
+import { examplePassages } from "@/app/lib/utilities";
 import { useChatProvider } from "../ChatBoxWrapper";
 
 export function DirectMessageCard({
@@ -29,7 +29,7 @@ export function DirectMessageCard({
 	const [commonServers, setCommonServers] = useState<Room[]>([]);
 	const [isPending, setIsPending] = useState(true);
 	const { setPath } = usePathProvider();
-	const { isSystem } = useChatProvider();
+	const { isSystem, setChatBotTopic, ChatBotTopic } = useChatProvider();
 	const toast = useToast();
 
 	useEffect(() => {
@@ -65,7 +65,7 @@ export function DirectMessageCard({
 	}, [user.id]);
 
 	return (
-		<div className="bg-contrast text-white pt-2 px-4 pb-2 rounded-lg max-w-full">
+		<div className="bg-contrast text-white px-4 pb-2 rounded-lg max-w-full">
 			<div className="flex items-center justify-between mb-4">
 				<div className="flex items-center gap-3">
 					<Avatar
@@ -134,8 +134,34 @@ export function DirectMessageCard({
 				) : (
 					<ServerList servers={commonServers} />
 				))}
+			{roomId.startsWith("system-room") && (
+				<>
+					<p className="text-base text-primary">
+						Hi! I can answer questions, but only if the answer is already known 😄 {`(TensorFlow Q&A Model)`}
+					</p>
+
+					<div className="flex flex-wrap gap-2 mt-2">
+						{Object.keys(examplePassages).map((topic, idx) => (
+							<button
+								onClick={() => setChatBotTopic(topic)}
+								key={idx}
+								className={clsx(
+									"btn-small  !w-fit !py-0.5  !px-2 btn-secondary border border-transparent",
+									ChatBotTopic === topic
+										? "!bg-accent !text-text border border-contrast pointer-events-none"
+										: "text-muted cursor-pointer"
+								)}
+							>
+								{topic}
+							</button>
+						))}
+					</div>
+				</>
+			)}
 			{roomId.startsWith("system-room") && isBlocked && isSystem && (
-				<p>Due to difficulties in finding free apis and hosting own llms, the AI chatbot does not work 😢</p>
+				<p className="text-base text-amber-400 not-dark:text-amber-500">
+					Due to difficulties in finding free apis and hosting own llms, the AI chatbot does not work 😢
+				</p>
 			)}
 		</div>
 	);

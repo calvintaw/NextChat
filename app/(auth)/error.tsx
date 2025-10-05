@@ -61,7 +61,7 @@ export default function ErrorPage({
 					<MdArrowBack className="text-xl " />
 					<span>Back to Home</span>
 				</Link>
-				<Button className="btn-third h-9" onClick={() => reset()}>
+				<Button className="btn-inverted h-9" onClick={() => reset()}>
 					Reload
 				</Button>
 			</div>

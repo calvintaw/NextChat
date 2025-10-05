@@ -15,7 +15,7 @@ import { v4 as uuidv4 } from "uuid";
 import useEventListener from "@/app/lib/hooks/useEventListener";
 import { getSystemUser, insertMessageInDB } from "@/app/lib/actions";
 import { useToast } from "@/app/lib/hooks/useToast";
-import { sendWithRetry, sleep } from "@/app/lib/utilities";
+import { examplePassages, sendWithRetry, sleep } from "@/app/lib/utilities";
 import { FaArrowUp } from "react-icons/fa";
 import { IoArrowUp } from "react-icons/io5";
 import { GrStatusDisabledSmall } from "react-icons/gr";
@@ -31,7 +31,8 @@ type ChatInputBoxProps = {
 };
 
 const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading, isBlocked }: ChatInputBoxProps) => {
-	const { input, setInput, replyToMsg, setReplyToMsg, textRef, isSystem, setActivePersons } = useChatProvider();
+	const { input, setInput, replyToMsg, setReplyToMsg, textRef, isSystem, setActivePersons, ChatBotTopic } =
+		useChatProvider();
 	const [isFocused, setIsFocused] = useState(false);
 	const [style, setStyle] = useState("!max-h-10");
 	const [isPending, setIsPending] = useState(false);
@@ -102,7 +103,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 			if (roomId.startsWith("system-room")) {
 				// TODO: FIX BOT
 
-				const botReply = await getReplyFromBot(temp_msg.content);
+				const botReply = await getReplyFromBot(temp_msg.content, ChatBotTopic);
 
 				if (botReply.success && botReply.message && botReply.bot) {
 					const botMsg: MessageType & { room_id: string } = {
@@ -389,10 +390,6 @@ export default ChatInputBox;
 // 	}
 // }
 
-const examplePassage = `
-			Space exploration has always fascinated humanity, but one of the most mysterious and intriguing objects in the universe is the black hole. A black hole is a region in space where the gravitational pull is so strong that nothing—not even light—can escape from it. Black holes are formed when massive stars collapse under their own gravity at the end of their life cycle. Despite being invisible, black holes reveal their presence by the effect they have on nearby stars and gas. The first-ever image of a black hole’s event horizon, captured in 2019 by the Event Horizon Telescope, confirmed many theoretical predictions about these cosmic phenomena. Black holes also challenge our understanding of physics, particularly the laws of relativity and quantum mechanics, making them a subject of intense scientific research.
-		`;
-
 // tensor flow chatbot codes
 
 import * as qna from "@tensorflow-models/qna";
@@ -409,7 +406,7 @@ export async function preloadQnAModel() {
 
 export async function getReplyFromBot(
 	question: string,
-	passage: string = examplePassage
+	topic: keyof typeof examplePassages = "space"
 ): Promise<{ success: boolean; message?: string; bot?: User | null }> {
 	try {
 		// Lazy-load the MobileBERT model in browser
@@ -418,6 +415,7 @@ export async function getReplyFromBot(
 		}
 		if (!model) throw new Error("QnA model failed to load");
 
+		const passage = examplePassages[topic];
 		const answers = await model.findAnswers(question, passage);
 		const bot = await getSystemUser();
 

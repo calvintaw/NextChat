@@ -38,6 +38,8 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	const [activePersons, setActivePersons] = useState<string[]>([]);
 	const [initialLoading, setInitialLoading] = useState(true);
 	const [isBlocked, setIsBlocked] = useState(false);
+	const examplePassageKeys = Object.keys(examplePassages) as Array<keyof typeof examplePassages>;
+	const [ChatBotTopic, setChatBotTopic] = useState<keyof typeof examplePassages>(examplePassageKeys[0]);
 	const [isSystem, setIsSystem] = useState(false);
 
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -353,6 +355,8 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 						isSystem,
 						deleteMessage,
 						setActivePersons,
+						setChatBotTopic,
+						ChatBotTopic,
 					}}
 				>
 					<div
@@ -429,7 +433,7 @@ import ChatInputBox, { preloadQnAModel } from "./components/ChatInputBox";
 import { Avatar } from "../general/Avatar";
 import { clsx } from "clsx";
 import Link from "next/link";
-import { isServerRoom } from "@/app/lib/utilities";
+import { examplePassages, isServerRoom } from "@/app/lib/utilities";
 import ChatProvider from "./ChatBoxWrapper";
 import Loading from "@/app/(root)/chat/[room_id]/loading";
 import { useToast } from "@/app/lib/hooks/useToast";
