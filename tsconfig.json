@@ -33,6 +33,6 @@
 		"app/ui/o",
 		"app/lib/hooks/useToggle.jsx",
 		"app/ui/general/imageForm.jsx"
-, "app/ui/NewsGridWrapper.tsx"	],
+, "app/ui/NewsGridWrapper.tsx", "app/api/bot/route.ts"	],
 	"exclude": ["node_modules"]
 }

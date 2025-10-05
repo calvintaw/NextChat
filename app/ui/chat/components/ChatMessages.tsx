@@ -52,7 +52,7 @@ const ChatMessages = ({ messages }: { messages: MessageType[] }) => {
 						<React.Fragment key={msg.id}>
 							{separateLogic && <MessageSeparator date={msg.createdAt} />}
 
-							<MessageCard msg={msg} key={msg.id} isFirstGroup={isFirstGroup}></MessageCard>
+							<MessageCard msg={msg} isFirstGroup={isFirstGroup}></MessageCard>
 						</React.Fragment>
 					);
 				})}

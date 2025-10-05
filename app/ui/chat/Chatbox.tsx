@@ -84,6 +84,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		}
 	}, [type, recipient, user.id]);
 
+	const LIMIT = 15;
 	// const msgReceivedSound = useRef<HTMLAudioElement>(new Audio("/msg-noti.mp3")); // does not fit the vibe
 
 	// fetching msgs at startup and add listeners for typing event
@@ -100,13 +101,6 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 				try {
 					const cached: MessageType[] | undefined = await getCache(getRoomMessagesKey(roomId));
 					if (cached && cached.length > 0) {
-						console.log(" ");
-						console.log(" ");
-						console.log(" ");
-						console.log("FROM CACHE: ", cached);
-						console.log(" ");
-						console.log(" ");
-						console.log(" ");
 						offsetRef.current = cached.length;
 						lastBatchLength.current = cached.length;
 						oldestMsgCreatedAt.current = cached[cached.length - 1].createdAt;
@@ -120,7 +114,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 			}
 
 			try {
-				const recent = await getRecentMessages(roomId);
+				const recent = await getRecentMessages(roomId, { limit: LIMIT });
 				if (recent.length !== 0) {
 					offsetRef.current = recent.length;
 					lastBatchLength.current = recent.length;
@@ -240,6 +234,12 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 	useEffect(() => {
 		socket.emit("join", roomId);
+		if (roomId.startsWith("system-room")) {
+			preloadQnAModel().catch((err) => {
+				console.error("Failed to load QnA model:", err);
+				throw new Error(`Unable to load the bot at the moment [Please try again later or refresh the page]`);
+			});
+		}
 
 		return () => {
 			socket.emit("leave", roomId);
@@ -331,7 +331,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	// cache msg in client browser
 	useEffect(() => {
 		if (messages.length > 0) {
-			const messagesToSave = messages.slice(-100); // last 100 messages
+			const messagesToSave = messages.slice(-50); // last 50 messages
 			setCache(getRoomMessagesKey(roomId), messagesToSave).catch((err) => console.error("IDB save error:", err));
 		}
 	}, [messages, roomId]);
@@ -425,7 +425,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 //=====================
 
 import ChatMessages from "./components/ChatMessages";
-import ChatInputBox from "./components/ChatInputBox";
+import ChatInputBox, { preloadQnAModel } from "./components/ChatInputBox";
 import { Avatar } from "../general/Avatar";
 import { clsx } from "clsx";
 import Link from "next/link";
@@ -436,7 +436,6 @@ import { useToast } from "@/app/lib/hooks/useToast";
 import { DirectMessageCard } from "./components/ChatHeaderForDM";
 import { ServerCardHeader } from "./components/ChatHeaderForServer";
 import useOnScreen from "@/app/lib/hooks/useOnScreen";
-import { usePathProvider } from "@/app/lib/PathContext";
 
 export const ServerList = ({ servers }: { servers: Room[] }) => {
 	if (!servers || servers.length === 0) {

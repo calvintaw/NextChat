@@ -175,6 +175,10 @@ interface GetMessagesOptions {
 	limit?: number; // optional, number of messages to fetch
 }
 
+export async function getSystemUser() {
+	return SYSTEM_USER;
+}
+
 export async function getRecentMessages(room_id: string, options: GetMessagesOptions = {}) {
 	const { cursor = "", limit = 15 } = options;
 
@@ -225,38 +229,6 @@ export async function insertMessageInDB(msg: LocalMessageType): Promise<{ succes
 		return {
 			success: false,
 			message: "Failed to send message. Please try again.",
-		};
-	}
-}
-
-export async function getReplyFromBot(
-	msg: LocalMessageType
-): Promise<{ success: boolean; message?: string; bot?: User | null }> {
-	try {
-		const botUrl = process.env.SYSTEM_CHATBOT_URL!;
-
-		const res = await fetch(botUrl, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ message: msg.content }),
-		});
-
-		if (!res.ok) {
-			throw new Error(`Bot server error: ${res.status}`);
-		}
-
-		const data = await res.json();
-
-		return {
-			success: true,
-			message: data.reply, // reply from Flask bot
-			bot: SYSTEM_USER,
-		};
-	} catch (error) {
-		console.error("getReplyFromBot ERROR:", error);
-		return {
-			success: false,
-			message: "Bot is unavailable. Please try again later.",
 		};
 	}
 }
