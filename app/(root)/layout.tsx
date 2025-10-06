@@ -45,7 +45,7 @@ export default async function RootLayout({
 	children: React.ReactNode;
 }>) {
 	const cookieStore = await cookies();
-	const theme = cookieStore.get("theme")?.value || "dark";
+	const theme = cookieStore.get("theme")?.value?.trim() || "dark";
 	const starsBackgroundEnabled = cookieStore.get("starsBackgroundEnabled")?.value || "disable-stars-bg";
 
 	return (
