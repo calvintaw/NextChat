@@ -177,6 +177,7 @@ const ImageBox = () => {
 		w-full h-full
 		bg-linear-to-r from-green-500 via-emerald-500 to-teal-500
 		rounded-3xl
+		z-[1200]
 		"
 		>
 			<div

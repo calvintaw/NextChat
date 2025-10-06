@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useLocalStorage } from "./useStorage";
 
 export default function useStarsBg() {
-	const [starsBackgroundEnabled, setStarsBackgroundEnabled] = useLocalStorage("starsBackgroundEnabled");
+	const [starsBackgroundEnabled, setStarsBackgroundEnabled] = useLocalStorage("starsBackgroundEnabled", false);
 
 	const toggle = (value) => {
 		setStarsBackgroundEnabled((prev) => (typeof value === "boolean" ? value : !prev));
