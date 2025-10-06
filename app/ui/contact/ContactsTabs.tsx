@@ -69,7 +69,7 @@ const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTa
 					incoming: [...prev.incoming],
 					sent: [...prev.sent, { ...result.targetUser! }],
 				}));
-				toast({ title: "Success!", mode: "positive", subtitle: "Friend request sent successfully." });
+				toast({ title: "Success!", mode: "positive", subtitle: request.message });
 			} else {
 				toast({
 					title: "Error!",

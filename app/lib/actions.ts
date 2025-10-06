@@ -864,7 +864,7 @@ export async function requestFriendship(
 
 			return {
 				success: true,
-				message: `Success! Your friend requests to ${username} was sent.`,
+				message: `Your friend requests to ${username} was sent.`,
 				targetUser,
 			};
 		} catch (error) {
@@ -1033,7 +1033,9 @@ export async function acceptFriendshipRequest(
 
 			return {
 				success: true,
-				message: `Friend request from ${targetUser.username} accepted.`,
+				message: system
+					? "Ai ChatBot has been added as friend."
+					: `Friend request from ${targetUser.username} accepted.`,
 			};
 		} catch (error) {
 			console.error("error in accept friend req", error);

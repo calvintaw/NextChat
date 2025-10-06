@@ -64,6 +64,13 @@ export const ContactPreviewContainer = ({ setContacts, user, contacts }: Props) 
 				// local update
 				setContacts((prev) => prev.filter((req) => req.id !== friend.id));
 				toast({ title: "Success!", mode: "positive", subtitle: result.message });
+				if (friend.username === "system") {
+					toast({
+						title: "AI ChatBot",
+						mode: "info",
+						subtitle: "Want to chat again? Use @system to add me as Friend.",
+					});
+				}
 			}
 		} catch (err) {
 			setError("Failed to remove friend request");
