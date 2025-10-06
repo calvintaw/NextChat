@@ -393,7 +393,6 @@ export default ChatInputBox;
 // tensor flow chatbot codes
 
 import * as qna from "@tensorflow-models/qna";
-import "@tensorflow/tfjs";
 let model: qna.QuestionAndAnswer | null = null;
 
 export async function preloadQnAModel() {
@@ -414,10 +413,15 @@ export async function getReplyFromBot(
 			await preloadQnAModel();
 		}
 		if (!model) throw new Error("QnA model failed to load");
+		console.log("Model instance:", model);
 
 		const passage = examplePassages[topic];
 		const answers = await model.findAnswers(question, passage);
 		const bot = await getSystemUser();
+
+		console.log("Question:", question);
+		console.log("Passage:", passage);
+		console.log("Answers returned:", answers);
 
 		// Pick the best answer (highest score)
 		const bestAnswer = answers.length ? answers.reduce((prev, curr) => (curr.score > prev.score ? curr : prev)) : null;

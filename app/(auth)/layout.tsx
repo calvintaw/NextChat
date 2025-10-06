@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "@/app/globals.css";
+import "@/app/stars.css";
 import { cookies } from "next/headers";
 import { Suspense } from "react";
 import Loading from "../(root)/chat/[room_id]/loading";
@@ -26,7 +27,7 @@ const roboto = localFont({
 });
 
 export const metadata: Metadata = {
-	title: "NextChat | auth",
+	title: "NextChat | SignIn",
 	description:
 		"NextChat - A Discord-inspired chat app with real-time messaging, servers, reactions, image uploads, and profile customization. | Created By calvintaw",
 	icons: {
@@ -45,6 +46,12 @@ export default async function RootLayout({
 	return (
 		<html lang="en" className={theme}>
 			<body className={`${roboto.className}  antialiased flex flex-row h-screen w-screen`}>
+				<div className="bg-animation !z-[1000]">
+					<div id="stars"></div>
+					<div id="stars2"></div>
+					<div id="stars3"></div>
+					<div id="stars4"></div>
+				</div>
 				<ProgressBar></ProgressBar>
 				<Suspense fallback={<Loading />}>{children}</Suspense>
 				<Toaster />

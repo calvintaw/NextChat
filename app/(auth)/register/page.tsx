@@ -14,6 +14,7 @@ import { ImSpinner9 } from "react-icons/im";
 import { useRouter } from "next/navigation";
 import { BiLoaderAlt } from "react-icons/bi";
 
+
 const Page = () => {
 	const [data, setData] = useState<FormState>({ errors: {}, message: "" });
 	const [isPending, setIsPending] = useState(false);
@@ -32,7 +33,7 @@ const Page = () => {
 
 	return (
 		<section className="flex-1 flex items-center justify-center register-section max-md:pb-15 max-md:pt-5 overflow-x-hidden">
-			<AuthFormWrapper className="max-w-166">
+			<AuthFormWrapper className="max-w-[578px]">
 				<form
 					onSubmit={async (e) => {
 						e.preventDefault();

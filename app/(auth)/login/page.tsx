@@ -44,7 +44,11 @@ const images = [
 export default function LoginPage() {
 	return (
 		<>
-			<section className="h-screen w-screen p-2 md:p-6 flex items-center justify-center gap-6 @container">
+			<section
+				className="h-screen w-screen p-2 md:p-6 flex items-center justify-center gap-6 @container *:
+				max-[998px]:bg-[url('/auth_bg.svg')]
+			"
+			>
 				<ImageBox></ImageBox>
 				<LoginForm></LoginForm>
 			</section>
@@ -63,7 +67,7 @@ function LoginForm() {
 	}, [errorMessage]);
 
 	return (
-		<AuthFormWrapper className="bg-background ">
+		<AuthFormWrapper className="bg-background max-w-[440px]">
 			<form ref={formRef} action={formAction} className="form ">
 				<div role="heading" className="flex items-center gap-2">
 					<IoLogoPolymer className="text-5xl"></IoLogoPolymer>
