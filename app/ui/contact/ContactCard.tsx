@@ -23,8 +23,6 @@ type Props = {
 };
 
 export const ContactPreviewContainer = ({ setContacts, user, contacts }: Props) => {
-	const [cona] = useState<ContactType[]>(contacts);
-
 	useEffect(() => {
 		function handleStatusChange(userId: string, online: boolean) {
 			setContacts((prev) => {
@@ -87,7 +85,7 @@ export const ContactPreviewContainer = ({ setContacts, user, contacts }: Props) 
 	return (
 		<section className="flex flex-col flex-1">
 			{error && <p className="text-sm text-error my-2">{error}</p>}
-			{cona.map((contact) => (
+			{/* {contacts.map((contact) => (
 				<ContactPreview
 					isPending={pendingDeletes.has(contact.id)}
 					user={user}
@@ -95,7 +93,12 @@ export const ContactPreviewContainer = ({ setContacts, user, contacts }: Props) 
 					contact={contact}
 					key={contact.id}
 				/>
-			))}
+			))} */}
+			{true && (
+				<div className="flex flex-1 items-center justify-center -mt-15">
+					<p className="text-muted">Looks like your friend list is as quiet as space. Time to send some invites! 😆</p>
+				</div>
+			)}
 		</section>
 	);
 };
@@ -160,7 +163,7 @@ export const ContactPreview = ({
 				{/* Avatar */}
 				<div className="h-full flex flex-row py-2.5">
 					<Avatar
-						disableTooltip
+						disableTooltip={true}
 						id={contact.id}
 						src={contact.image}
 						size="size-8.5"

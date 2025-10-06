@@ -196,7 +196,7 @@ export const ChatPreview = ({
 				)}
 			>
 				<Avatar
-					disableTooltip
+					disableTooltip={true}
 					statusIndicator={false}
 					id={chat.id}
 					src={chat.image}

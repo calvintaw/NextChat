@@ -78,15 +78,17 @@ export const Avatar = ({
 		}
 	}, [src]);
 
+	const tooltipProps = disableTooltip
+		? {}
+		: {
+				"data-tooltip-id": "avatar-tooltip",
+				"data-tooltip-content": `View ${displayName}'s profile`,
+		  };
+
 	return (
 		<>
 			{hasValidSrc && (
-				<div
-					onClick={onParentClick}
-					data-tooltip-id={disableTooltip ? undefined : "avatar-tooltip"}
-					data-tooltip-content={disableTooltip ? undefined : `View ${displayName}'s profile`}
-					className={clsx("relative", size, parentClassName)}
-				>
+				<div onClick={onParentClick} {...tooltipProps} className={clsx("relative", size, parentClassName)}>
 					<UserLink id={id} disable={disableTooltip}>
 						{!loaded && (
 							<div
@@ -136,12 +138,7 @@ export const Avatar = ({
 			)}
 
 			{!hasValidSrc && (
-				<div
-					onClick={onParentClick}
-					data-tooltip-id="avatar-tooltip"
-					data-tooltip-content={`View ${displayName}'s profile`}
-					className={clsx("relative", size, parentClassName)}
-				>
+				<div onClick={onParentClick} {...tooltipProps} className={clsx("relative", size, parentClassName)}>
 					<UserLink id={id} disable={disableTooltip}>
 						<div
 							className={clsx(
