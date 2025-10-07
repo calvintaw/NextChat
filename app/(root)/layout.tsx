@@ -56,6 +56,8 @@ export default async function RootLayout({
 				<div className="bg-animation !z-[1000]">
 					<div id="stars"></div>
 					<div id="stars2"></div>
+					<div id="stars3"></div>
+					<div id="stars4"></div>
 				</div>
 				<ProgressBar></ProgressBar>
 				<PathProvider>

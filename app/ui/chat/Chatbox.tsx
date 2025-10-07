@@ -80,7 +80,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		}
 
 		if (roomId.startsWith("system-room")) {
-			// setIsSystem(true); //
+			// setIsSystem(true); //p
 			// setIsBlocked(true);
 			setInitialLoading(false);
 		}

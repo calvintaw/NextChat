@@ -85,7 +85,7 @@ export const ContactPreviewContainer = ({ setContacts, user, contacts }: Props) 
 	return (
 		<section className="flex flex-col flex-1">
 			{error && <p className="text-sm text-error my-2">{error}</p>}
-			{/* {contacts.map((contact) => (
+			{contacts.map((contact) => (
 				<ContactPreview
 					isPending={pendingDeletes.has(contact.id)}
 					user={user}
@@ -93,8 +93,8 @@ export const ContactPreviewContainer = ({ setContacts, user, contacts }: Props) 
 					contact={contact}
 					key={contact.id}
 				/>
-			))} */}
-			{true && (
+			))}
+			{contacts.length <= 0 && (
 				<div className="flex flex-1 items-center justify-center -mt-15">
 					<p className="text-muted">Looks like your friend list is as quiet as space. Time to send some invites! 😆</p>
 				</div>

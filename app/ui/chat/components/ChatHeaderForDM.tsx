@@ -140,7 +140,7 @@ export function DirectMessageCard({
 						Hi! I can answer questions, but only if the answer is already known 😄 {`(TensorFlow Q&A Model)`}
 					</p>
 
-					<div className="flex flex-wrap gap-2 mt-2">
+					{/* <div className="flex flex-wrap gap-2 mt-2">
 						{Object.keys(examplePassages).map((topic, idx) => (
 							<button
 								onClick={() => setChatBotTopic(topic)}
@@ -155,7 +155,7 @@ export function DirectMessageCard({
 								{topic}
 							</button>
 						))}
-					</div>
+					</div> */}
 				</>
 			)}
 			{roomId.startsWith("system-room") && isBlocked && isSystem && (
