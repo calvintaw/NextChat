@@ -155,3 +155,5 @@ export const examplePassages = {
   Climate change refers to long-term shifts in temperature, precipitation, and weather patterns on Earth, largely driven by human activities. Burning fossil fuels, deforestation, and industrial processes release greenhouse gases, trapping heat in the atmosphere. The consequences include rising sea levels, extreme weather events, melting glaciers, and threats to biodiversity. Addressing climate change requires global cooperation, sustainable energy solutions, and environmental stewardship. Scientists, policymakers, and communities are working together to mitigate its impact and adapt to changes. Understanding climate change is essential for protecting the planet and ensuring a sustainable future.
 `,
 };
+
+

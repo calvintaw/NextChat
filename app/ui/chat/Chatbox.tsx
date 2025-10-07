@@ -236,12 +236,8 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 	useEffect(() => {
 		socket.emit("join", roomId);
-		if (roomId.startsWith("system-room")) {
-			preloadQnAModel().catch((err) => {
-				console.error("Failed to load QnA model:", err);
-				throw new Error(`Unable to load the bot at the moment [Please try again later or refresh the page]`);
-			});
-		}
+		// if (roomId.startsWith("system-room")) {
+		// }
 
 		return () => {
 			socket.emit("leave", roomId);
@@ -429,7 +425,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 //=====================
 
 import ChatMessages from "./components/ChatMessages";
-import ChatInputBox, { preloadQnAModel } from "./components/ChatInputBox";
+import ChatInputBox from "./components/ChatInputBox";
 import { Avatar } from "../general/Avatar";
 import { clsx } from "clsx";
 import Link from "next/link";

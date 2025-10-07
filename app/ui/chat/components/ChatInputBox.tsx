@@ -20,6 +20,7 @@ import { FaArrowUp } from "react-icons/fa";
 import { IoArrowUp } from "react-icons/io5";
 import { GrStatusDisabledSmall } from "react-icons/gr";
 import { GoSquareFill } from "react-icons/go";
+import { model } from "@tensorflow/tfjs";
 
 type ChatInputBoxProps = {
 	activePersons: string[];
@@ -103,34 +104,34 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 			if (roomId.startsWith("system-room")) {
 				// TODO: FIX BOT
 
-				const botReply = await getReplyFromBot(temp_msg.content, ChatBotTopic);
+				// const botReply = await getReplyFromBot(temp_msg.content, ChatBotTopic);
 
-				if (botReply.success && botReply.message && botReply.bot) {
-					const botMsg: MessageType & { room_id: string } = {
-						id: uuidv4(),
-						room_id: roomId,
-						sender_id: botReply.bot.id,
-						sender_image: botReply.bot.image,
-						sender_display_name: botReply.bot.displayName,
-						content: botReply.message,
-						replyTo: temp_msg.id,
-						createdAt: new Date().toISOString(),
-						edited: false,
-						reactions: {},
-						type: "text",
-					};
+				// if (botReply.success && botReply.message && botReply.bot) {
+				// 	const botMsg: MessageType & { room_id: string } = {
+				// 		id: uuidv4(),
+				// 		room_id: roomId,
+				// 		sender_id: botReply.bot.id,
+				// 		sender_image: botReply.bot.image,
+				// 		sender_display_name: botReply.bot.displayName,
+				// 		content: botReply.message,
+				// 		replyTo: temp_msg.id,
+				// 		createdAt: new Date().toISOString(),
+				// 		edited: false,
+				// 		reactions: {},
+				// 		type: "text",
+				// 	};
 
-					console.log("bot msg id: ", botMsg.id, "user msg id: ", temp_msg.id);
+				// 	console.log("bot msg id: ", botMsg.id, "user msg id: ", temp_msg.id);
 
-					const botInsert = await insertMessageInDB(botMsg);
-					if (botInsert.success) {
-						setMessages((prev) => [...prev, { ...botMsg, synced: true }]);
-					}
-				}
+				// 	const botInsert = await insertMessageInDB(botMsg);
+				// 	if (botInsert.success) {
+				// 		setMessages((prev) => [...prev, { ...botMsg, synced: true }]);
+				// 	}
+				// }
 
-				// sendWithRetry("system", temp_msg, 3, 2000)
-				// 	.then((res) => console.log("System message delivered:", res))
-				// 	.catch((err) => console.error("System message failed:", err));
+				sendWithRetry("system", { msg_content: temp_msg.content, room_id: temp_msg.room_id }, 3, 2000)
+					.then((res) => console.log("System message delivered:", res))
+					.catch((err) => console.error("System message failed:", err));
 			} else {
 				sendWithRetry("message", temp_msg, 3, 2000)
 					.then((res) => console.log("Message delivered:", res))
@@ -390,53 +391,40 @@ export default ChatInputBox;
 // 	}
 // }
 
-// tensor flow chatbot codes
+// export async function getReplyFromBot(
+// 	question: string,
+// 	topic: keyof typeof examplePassages = "space"
+// ): Promise<{ success: boolean; message?: string; bot?: User | null }> {
+// 	try {
+// 		// Lazy-load the MobileBERT model in browser
+// 		if (!model) {
+// 			await preloadQnAModel();
+// 		}
+// 		if (!model) throw new Error("QnA model failed to load");
+// 		console.log("Model instance:", model);
 
-import * as qna from "@tensorflow-models/qna";
-let model: qna.QuestionAndAnswer | null = null;
+// 		const passage = examplePassages[topic];
+// 		const answers = await model.findAnswers(question, passage);
+// 		const bot = await getSystemUser();
 
-export async function preloadQnAModel() {
-	if (!model) {
-		console.log("Loading MobileBERT QnA model in background...");
-		model = await qna.load();
-		console.log("Model loaded ✅");
-	}
-}
+// 		console.log("Question:", question);
+// 		console.log("Passage:", passage);
+// 		console.log("Answers returned:", answers);
 
-export async function getReplyFromBot(
-	question: string,
-	topic: keyof typeof examplePassages = "space"
-): Promise<{ success: boolean; message?: string; bot?: User | null }> {
-	try {
-		// Lazy-load the MobileBERT model in browser
-		if (!model) {
-			await preloadQnAModel();
-		}
-		if (!model) throw new Error("QnA model failed to load");
-		console.log("Model instance:", model);
+// 		// Pick the best answer (highest score)
+// 		const bestAnswer = answers.length ? answers.reduce((prev, curr) => (curr.score > prev.score ? curr : prev)) : null;
 
-		const passage = examplePassages[topic];
-		const answers = await model.findAnswers(question, passage);
-		const bot = await getSystemUser();
-
-		console.log("Question:", question);
-		console.log("Passage:", passage);
-		console.log("Answers returned:", answers);
-
-		// Pick the best answer (highest score)
-		const bestAnswer = answers.length ? answers.reduce((prev, curr) => (curr.score > prev.score ? curr : prev)) : null;
-
-		return {
-			success: true,
-			message: bestAnswer?.text ?? "No answer found.",
-			bot,
-		};
-	} catch (err) {
-		console.error("QnA ERROR:", err);
-		return {
-			success: true,
-			message: "Bot is unavailable. Please try again later.",
-			bot: null,
-		};
-	}
-}
+// 		return {
+// 			success: true,
+// 			message: bestAnswer?.text ?? "No answer found.",
+// 			bot,
+// 		};
+// 	} catch (err) {
+// 		console.error("QnA ERROR:", err);
+// 		return {
+// 			success: true,
+// 			message: "Bot is unavailable. Please try again later.",
+// 			bot: null,
+// 		};
+// 	}
+// }

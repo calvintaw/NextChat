@@ -68,11 +68,11 @@ export const config = {
 				if (credentials.email === "null") credentials.email = null;
 				if (credentials.username === "null") credentials.username = null;
 
-				console.log("Credentials received:", credentials);
+				// console.log("Credentials received:", credentials);
 
 				const parsed = LoginFormSchema.safeParse(credentials);
 				if (!parsed.success) {
-					console.log("Validation failed:", parsed.error.format());
+					// console.log("Validation failed:", parsed.error.format());
 					return null;
 				}
 
@@ -80,14 +80,14 @@ export const config = {
 				const user = await getUser(email, username);
 
 				if (!user) {
-					console.log("User not found");
+					// console.log("User not found");
 					return null;
 				}
 
 				const passwordsMatch = await bcrypt.compare(password, user.password);
 				if (!passwordsMatch) return null;
 
-				console.log("User authenticated:", user);
+				// console.log("User authenticated:", user);
 				return {
 					id: user.id,
 					username: user.username,

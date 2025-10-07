@@ -38,7 +38,7 @@ const Page = () => {
 					onSubmit={async (e) => {
 						e.preventDefault();
 						if (!isAllowed) {
-							console.log("not allowed register");
+							// console.log("not allowed register");
 							return;
 						}
 

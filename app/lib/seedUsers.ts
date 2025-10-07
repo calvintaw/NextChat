@@ -28,12 +28,12 @@ export async function seedRegisterUsers(users: SeedUser[]) {
 			const result = await registerUser(formData);
 
 			if (result.errors && Object.keys(result.errors).length > 0) {
-				console.error(`❌ Failed to register user ${user.username}:`, result.errors, result.message);
+				console.error(`Failed to register user ${user.username}:`, result.errors, result.message);
 			} else {
-				console.log(`✅ User ${user.username} registered successfully`);
+				console.log(`User ${user.username} registered successfully`);
 			}
 		} catch (err) {
-			console.error(`💥 Error while registering ${user.username}:`, err);
+			console.error(`Error while registering ${user.username}:`, err);
 		}
 	}
 }
