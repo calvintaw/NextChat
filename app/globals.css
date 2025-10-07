@@ -571,7 +571,7 @@ html {
 	}
 
 	.msg-synced-indicator {
-		@apply max-sm:hidden flex gap-0.5 items-center h-fit w-fit m-0 p-0 text-muted absolute bottom-3 right-0 text-[11px] -z-50 group-hover:z-0;
+		@apply max-sm:hidden flex gap-0.5 items-center h-fit w-fit m-0 p-0 text-muted absolute !bottom-1 right-0 text-[11px] -z-50 group-hover:z-0;
 	}
 }
 
