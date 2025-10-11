@@ -17,6 +17,7 @@ import { IconWithSVG, Button } from "../../general/Buttons";
 import imageCompression from "browser-image-compression";
 import { ServerImageUploadBtn } from "./UploadButtons";
 import { BiLoaderAlt } from "react-icons/bi";
+import { useRouterWithProgress } from "@/app/lib/hooks/useRouterWithProgressBar";
 
 type EditServerState = {
 	errors: Record<string, string[]>;
@@ -49,7 +50,7 @@ export function ServerEditForm({
 		server: null,
 	});
 	const [isPending, setIsPending] = useState(false);
-	const router = useRouter();
+	const router = useRouterWithProgress();
 
 	async function handleSubmit(e: React.FormEvent) {
 		e.preventDefault();
@@ -86,7 +87,7 @@ export function ServerEditForm({
 			const compressedFile = await imageCompression(selectedFile, options);
 			const filename = `profile.jpg`;
 			const filePath = `${server.name}/${filename}`;
-			const { data, error } = await supabase.storage.from("uploads").upload(filePath, compressedFile, {upsert: true});
+			const { data, error } = await supabase.storage.from("uploads").upload(filePath, compressedFile, { upsert: true });
 			if (error) throw error;
 
 			const { data: publicData } = supabase.storage.from("uploads").getPublicUrl(data?.path || "");

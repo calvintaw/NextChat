@@ -22,6 +22,7 @@ import remarkGfm from "remark-gfm";
 import rehypeReact from "rehype-react";
 import { useToast } from "../lib/hooks/useToast";
 import { normalizeMarkdown } from "../lib/utilities";
+import { useRouterWithProgress } from "../lib/hooks/useRouterWithProgressBar";
 
 type EditProfileState = {
 	errors: Record<string, string[]>;
@@ -43,7 +44,7 @@ const DashboardPage = ({ initialUser, isOwnPage = true }: { initialUser: User; i
 		user: null,
 	});
 	const [isPending, setIsPending] = useState(false);
-	const router = useRouter();
+	const router = useRouterWithProgress();
 
 	async function handleSubmit(e: React.FormEvent) {
 		e.preventDefault();

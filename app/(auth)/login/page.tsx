@@ -191,13 +191,7 @@ const ImageBox = () => {
 						<IoLogoPolymer className="text-5xl text-black"></IoLogoPolymer>
 						<h2 className="text-3xl font-bold font-sans text-shadow-md text-black">NextChat</h2>
 					</div>
-					{/* <button
-						onClick={() => router.push("/")}
-						className="btn-primary rounded-full shadow-lg btn-with-icon px-4 py-2 bg-linear-to-r from-indigo-500 via-blue-500 to-cyan-500"
-					>
-						Back to Website
-						<FaArrowRight className="text-lg" />
-					</button> */}
+				
 				</div>
 				{images.map((image, index) => (
 					<React.Fragment key={image.src}>

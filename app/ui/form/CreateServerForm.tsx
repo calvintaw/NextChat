@@ -26,6 +26,7 @@ import imageCompression from "browser-image-compression";
 import { nanoid } from "nanoid";
 import { useRouter } from "next/navigation";
 import { BiLoaderAlt } from "react-icons/bi";
+import { useRouterWithProgress } from "@/app/lib/hooks/useRouterWithProgressBar";
 
 type FormState = {
 	errors: Record<string, string[]>;
@@ -44,7 +45,7 @@ export default function CreateServerFormDialog({ className, user }: { className:
 	});
 
 	const [isPending, setIsPending] = useState(false);
-	const router = useRouter();
+	const router = useRouterWithProgress();
 
 	const [uploaded, setUploaded] = useState<string>("");
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);

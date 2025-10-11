@@ -21,6 +21,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Route } from "next";
 import { useFriendsProvider } from "@/app/lib/friendsContext";
 import { useToast } from "@/app/lib/hooks/useToast";
+import { useRouterWithProgress } from "@/app/lib/hooks/useRouterWithProgressBar";
 
 dayjs.extend(isToday);
 dayjs.extend(isYesterday);
@@ -79,7 +80,7 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 	};
 
 	const pathname = usePathname();
-	const router = useRouter();
+	const router = useRouterWithProgress();
 
 	return (
 		<>
@@ -232,7 +233,7 @@ const headerButtons = [
 ];
 
 export const ChatPanelHeader = () => {
-	const router = useRouter();
+	const router = useRouterWithProgress();
 	const pathname = usePathname();
 	return (
 		<>

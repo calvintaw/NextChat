@@ -14,6 +14,7 @@ import InputField from "../form/InputField";
 import { IconWithSVG } from "../general/Buttons";
 import NewsBlock from "./NewsCard";
 import { Route } from "next";
+import { useRouterWithProgress } from "@/app/lib/hooks/useRouterWithProgressBar";
 
 const breakpointColumnsObj = { default: 2, 700: 1 };
 
@@ -40,7 +41,7 @@ export const categories: CategoriesType[] = [
 
 const NewsGrid = () => {
 	const searchParams = useSearchParams();
-	const router = useRouter();
+	const router = useRouterWithProgress();
 
 	const queryParam = searchParams?.get("q") || "home";
 	const [filter, setFilter] = useState(queryParam);

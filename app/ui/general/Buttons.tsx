@@ -3,6 +3,7 @@ import { Children, cloneElement, isValidElement, useState } from "react";
 import useDarkMode from "../../lib/hooks/useDarkMode";
 import { FaCircleHalfStroke } from "react-icons/fa6";
 import clsx from "clsx";
+import { MdLightMode, MdDarkMode } from "react-icons/md";
 
 export function MenuIcon() {
 	const [active, setActive] = useState(false);
@@ -66,7 +67,7 @@ export function IconWithSVG(props: React.PropsWithChildren<IconProps>) {
 				className: clsx(child.props.className, "absolute inset-0 m-auto text-2xl"),
 			});
 		}
-		return child; 
+		return child;
 	});
 
 	return (
@@ -77,8 +78,7 @@ export function IconWithSVG(props: React.PropsWithChildren<IconProps>) {
 }
 
 export const DarkModeBtn = ({ className }: { className?: string }) => {
-	const [_, toggle] = useDarkMode();
-
+	const [darkMode, toggle] = useDarkMode();
 	const icon_class = "absolute inset-0 m-auto text-2xl not-dark:group-hover:text-background";
 	return (
 		<button
@@ -89,7 +89,8 @@ export const DarkModeBtn = ({ className }: { className?: string }) => {
 				className
 			)}
 		>
-			<FaCircleHalfStroke className={icon_class}></FaCircleHalfStroke>
+			{darkMode && <MdLightMode className={icon_class}></MdLightMode>}
+			{!darkMode && <MdDarkMode className={icon_class}></MdDarkMode>}
 		</button>
 	);
 };

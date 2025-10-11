@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useLocalStorage } from "./useStorage";
 
 export default function useDarkMode() {
+	
 	const [darkMode, setDarkMode] = useLocalStorage("useDarkMode", true);
 
 	const toggle = (value) => {

@@ -13,13 +13,13 @@ import { ImSpinner9 } from "react-icons/im";
 
 import { useRouter } from "next/navigation";
 import { BiLoaderAlt } from "react-icons/bi";
-
+import { useRouterWithProgress } from "@/app/lib/hooks/useRouterWithProgressBar";
 
 const Page = () => {
 	const [data, setData] = useState<FormState>({ errors: {}, message: "" });
 	const [isPending, setIsPending] = useState(false);
 	const [isAllowed, setIsAllowed] = useState(false);
-	const router = useRouter();
+	const router = useRouterWithProgress();
 
 	const handleFormSubmit = async (formData: FormData) => {
 		const data = await registerUser(formData);

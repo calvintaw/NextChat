@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import NProgress from "nprogress";
 
 NProgress.configure({
@@ -11,6 +11,7 @@ NProgress.configure({
 
 export default function ProgressBar() {
 	const pathname = usePathname();
+	const searchParams = useSearchParams();
 	const timeouts = useRef<number[]>([]); // store timeout IDs
 
 	const normalizePath = (url: string) => {
@@ -69,9 +70,9 @@ export default function ProgressBar() {
 
 	// When pathname changes → navigation finished → stop NProgress
 	useEffect(() => {
-		if (!pathname) return;
+		if (!pathname || !searchParams) return;
 		NProgress.done();
-	}, [pathname]);
+	}, [pathname, searchParams]);
 
 	return null;
 }
