@@ -82,7 +82,7 @@ const TicTacToeHome: React.FC<{ user: User }> = ({ user }) => {
 		if (hasWonGame(newBoard, playerTurn)) {
 			setBoard(newBoard);
 			setWinner(playerTurn);
-			if (opponent === "Bot" && playerTurn === "O") {
+			if (opponent === "Bot" && playerTurn !== userSymbol) {
 				const msg = botMessages[Math.floor(Math.random() * botMessages.length)];
 				setStatusMessage(`Bot wins! ${msg}`);
 			} else {
@@ -105,7 +105,7 @@ const TicTacToeHome: React.FC<{ user: User }> = ({ user }) => {
 
 		if (opponent === "Bot") {
 			await new Promise((resolve) => setTimeout(resolve, 750));
-			const botSymbol = playerTurn === "X" ? "O" : "X"; // correctly determine bot symbol
+			const botSymbol = userSymbol === "X" ? "O" : "X";
 			const move = botMove(newBoard, botSymbol);
 			if (move) {
 				const [r, c] = move;
@@ -269,7 +269,9 @@ const TicTacToeHome: React.FC<{ user: User }> = ({ user }) => {
 										<span className="text-muted uppercase text-xs tracking-wide whitespace-nowrap text-nowrap">
 											Current Turn
 										</span>
-										<span className={`font-bold text-base ${playerTurn === "X" ? "text-blue-500" : "text-red-500"}`}>
+										<span
+											className={`font-bold text-base ${userSymbol === playerTurn ? "text-blue-500" : "text-red-500"}`}
+										>
 											@
 											{userSymbol === playerTurn ? (
 												<>
