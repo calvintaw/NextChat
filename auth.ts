@@ -5,13 +5,6 @@ import bcrypt from "bcryptjs";
 import { LoginFormSchema, sql } from "./app/lib/definitions";
 import { JWT } from "next-auth/jwt";
 
-// logins
-// P@ssword123
-// super
-// super@gmail.com
-// test email and credentials
-//
-
 type DBUser = {
 	id: string;
 	image: string;

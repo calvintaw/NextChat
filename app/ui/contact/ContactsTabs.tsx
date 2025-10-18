@@ -21,9 +21,6 @@ import { Button, IconWithSVG } from "../general/Buttons";
 import Search from "../general/Search";
 import { ContactPreviewContainer } from "./ContactCard";
 import { User } from "@/app/lib/definitions";
-import { ImSpinner9 } from "react-icons/im";
-import { RiLoader2Fill } from "react-icons/ri";
-import { RiLoader4Line } from "react-icons/ri";
 import { BiLoaderAlt } from "react-icons/bi";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
@@ -141,6 +138,29 @@ const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTa
 								Add Friend
 							</Button>
 						</Tabs.Trigger>
+
+						<div className="flex items-center gap-2 mx-2 max-[445px]:hidden">
+							<TbMinusVertical className="text-2xl text-muted/75 mt-0.5" />
+						</div>
+
+						<Tabs.Trigger value="games" asChild>
+							<Button
+								className="bg-accent/15  text-text hover:bg-accent/80 data-[state=active]:bg-accent/80 data-[state=active]:cursor-default btn-secondary-border max-[445px]:hidden
+							"
+							>
+								Games
+							</Button>
+						</Tabs.Trigger>
+
+						<Tabs.Trigger value="games" asChild>
+							<IconWithSVG
+								className="!size-9.5 btn-secondary-border !absolute !bottom-5 !right-5 z-10"
+								data-tooltip-id="Games-icon"
+								data-tooltip-content={"Feeling Bored? Play a fun game with your friends! 😃"}
+							>
+								<IoGameController className="text-2xl" />
+							</IconWithSVG>
+						</Tabs.Trigger>
 					</Tabs.List>
 
 					<Tabs.Content value="all" asChild>
@@ -164,10 +184,15 @@ const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTa
 							request={request}
 						/>
 					</Tabs.Content>
+
+					<Tabs.Content value="games" asChild>
+						<GamesTab></GamesTab>
+					</Tabs.Content>
 				</Tabs.Root>
 			</section>
 
 			<Tooltip id={`tooltip-friendship`} place="top" className="my-tooltip" border="var(--tooltip-border)" />
+			<Tooltip id={`Games-icon`} place="left-start" className="my-tooltip" border="var(--tooltip-border)" />
 		</>
 	);
 };
@@ -199,7 +224,7 @@ const AddContactTab = ({ formAction, addFriendInputRef, request, isPending }: Ad
 								bg-primary btn-with-icon opacity-65 group-focus-within:opacity-100 hover:bg-primary/75 active:bg-primary/50 py-1 sm:py-1.5 px-2 sm:px-3 text-[0.938rem] text-white rounded-md sm:rounded-lg sm:mr-0.5"
 							>
 								{isPending ? "Sending Friend Request" : "Send Friend Request"}
-								{true && <BiLoaderAlt className="animate-spin text-lg"></BiLoaderAlt>}
+								{isPending && <BiLoaderAlt className="animate-spin text-lg"></BiLoaderAlt>}
 							</button>
 						</>
 					}
@@ -230,6 +255,10 @@ import { BsFilterLeft } from "react-icons/bs";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/app/lib/hooks/useToast";
+import { IoGameController } from "react-icons/io5";
+import { TbMinusVertical } from "react-icons/tb";
+import GameCard from "../games/GameCard";
+import { Route } from "next";
 
 const RequestTab = ({ user, friendRequests, setFriendRequests, setContacts }: RequestTabProps) => {
 	const [error, setError] = useState("");
@@ -533,6 +562,30 @@ const AllContactsTab = ({ friendsCount, contacts, user, setContacts }: AllContac
 
 			<ContactPreviewContainer setContacts={setContacts} user={user} contacts={filteredContacts} />
 		</div>
+	);
+};
+
+const GamesTab = () => {
+	return (
+		<>
+			<div className="p-2 px-1.5 pb-0">
+				<div className="flex flex-row justify-between items-center sm:items-end gap-2 my-3">
+					<div className="flex flex-col gap-2">
+						<h1 className="text-[clamp(1rem,4vw,1.5rem)] font-semibold ">Available Games</h1>
+					</div>
+				</div>
+				<hr className="hr-separator my-2 bg-transparent" />
+			</div>
+
+			<GameCard
+				imgSrc="/tictactoe.png"
+				title="Tic Tac Toe"
+				description="A classic 2-player game of Xs and Os. t is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now u"
+				href={"/games/tictactoe" as Route}
+			/>
+
+			<div className="flex flex-col p-2 px-0 pr-1 h-full overflow-y-auto has-scroll-container fade-bg-bottom pb-[100px]"></div>
+		</>
 	);
 };
 

@@ -486,6 +486,7 @@ html {
 		@apply border border-foreground/25 dark:border-foreground/15;
 	}
 
+
 	.btn-with-icon {
 		@apply flex gap-2 items-center;
 	}

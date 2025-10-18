@@ -13,14 +13,11 @@ import { IconWithSVG } from "../../general/Buttons";
 import { useMessageLimiter } from "@/app/lib/hooks/useMsgLimiter";
 import { v4 as uuidv4 } from "uuid";
 import useEventListener from "@/app/lib/hooks/useEventListener";
-import { getSystemUser, insertMessageInDB } from "@/app/lib/actions";
+import {  insertMessageInDB } from "@/app/lib/actions";
 import { useToast } from "@/app/lib/hooks/useToast";
-import { examplePassages, sendWithRetry, sleep } from "@/app/lib/utilities";
-import { FaArrowUp } from "react-icons/fa";
+import {  sendWithRetry } from "@/app/lib/utilities";
 import { IoArrowUp } from "react-icons/io5";
-import { GrStatusDisabledSmall } from "react-icons/gr";
 import { GoSquareFill } from "react-icons/go";
-import { model } from "@tensorflow/tfjs";
 
 type ChatInputBoxProps = {
 	activePersons: string[];

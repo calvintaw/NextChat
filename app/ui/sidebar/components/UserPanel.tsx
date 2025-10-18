@@ -73,7 +73,7 @@ const UserPanel = ({ user }: Props) => {
 
 			<DropdownMenu.Root modal={false}>
 				<DropdownMenu.Trigger asChild className="@min-[200px]:hidden [#sidebar.active_&]:!hidden">
-					<button className="flex items-center justify-center w-full -mt-12.5 bg-transparent  p-0">
+					<button className="flex items-center justify-center w-full bg-transparent p-0">
 						<Avatar
 							disableTooltip
 							id={user.id}
