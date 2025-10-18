@@ -68,7 +68,7 @@ export default function ProgressBar() {
 		};
 	}, []);
 
-	// When pathname changes → navigation finished → stop NProgress
+	// When pathname changes > navigation finished > stop NProgress
 	useEffect(() => {
 		if (!pathname || !searchParams) return;
 		NProgress.done();
