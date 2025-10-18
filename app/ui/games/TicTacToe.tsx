@@ -49,29 +49,82 @@ const TicTacToeHome: React.FC<{ user: User }> = ({ user }) => {
 	const [board, setBoard] = useState<string[][]>(() => Array.from({ length: 3 }, () => ["", "", ""]));
 	const [onlineFriends, setOnlineFriends] = useState<User[]>([]);
 	const [isPending, setIsPending] = useState(false);
+	const botMessages = [
+		"Better luck next time!",
+		"I'm unstoppable!",
+		"Close, but not close enough!",
+		"You almost got me!",
+		"Haha, easy win!",
+		"Try again!",
+		"You can't beat me!",
+		"I'm learning fast!",
+		"Not bad, but I win!",
+		"Next time, maybe!",
+	];
+
+	const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
 	useEffect(() => {
 		setPath("TicTacToe");
 	}, []);
+	const [userSymbol, setUserSymbol] = useState<"X" | "O">("X");
 
-	function place(rowIdx: number, colIdx: number) {
+	async function place(rowIdx: number, colIdx: number) {
 		if (board[rowIdx][colIdx] || winner) return;
 
-		setBoard((prev) => {
-			const newBoard = prev.map((row) => [...row]);
-			newBoard[rowIdx][colIdx] = playerTurn;
+		// Clone and update board synchronously
+		const newBoard = board.map((row) => [...row]);
+		newBoard[rowIdx][colIdx] = playerTurn;
 
-			if (hasWonGame(newBoard, playerTurn)) {
-				setWinner(playerTurn);
-			} else if (isDraw(newBoard)) {
-				setWinner("Draw"); // Use string "Draw" to indicate a tie
+		if (hasWonGame(newBoard, playerTurn)) {
+			setBoard(newBoard);
+			setWinner(playerTurn);
+			if (opponent === "Bot" && playerTurn === "O") {
+				// Bot won
+				const msg = botMessages[Math.floor(Math.random() * botMessages.length)];
+				setStatusMessage(`Bot wins! ${msg}`);
+			} else {
+				// Player won
+				setStatusMessage("You win! 🎉");
 			}
+			return;
+		}
 
-			return newBoard;
-		});
+		if (isDraw(newBoard)) {
+			setBoard(newBoard);
+			setWinner("Draw");
+			setStatusMessage("It's a draw! 🤝");
+			return;
+		}
 
-		// Only change turn if game not over
-		if (!winner) {
+		// Update immediately so UI re-renders before bot plays
+		setPlayerTurn((prev) => (prev === "X" ? "O" : "X"));
+		setBoard(newBoard);
+
+		if (opponent === "Bot") {
+			// Wait for bot "thinking"
+			await new Promise((resolve) => setTimeout(resolve, 750));
+
+			const botSymbol =
+				opponent === "Bot" ? (playerTurn === userSymbol ? (userSymbol === "X" ? "O" : "X") : playerTurn) : null;
+			const move = botMove(newBoard, botSymbol);
+			if (move) {
+				const [r, c] = move;
+				newBoard[r][c] = botSymbol;
+
+				if (hasWonGame(newBoard, botSymbol)) {
+					setWinner(botSymbol);
+					const msg = botMessages[Math.floor(Math.random() * botMessages.length)];
+					setStatusMessage(`Bot wins! ${msg}`);
+				} else if (isDraw(newBoard)) {
+					setWinner("Draw");
+					setStatusMessage("It's a draw! 🤝");
+				}
+
+				setBoard([...newBoard]);
+				setPlayerTurn(botSymbol === "X" ? "O" : "X");
+			}
+		} else {
 			setPlayerTurn((prev) => (prev === "X" ? "O" : "X"));
 		}
 	}
@@ -99,12 +152,14 @@ const TicTacToeHome: React.FC<{ user: User }> = ({ user }) => {
 	}
 
 	function startGame() {
-		// 50/50 chance for player turn
-		setPlayerTurn(Math.random() < 0.5 ? "X" : "O");
+		setStatusMessage(null);
+		const startingTurn: "X" | "O" = Math.random() < 0.5 ? "X" : "O";
+		setPlayerTurn(startingTurn);
 		setGameStarted(true);
 	}
 
 	function endGame() {
+		setStatusMessage(null);
 		setGameStarted(false);
 		setWinner(null);
 		setOpponent(null);
@@ -113,21 +168,109 @@ const TicTacToeHome: React.FC<{ user: User }> = ({ user }) => {
 
 	function sendInvite() {}
 
+	// chatgpt ai code
+
+	// --- BOT LOGIC BLOCK ---
+	// Simple AI for Tic Tac Toe (plays as "O" by default)
+	function botMove(currentBoard: string[][], botSymbol: "X" | "O") {
+		const opponent = botSymbol === "X" ? "O" : "X";
+		const flat = currentBoard.flat();
+
+		// 25% chance to make a random "blunder"
+		if (Math.random() < 0.25) {
+			const emptySpots: number[] = [];
+			for (let i = 0; i < flat.length; i++) {
+				if (!flat[i]) emptySpots.push(i);
+			}
+			if (emptySpots.length > 0) {
+				const randomIndex = emptySpots[Math.floor(Math.random() * emptySpots.length)];
+				return [Math.floor(randomIndex / 3), randomIndex % 3];
+			}
+		}
+
+		// Try to win
+		for (const [a, b, c] of winningStates) {
+			const line = [flat[a], flat[b], flat[c]];
+			if (line.filter((v) => v === botSymbol).length === 2 && line.includes("")) {
+				const idx = [a, b, c][line.indexOf("")];
+				return [Math.floor(idx / 3), idx % 3];
+			}
+		}
+
+		// Block opponent
+		for (const [a, b, c] of winningStates) {
+			const line = [flat[a], flat[b], flat[c]];
+			if (line.filter((v) => v === opponent).length === 2 && line.includes("")) {
+				const idx = [a, b, c][line.indexOf("")];
+				return [Math.floor(idx / 3), idx % 3];
+			}
+		}
+
+		// Take center if available
+		if (!flat[4]) return [1, 1];
+
+		// Take a corner if available
+		const corners = [0, 2, 6, 8];
+		const availableCorner = corners.find((i) => !flat[i]);
+		if (availableCorner !== undefined) {
+			return [Math.floor(availableCorner / 3), availableCorner % 3];
+		}
+
+		// Otherwise, pick any empty spot
+		for (let i = 0; i < 9; i++) {
+			if (!flat[i]) return [Math.floor(i / 3), i % 3];
+		}
+
+		return null; // No moves left
+	}
+
+	function botFirstMove(botSymbol: "X" | "O") {
+		setPlayerTurn(userSymbol);
+
+		const newBoard = board.map((row) => [...row]);
+		const move = botMove(newBoard, botSymbol);
+		if (move) {
+			const [r, c] = move;
+			newBoard[r][c] = botSymbol;
+			setBoard(newBoard);
+			// Set turn to player symbol (opposite of bot)
+			setPlayerTurn(botSymbol === "X" ? "O" : "X");
+		}
+	}
+
+	// Example usage inside place():
+	// After player move:
+	// if (opponent === "Bot" && !winner) {
+	//   const move = botMove(newBoard, playerTurn === "X" ? "O" : "X");
+	//   if (move) {
+	//     const [r, c] = move;
+	//     newBoard[r][c] = playerTurn === "X" ? "O" : "X";
+	//     if (hasWonGame(newBoard, playerTurn === "X" ? "O" : "X")) setWinner(playerTurn === "X" ? "O" : "X");
+	//   }
+	// }
+
 	return (
 		<div
 			className="
-    w-full flex-1
-    overflow-y-auto
-    flex flex-col md:flex-row bg-background text-text
-    
-    "
+		w-full flex-1
+		overflow-y-auto
+		flex flex-col md:flex-row bg-background text-text
+		relative
+		
+		"
 		>
+			{statusMessage && (
+				<div className="w-full h-fit absolute top-0 left-0 right-0 text-center py-1 text-sm font-semibold bg-yellow-200 text-yellow-900">
+					{statusMessage}
+				</div>
+			)}
+
 			{/* Game Preview Section */}
 			<div className="flex-1 flex flex-col items-center justify-center p-6">
 				<div className="bg-surface border-contrast border rounded-2xl shadow-md p-6 flex flex-col items-center max-w-md w-fit">
 					<div
 						className="flex items-center justify-center
-          "
+					"
 					>
 						{!GameStarted && (
 							<img
@@ -139,8 +282,8 @@ const TicTacToeHome: React.FC<{ user: User }> = ({ user }) => {
 						{GameStarted && (
 							<div
 								className="inline-grid grid-rows-3 border border-contrast
-              size-[clamp(225px,50vw,400px)]
-            "
+							size-[clamp(225px,50vw,400px)]
+						"
 							>
 								{board.map((row, rowIdx) => (
 									<div key={rowIdx} className="grid grid-cols-3 border border-contrast">
@@ -149,9 +292,9 @@ const TicTacToeHome: React.FC<{ user: User }> = ({ user }) => {
 												onClick={() => place(rowIdx, colIdx)}
 												key={`${rowIdx}-${colIdx}`}
 												className="size-full bg-contrast
-                        border border-contrast
-                        flex items-center justify-center 
-                      "
+												border border-contrast
+												flex items-center justify-center 
+											"
 											>
 												{col === "X" && (
 													<>
@@ -173,7 +316,7 @@ const TicTacToeHome: React.FC<{ user: User }> = ({ user }) => {
 					</div>
 
 					{GameStarted && (
-						<div className="mt-4 w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm font-semibold text-muted">
+						<div className="mt-4 w-full flex flex-row items-center justify-between gap-3 text-sm font-semibold text-muted">
 							{/* Opponent Info */}
 							<div className="flex flex-col">
 								<span className="text-muted uppercase text-xs tracking-wide">Opponent</span>
@@ -190,7 +333,9 @@ const TicTacToeHome: React.FC<{ user: User }> = ({ user }) => {
 									)
 								) : (
 									<>
-										<span className="text-muted uppercase text-xs tracking-wide">Current Turn</span>
+										<span className="text-muted uppercase text-xs tracking-wide whitespace-nowrap text-nowrap">
+											Current Turn
+										</span>
 										<span className={`font-bold text-base ${playerTurn === "X" ? "text-blue-500" : "text-red-500"}`}>
 											@{playerTurn === "X" ? user.username : opponent}
 										</span>
@@ -216,12 +361,47 @@ const TicTacToeHome: React.FC<{ user: User }> = ({ user }) => {
 					<h2 className="text-2xl font-bold text-foreground mb-6">Play Tic Tac Toe</h2>
 
 					{/* Play Bots */}
+
+					{!GameStarted && !opponent && (
+						<div className="flex flex-col items-center gap-4">
+							<p className="text-lg font-semibold">Choose your symbol</p>
+							<div className="flex gap-4">
+								<button
+									onClick={() => {
+										setPlayerTurn("X");
+										setUserSymbol("X"); // or "O"
+										setOpponent("Bot");
+										setGameStarted(true);
+									}}
+									className="btn-primary px-4 py-2"
+								>
+									X (go first)
+								</button>
+								<button
+									onClick={() => {
+										setPlayerTurn("O");
+										setUserSymbol("O"); // or "O"
+
+										setOpponent("Bot");
+
+										setGameStarted(true);
+										// Bot goes first
+										setTimeout(() => botFirstMove("X"), 200);
+									}}
+									className="btn-primary px-4 py-2"
+								>
+									O (go second)
+								</button>
+							</div>
+						</div>
+					)}
+
 					<button
-						onClick={() => {
-							startGame();
-							setOpponent("Bot");
-						}}
-						className="w-full flex items-center max-w-[320px] gap-4 p-4 rounded-xl bg-background hover:bg-secondary transition-all border border-border/50 mb-4"
+						// onClick={() => {
+						// 	startGame();
+						// 	setOpponent("Bot");
+						// }}
+						className="w-full flex items-center max-w-[320px] gap-4 p-4 rounded-xl bg-background hover:bg-secondary transition-all border border-border/50 mb-4 "
 					>
 						<div className="bg-primary/10 p-3 rounded-lg">
 							<FaRobot className="text-primary w-6 h-6" />
@@ -249,8 +429,8 @@ const TicTacToeHome: React.FC<{ user: User }> = ({ user }) => {
 								}}
 								disabled
 								className="w-full flex items-center max-w-[320px] gap-4 p-4 rounded-xl bg-background hover:bg-secondary transition-all border border-border/50 disabled:opacity-50
-                  cursor-not-allowed
-                "
+									cursor-not-allowed
+								"
 							>
 								<div className="bg-primary/10 p-3 rounded-lg">
 									<FaUserFriends className="text-primary w-6 h-6" />
