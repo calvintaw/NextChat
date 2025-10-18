@@ -102,10 +102,12 @@ const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTa
 		};
 	}, []);
 
+	const [activeTab, setActiveTab] = useState<string | undefined>(undefined);
+
 	return (
 		<>
 			<section className="border-r-2 border-border/10 h-full flex flex-col px-[clamp(6px,2vw,16px)] py-2 pt-0 bg-contrast">
-				<Tabs.Root defaultValue="all" className="flex flex-col h-full">
+				<Tabs.Root defaultValue="all" onValueChange={(tab) => setActiveTab(tab)} className="flex flex-col h-full">
 					<Tabs.List className="my-3 flex gap-2 items-center">
 						<div className="flex items-center gap-2 mr-2 max-sm:hidden">
 							<FaUserFriends className="text-[clamp(1rem,4vw,1.5rem)] text-muted" />
@@ -153,13 +155,15 @@ const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTa
 						</Tabs.Trigger>
 
 						<Tabs.Trigger value="games" asChild>
-							<IconWithSVG
-								className="!size-9.5 btn-secondary-border !absolute !bottom-5 !right-5 z-10"
-								data-tooltip-id="Games-icon"
-								data-tooltip-content={"Feeling Bored? Play a fun game with your friends! 😃"}
-							>
-								<IoGameController className="text-2xl" />
-							</IconWithSVG>
+							{activeTab !== "games" && (
+								<IconWithSVG
+									className="!size-9.5 btn-secondary-border !absolute !bottom-5 !right-5 z-10"
+									data-tooltip-id="Games-icon"
+									data-tooltip-content={"Feeling Bored? Play a fun game with your friends! 😃"}
+								>
+									<IoGameController className="text-2xl" />
+								</IconWithSVG>
+							)}
 						</Tabs.Trigger>
 					</Tabs.List>
 
