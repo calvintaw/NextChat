@@ -337,7 +337,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	return (
 		<>
 			<div
-				className="flex flex-1 h-full min-lg:max-h-[calc(100vh-34px)] !overflow-hidden flex-col shadow-md bg-contrast 
+				className="flex flex-1 h-full min-lg:max-h-[calc(100vh-34px)] !overflow-clip flex-col shadow-md bg-contrast 
 			"
 			>
 				<ChatProvider

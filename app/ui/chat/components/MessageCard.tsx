@@ -342,7 +342,7 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 
 									return (
 										<div
-											key={`${src}-${i}`}
+											key={`${src}-${i}-${msg.id}`}
 											className="rounded-2xl w-full max-h-65 flex items-center justify-center bg-accent"
 											style={{
 												gridColumn: `span ${colSpan}`,
@@ -428,11 +428,7 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 				</div>
 			</div>
 
-			<MessageDropdownMenu
-				retrySendingMessage={retrySendingMessage}
-				key={`${msg.id}-dropdownMenu`}
-				msg={msg}
-			></MessageDropdownMenu>
+			<MessageDropdownMenu retrySendingMessage={retrySendingMessage} msg={msg}></MessageDropdownMenu>
 		</div>
 	);
 };

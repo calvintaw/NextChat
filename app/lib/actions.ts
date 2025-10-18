@@ -756,6 +756,34 @@ export async function getFriendRequests(userId: string) {
 	}
 }
 
+export async function getOnlineFriends(userId: string) {
+	try {
+		const friends: User[] = await sql<User[]>`
+						SELECT
+					u.id,
+					u.username,
+					u.display_name AS "displayName",
+					u.email,
+					u.created_at AS "createdAt"
+			FROM friends f
+			JOIN users u ON u.id = CASE
+					WHEN f.user1_id = ${userId} THEN f.user2_id
+					ELSE f.user1_id
+			END
+			JOIN user_status us ON us.user_id = u.id
+			WHERE f.status = 'accepted'
+				AND (f.user1_id = ${userId} OR f.user2_id = ${userId})
+				AND us.online = TRUE;
+
+    `;
+
+		return friends;
+	} catch (error) {
+		console.error("Error fetching online friends:", error);
+		throw new Error("Failed to fetch online friends.");
+	}
+}
+
 export async function deleteDM(targetUser: MinimalUserType): Promise<{ success: boolean; message: string }> {
 	return withCurrentUser(async (currentUser: User) => {
 		try {
