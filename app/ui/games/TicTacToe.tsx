@@ -46,7 +46,7 @@ const TicTacToeHome: React.FC<{ user: User }> = ({ user }) => {
 	const { setPath } = usePathProvider();
 	const [GameStarted, setGameStarted] = useState(false);
 	const [playerTurn, setPlayerTurn] = useState<"X" | "O">("X");
-	const [activeTab, setActiveTab] = useState<string | undefined>("default");
+	const [activeTab, setActiveTab] = useState<string | undefined>(undefined);
 
 	const [userSymbol, setUserSymbol] = useState<"X" | "O">("X");
 	const [opponent, setOpponent] = useState<string | null>(null);
@@ -297,7 +297,7 @@ const TicTacToeHome: React.FC<{ user: User }> = ({ user }) => {
 					<div>
 						<h2 className="text-2xl font-bold text-foreground mb-6">Play Tic Tac Toe</h2>
 
-						<Tabs.Root value={activeTab} onValueChange={setActiveTab}>
+						<Tabs.Root value={activeTab ?? "default"} onValueChange={setActiveTab}>
 							{/* Hidden triggers just to satisfy Radix */}
 							<Tabs.List>
 								<Tabs.Trigger value="play-bot" asChild>
@@ -306,7 +306,7 @@ const TicTacToeHome: React.FC<{ user: User }> = ({ user }) => {
 										className="w-full flex items-center md:max-w-[320px] gap-4 p-4 rounded-xl bg-background hover:bg-secondary transition-all border border-border/50 mb-2 "
 									>
 										<div className="bg-primary/10 p-3 rounded-lg">
-											<FaRobot className="text-primary w-6 h-6" />
+											<FaRobot className="text-primary w-6 h-6 text-2xl" />
 										</div>
 										<div className="flex flex-col text-left">
 											<span className="font-semibold text-foreground">Play Bots</span>
@@ -328,7 +328,7 @@ const TicTacToeHome: React.FC<{ user: User }> = ({ user }) => {
 										className="w-full flex items-center md:max-w-[320px] gap-4 p-4 rounded-xl bg-background hover:bg-secondary transition-all border border-border/50 disabled:opacity-50 cursor-not-allowed"
 									>
 										<div className="bg-primary/10 p-3 rounded-lg">
-											<FaUserFriends className="text-primary w-6 h-6" />
+											<FaUserFriends className="text-primary w-6 h-6 text-2xl" />
 										</div>
 										<div className="flex flex-col text-left">
 											<span className="font-semibold text-foreground">Play a Friend</span>
@@ -443,8 +443,8 @@ const TicTacToeHome: React.FC<{ user: User }> = ({ user }) => {
 						</Tabs.Root>
 					</div>
 
-					{activeTab !== "de" && (
-						<button onClick={() => setActiveTab("default")} className="btn-secondary-border mt-auto max-md:mt-15">
+					{activeTab && (
+						<button onClick={() => setActiveTab(undefined)} className="btn-secondary-border mt-auto max-md:mt-15">
 							Cancel
 						</button>
 					)}
