@@ -233,7 +233,10 @@ const TicTacToeHome: React.FC<{ user: User }> = ({ user }) => {
 									<div key={rowIdx} className="grid grid-cols-3 border border-contrast">
 										{row.map((col, colIdx) => (
 											<div
-												onClick={() => place(rowIdx, colIdx)}
+												onClick={() => {
+													if (playerTurn !== userSymbol) return;
+													place(rowIdx, colIdx);
+												}}
 												key={`${rowIdx}-${colIdx}`}
 												className="size-full bg-contrast border border-contrast flex items-center justify-center"
 											>
