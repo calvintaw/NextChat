@@ -185,8 +185,14 @@ My Next.js skills definitely improved, but my React fundamentals, or rather my l
 
 Next up, I plan to add a **video chat** feature, probably in a month or two. This project has turned into a place where I experiment with everything I’ve wanted to try and learn.
 
-That’s all for now.
-
 ---
 
+### Credits
+
+* **Stars background:** [Riley Pearce](https://codepen.io/riley-pearce/pen/OJWPjZM)
+* **Icons / PNGs:** [Flaticon](https://www.flaticon.com/)
+
+That’s all for now. Thank you for visting my repo!<br>
 Feedback is always welcomed :)
+
+
