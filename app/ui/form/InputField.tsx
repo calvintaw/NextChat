@@ -187,20 +187,7 @@ export function PasswordField({
 								</p>
 							</div>
 
-							{/* <div
-								className="password-strength-meter my-1"
-								data-score={zxcvbnScore}
-								style={{ "--score": zxcvbnScore, "--total": 4 } as React.CSSProperties}
-							>
-								<div className="flex gap-1">
-									{[0, 1, 2, 3, 4].map((i) => (
-										<span
-											key={i}
-											className={clsx("flex-1 h-1 rounded", i <= zxcvbnScore ? "bg-green-500" : "bg-gray-300")}
-										/>
-									))}
-								</div>
-							</div> */}
+				
 						</>
 					)}
 

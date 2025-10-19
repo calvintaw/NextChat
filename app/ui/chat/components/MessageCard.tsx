@@ -131,8 +131,6 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 		}
 	}, [msgToEdit]);
 
-	// duplicate fn copied from chat inputbox
-
 	// fn for resending the msg to db if the original operation fails
 	const retrySendingMessage = async (msg: MessageType) => {
 		setMessages((prev: MessageType[]) =>
@@ -150,10 +148,9 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 		} else if (result.success) {
 			// if errors, it console logs but need to be fixed if the goal is to make sure the receiver receives the msg
 			if (roomId.startsWith("system-room")) {
-				// TODO: FIX BOT
-				// sendWithRetry("system", msg, 3, 2000)
-				// 	.then((res) => console.log("System message delivered:", res))
-				// 	.catch((err) => console.error("System message failed:", err));
+				sendWithRetry("system", msg, 3, 2000)
+					.then((res) => console.log("System message delivered:", res))
+					.catch((err) => console.error("System message failed:", err));
 			} else {
 				sendWithRetry("message", msg, 3, 2000)
 					.then((res) => console.log("Message delivered:", res))

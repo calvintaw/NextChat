@@ -13,9 +13,9 @@ import { IconWithSVG } from "../../general/Buttons";
 import { useMessageLimiter } from "@/app/lib/hooks/useMsgLimiter";
 import { v4 as uuidv4 } from "uuid";
 import useEventListener from "@/app/lib/hooks/useEventListener";
-import {  insertMessageInDB } from "@/app/lib/actions";
+import { insertMessageInDB } from "@/app/lib/actions";
 import { useToast } from "@/app/lib/hooks/useToast";
-import {  sendWithRetry } from "@/app/lib/utilities";
+import { sendWithRetry } from "@/app/lib/utilities";
 import { IoArrowUp } from "react-icons/io5";
 import { GoSquareFill } from "react-icons/go";
 
@@ -99,33 +99,6 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 			setMessages((prev) => prev.map((msg) => (msg.id === tempId ? { ...msg, synced: false } : msg)));
 		} else if (result.success) {
 			if (roomId.startsWith("system-room")) {
-				// TODO: FIX BOT
-
-				// const botReply = await getReplyFromBot(temp_msg.content, ChatBotTopic);
-
-				// if (botReply.success && botReply.message && botReply.bot) {
-				// 	const botMsg: MessageType & { room_id: string } = {
-				// 		id: uuidv4(),
-				// 		room_id: roomId,
-				// 		sender_id: botReply.bot.id,
-				// 		sender_image: botReply.bot.image,
-				// 		sender_display_name: botReply.bot.displayName,
-				// 		content: botReply.message,
-				// 		replyTo: temp_msg.id,
-				// 		createdAt: new Date().toISOString(),
-				// 		edited: false,
-				// 		reactions: {},
-				// 		type: "text",
-				// 	};
-
-				// 	console.log("bot msg id: ", botMsg.id, "user msg id: ", temp_msg.id);
-
-				// 	const botInsert = await insertMessageInDB(botMsg);
-				// 	if (botInsert.success) {
-				// 		setMessages((prev) => [...prev, { ...botMsg, synced: true }]);
-				// 	}
-				// }
-
 				sendWithRetry("system", { msg_content: temp_msg.content, room_id: temp_msg.room_id }, 3, 2000)
 					.then((res) => console.log("System message delivered:", res))
 					.catch((err) => console.error("System message failed:", err));
@@ -178,12 +151,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 	}, [replyToMsg]);
 
 	return (
-		<div
-			className={clsx(
-				(isBlocked || (isSystem && isBlocked)) && "cursor-not-allowed"
-				// initialLoading && "pointer-events-none"
-			)}
-		>
+		<div className={clsx((isBlocked || (isSystem && isBlocked)) && "cursor-not-allowed")}>
 			<div
 				className={clsx("p-4 relative mb-3 ", (isBlocked || (isSystem && isBlocked)) && "pointer-events-none")}
 				data-tooltip-id={"typing-indicator"}
@@ -338,90 +306,3 @@ const TypingIndicator = ({ displayName }: { displayName: string[] }) => {
 };
 
 export default ChatInputBox;
-
-// get reply from bot fn
-
-// async function getReplyFromBot(msg: {
-// 	content: string;
-// 	room_id: string;
-// }): Promise<{ success: boolean; message?: string; bot?: User | null }> {
-// 	try {
-// 		const res = await fetch("/api/bot", {
-// 			method: "POST",
-// 			headers: { "Content-Type": "application/json" },
-// 			body: JSON.stringify({
-// 				question: msg.content,
-// 				passage: `
-// 					Space exploration has always fascinated humanity, but one of the most mysterious and intriguing objects in the universe is the black hole. A black hole is a region in space where the gravitational pull is so strong that nothing—not even light—can escape from it. Black holes are formed when massive stars collapse under their own gravity at the end of their life cycle. Despite being invisible, black holes reveal their presence by the effect they have on nearby stars and gas. The first-ever image of a black hole’s event horizon, captured in 2019 by the Event Horizon Telescope, confirmed many theoretical predictions about these cosmic phenomena. Black holes also challenge our understanding of physics, particularly the laws of relativity and quantum mechanics, making them a subject of intense scientific research.
-// 				`, // adapt as needed
-
-// 				// example questions
-
-// 				// What is a black hole?
-
-// 				// How are black holes formed?
-
-// 				// When was the first image of a black hole captured?
-
-// 				// Why are black holes important in physics?
-// 			}),
-// 		});
-
-// 		if (!res.ok) {
-// 			throw new Error(`Bot server error: ${res.status}`);
-// 		}
-
-// 		const data = await res.json();
-
-// 		return {
-// 			success: true,
-// 			message: data.reply, // best answer only
-// 			bot: data.bot,
-// 		};
-// 	} catch (error) {
-// 		console.error("getReplyFromBot ERROR:", error);
-// 		return {
-// 			success: false,
-// 			message: "Bot is unavailable. Please try again later.",
-// 			bot: null,
-// 		};
-// 	}
-// }
-
-// export async function getReplyFromBot(
-// 	question: string,
-// 	topic: keyof typeof examplePassages = "space"
-// ): Promise<{ success: boolean; message?: string; bot?: User | null }> {
-// 	try {
-// 		// Lazy-load the MobileBERT model in browser
-// 		if (!model) {
-// 			await preloadQnAModel();
-// 		}
-// 		if (!model) throw new Error("QnA model failed to load");
-// 		console.log("Model instance:", model);
-
-// 		const passage = examplePassages[topic];
-// 		const answers = await model.findAnswers(question, passage);
-// 		const bot = await getSystemUser();
-
-// 		console.log("Question:", question);
-// 		console.log("Passage:", passage);
-// 		console.log("Answers returned:", answers);
-
-// 		// Pick the best answer (highest score)
-// 		const bestAnswer = answers.length ? answers.reduce((prev, curr) => (curr.score > prev.score ? curr : prev)) : null;
-
-// 		return {
-// 			success: true,
-// 			message: bestAnswer?.text ?? "No answer found.",
-// 			bot,
-// 		};
-// 	} catch (err) {
-// 		console.error("QnA ERROR:", err);
-// 		return {
-// 			success: true,
-// 			message: "Bot is unavailable. Please try again later.",
-// 			bot: null,
-// 		};
-// 	}
-// }

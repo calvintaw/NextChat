@@ -44,7 +44,6 @@ export const PathBanner = () => {
 		};
 	}, []);
 
-	// max-w-86
 
 	return (
 		<div

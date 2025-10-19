@@ -448,9 +448,6 @@ const RequestTab = ({ user, friendRequests, setFriendRequests, setContacts }: Re
 										<IconWithSVG
 											disabled={isPending.has(friend.id)}
 											onClick={() => {
-												// TODO: use toast noti to show users the result of their actions
-												// TODO: done!
-
 												handleRemove(friend, "incoming");
 											}}
 											data-tooltip-id={`tooltip-friendship`}
@@ -582,14 +579,6 @@ export const gamesData = [
 		description: "Guide the snake to eat food and grow longer — but don’t run into yourself or the walls!",
 		href: "/games/snake" as Route,
 	},
-
-	// Add more games easily here:
-	// {
-	//   imgSrc: "/chess.png",
-	//   title: "Chess",
-	//   description: "Challenge your mind with the timeless game of strategy and tactics.",
-	//   href: "/games/chess" as Route,
-	// },
 ];
 
 const GamesTab = () => {

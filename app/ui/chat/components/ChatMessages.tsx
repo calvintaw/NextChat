@@ -18,7 +18,6 @@ dayjs.extend(weekday);
 const ChatMessages = ({ messages }: { messages: MessageType[] }) => {
 	const { isBlocked, isSystem } = useChatProvider();
 
-	// relative min-h-[calc(100vh-400px)] h-full
 	return (
 		<div className={clsx("flex-1 flex flex-col relative")}>
 			{isBlocked && (
