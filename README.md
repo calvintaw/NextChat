@@ -1,9 +1,8 @@
-# Discord Clone 
+# Discord Clone
 
-> ⚠️ **Note:** This README is partially outdated.  
-> New features have been added, and the documentation is being updated.
 
-A full-stack **Discord-inspired chat app** built with [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com/), [React](https://react.dev/), [postgres.js](https://github.com/porsager/postgres), and [Supabase](https://supabase.com/) DB.
+A full-stack Discord-inspired chat app built with [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com/), [React](https://react.dev/), [postgres.js](https://github.com/porsager/postgres), and [Supabase](https://supabase.com/).
+
 
 ## Table of Contents
 
@@ -13,34 +12,36 @@ A full-stack **Discord-inspired chat app** built with [Next.js](https://nextjs.o
 - [Environment Variables](#environment-variables)
 - [Project Structure](#project-structure)
 - [Screenshots](#screenshots)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
+- [Flaws / Bugs](#flaws--bugs)
+- [Notes](#notes)
 
 ---
 
 ## Features
 
-- **Instant Messaging** between users and servers (rooms)
-- **Authentication** via Supabase and NextAuth.js
-- **Real-time database updates** and presence (Online/Offline) features
-- **Responsive UI** built with Tailwind CSS
-- **Dark mode** switch
-- **CRUD operations** for messages, servers, and users
-- **React to messages** from friends & servers
-- **Media upload** (images/attachments)
-- **User presence indicator:** Online status
-- **Custom server creation**
-- **User Profile customization**
-- **Terms of Service** (just as a prop)
-- ...and more
+- Instant messaging between users and servers (rooms)
+- Authentication via Supabase and NextAuth.js
+- Real-time database updates and online/offline status
+- Dark mode
+- CRUD operations for messages, servers, and users
+- Message reactions
+- Media uploads (images and attachments)
+- Custom server creation
+- User profile customization
+- Terms of Service (placeholder)
+- Play Tic-Tac-Toe with friends or the bot
+- Built-in AI bot (calls DeepSeek through Hugging Face)
+
+---
 
 ## Tech Stack
 
-**Frontend:** Next.js (App Router), React, Tailwind CSS  
-**Backend:** Next.js API routes, postgres.js  
-**Database:** Supabase (PostgreSQL)  
+**Frontend:** Next.js (App Router), React, Tailwind CSS
+**Backend:** Next.js API routes, postgres.js
+**Database:** Supabase (PostgreSQL)
 **Auth:** NextAuth.js, Supabase Auth
+
+---
 
 ## Getting Started
 
@@ -48,7 +49,7 @@ A full-stack **Discord-inspired chat app** built with [Next.js](https://nextjs.o
 
 - [Node.js](https://nodejs.org/) v18+
 - [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
-- Supabase project & API keys
+- A Supabase project with API keys
 
 ### Installation
 
@@ -58,16 +59,54 @@ cd discord_clone
 npm install
 ```
 
+---
+
 ### Environment Variables
 
-Create a `.env.local` file in the root and add your credentials:
+Create a `.env.local` file in the root folder and fill it out like this:
 
+```env
+AUTH_SECRET= # Added automatically by `npx auth`. Learn more: https://cli.authjs.dev
+
+# GitHub login credentials for NextAuth.js
+AUTH_GITHUB_ID=
+AUTH_GITHUB_SECRET=
+
+# Database and Supabase configuration
+POSTGRES_URL=
+POSTGRES_USER=
+POSTGRES_HOST=
+SUPABASE_JWT_SECRET=
+POSTGRES_PRISMA_URL=
+POSTGRES_PASSWORD=
+POSTGRES_DATABASE=
+SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
+POSTGRES_URL_NON_POOLING=
+
+# Node.js socket server URL
+NEXT_PUBLIC_SOCKET_URL=
+
+# Vercel environment variables
+NEXTAUTH_SECRET=
+NEXTAUTH_URL= # URL of your deployed site
+
+# News API key (any free provider works)
+NEWS_API_KEY=
+
+# System/admin user details (used to reduce DB calls)
+SYSTEM_USER_ID=
+SYSTEM_USER_DISPLAY_NAME=
+SYSTEM_USER_EMAIL=
+SYSTEM_USER_IMAGE=
+SYSTEM_USER_CREATED_AT=
+SYSTEM_USER_USERNAME=
+SYSTEM_CHATBOT_URL=
 ```
-SUPABASE_URL=your-supabase-url
-SUPABASE_ANON_KEY=your-supabase-anon-key
-DATABASE_URL=your-postgres-connection-string
-NEXTAUTH_SECRET=your-nextauth-secret
-```
+
+---
 
 ### Running Locally
 
@@ -75,23 +114,25 @@ NEXTAUTH_SECRET=your-nextauth-secret
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Then open [http://localhost:3000](http://localhost:3000).
+
+---
 
 ## Project Structure
 
-Main folders and their purpose:
-
 ```
-📁app
- ├── (auth)         # Authentication pages (login, register, terms)
- ├── (root)         # Main app pages (chat, dashboard, discover, news, test)
- ├── api            # Backend API routes (auth, seed, theme)
+app/
+ ├── (auth)         # Auth pages (login, register, terms)
+ ├── (root)         # Main app (chat, dashboard, discover, news, games)
+ ├── api            # API routes (auth, theme, etc.)
  ├── lib            # Hooks, helpers, context, Supabase, etc.
- ├── ui             # Modular UI components: chat, contact, form, general, news, sidebar
+ ├── ui             # UI components (chat, contact, form, news, sidebar)
  ├── globals.css    # Global styles
  ├── store.ts       # State management
  └── types.d.ts     # TypeScript types
 ```
+
+---
 
 ## Screenshots
 
@@ -107,32 +148,45 @@ Main folders and their purpose:
 
 <img width="1314" height="647" alt="Servers Screenshot" src="https://github.com/user-attachments/assets/5acf766f-900c-4943-be37-3777af9a88a1" />
 
-### Flaws / Bugs with this project
+### Games
+
+<img width="1316" height="657" alt="image" src="https://github.com/user-attachments/assets/267e5a3e-19a3-4014-9728-b623c2fdb3de" />
 
 ---
 
-- There’s no proper way to verify if the provided email address is legitimate.
-- No login rate limiting is implemented.
-- The website always defaults to the light theme (it’s supposed to be dark by default, but I couldn’t figure out why this bug occurs).
-- There may be database update or UI display issues in edge cases, such as when User A accepts a friend request at the same time User B rejects it.
-- When a user spams messages quickly, you may see mismatches between what the sender and receiver see, or sometimes the sender may see duplicate messages. This is either due to WebSocket not handling all messages properly, or a bug in how local messages are inserted (which is done to give the user an instant feedback feel).
-- When editing a multi-line message, all lines collapse into a single line (this could be fixed by using a textarea, but I haven’t implemented it yet).
-- The news feed page does not show actual news; instead, it just displays a list of old news stored on the server because I couldn’t find a suitable free API.
-- The Discover Servers page lacks a polished UI.
-- Uploaded media files are not properly structured or stored. For example, when a user uploads a profile picture, it is not stored separately, and if they upload another, the old one is not deleted. This results in improper media management.
+## Flaws
 
-## Contributing
+- No email verification
+- No login rate limiting
+- User IDs are visible in URLs (potential security issue)
+- Server member counts (online/offline) are placeholders
+- Some files contain multiple components
+- Code is messy in places
+- Friend request handling can desync if users act at the same time
+- Spamming messages can cause duplicates or mismatches
+- Editing multi-line messages collapses them into one line
+- News feed shows static data (API only works when the project is running locally)
+- Probably more that I haven’t noticed yet
 
-Pull requests are welcome.  
-For major changes, please open an issue first to discuss what you’d like to change.
+Comments like `// generated by chatgpt` exist in some files.
+That just means I didn’t write that part, I had ChatGPT generate it for me either because I couldn’t figure it out at the time or I was being lazy
 
-(Feedback is always appreciated!) :)
+---
 
-## License
+## My thoughts
 
-[MIT](LICENSE)
+I worked on this project for about five months, not every day, but when I did, it was usually for more than five hours at a time.
 
-## Contact
+Now that it’s mostly done, I have mixed feelings. It’s not some groundbreaking project; it’s basically another CRUD app with chat features. I don’t think it’s great, but I don’t hate it either, it’s somewhere in between.
 
-Created by [@calvintaw](https://github.com/calvintaw)  
-Feel free to reach out!
+I used ChatGPT for maybe around 5% of the project, mostly for SQL syntax or creating indexes. Later on, I started using it more when I got stuck, especially with React components and useEffects. At some point, I realized I was relying on it too much, and that’s not where I want to be.
+
+My Next.js skills definitely improved, but my React fundamentals, or rather my logical thinking, still need work. I even failed to build a simple Snake game from scratch, ended up using code from a blog and patched it with ChatGPT’s help to make it work. I’m not exactly proud of that, but it is what it is.
+
+Next up, I plan to add a **video chat** feature, probably in a month or two. This project has turned into a place where I experiment with everything I’ve wanted to try and learn.
+
+That’s all for now.
+
+---
+
+Feedback is always welcomed :)
