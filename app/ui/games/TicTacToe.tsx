@@ -222,7 +222,7 @@ const TicTacToeHome: React.FC<{ user: User }> = ({ user }) => {
 					<div className="flex items-center justify-center">
 						{!GameStarted && (
 							<img
-								src="/tictactoe-large.png"
+								src="/tictactoe/tictactoe-large.png"
 								alt="Tic Tac Toe Board"
 								className="rounded-2xl shadow-lg w-full h-auto object-cover"
 							/>

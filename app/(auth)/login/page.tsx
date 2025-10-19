@@ -20,22 +20,22 @@ import { BiLoaderAlt } from "react-icons/bi";
 
 const images = [
 	{
-		src: "/marketing_connect.png",
+		src: "/login/marketing_4.png",
 		alt: "marketing_connect 1 - Top view of marked surface",
 		description: "Connect Instantly",
 	},
 	{
-		src: "/marketing_chat.png",
+		src: "/login/marketing_3.png",
 		alt: "marketing_chat 2 - Close-up of edge detail",
 		description: "Chats That Click",
 	},
 	{
-		src: "/marketing_2.png",
+		src: "/login/marketing_1.png",
 		alt: "marketing_2 - Material texture after marketing_2",
 		description: "Built to Last",
 	},
 	{
-		src: "/marketing_3.png",
+		src: "/login/marketing_2.png",
 		alt: "marketing_3 - Marked sample under lighting",
 		description: "Make Your Mark",
 	},
@@ -191,7 +191,6 @@ const ImageBox = () => {
 						<IoLogoPolymer className="text-5xl text-black"></IoLogoPolymer>
 						<h2 className="text-3xl font-bold font-sans text-shadow-md text-black">NextChat</h2>
 					</div>
-				
 				</div>
 				{images.map((image, index) => (
 					<React.Fragment key={image.src}>

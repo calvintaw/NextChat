@@ -568,13 +568,13 @@ const AllContactsTab = ({ friendsCount, contacts, user, setContacts }: AllContac
 
 export const gamesData = [
 	{
-		imgSrc: "/tictactoe.png",
+		imgSrc: "/tictactoe/tictactoe.png",
 		title: "Tic Tac Toe",
 		description: "Play the classic 2-player game of strategy and skill. Get three in a row to win!",
 		href: "/games/tictactoe" as Route,
 	},
 	{
-		imgSrc: "/snake.png",
+		imgSrc: "/snake/snake.png",
 		title: "Snake",
 		description: "Guide the snake to eat food and grow longer — but don’t run into yourself or the walls!",
 		href: "/games/snake" as Route,
