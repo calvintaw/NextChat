@@ -27,6 +27,7 @@ import console, { error } from "console";
 import { cookies } from "next/headers";
 import { io } from "socket.io-client";
 import { supabase } from "./supabase";
+import { type } from "os";
 
 const SYSTEM_USER: User = {
 	id: process.env.SYSTEM_USER_ID!,
@@ -125,6 +126,39 @@ export async function deleteMsg(
 				return { success: false, message: "Failed to delete the message. Please try again!" };
 			}
 		}
+
+		return { success: true, message: "Message deleted successfully." };
+	} catch (error) {
+		console.error("Error deleting message:", error);
+		return { success: false, message: "Failed to delete the message. Please try again!" };
+	}
+}
+
+export async function clearMsgHistory(
+	room_id: string
+): Promise<{ success: true; message: string } | { success: false; message: string }> {
+	try {
+		console.log("history clearning process starting ...");
+		await sql.begin(async (tx) => {
+			await tx`
+				DELETE FROM messages
+				WHERE room_id = ${room_id}
+			`;
+		});
+
+		console.log("history clearning process [all msg deleted] ...");
+
+		const { data: files, error: listError } = await supabase.storage.from("uploads").list(room_id, { limit: 1000 }); // list all files in the folder
+
+		if (listError) throw listError;
+
+		if (files && files.length > 0) {
+			const filePaths = files.map((f) => `${room_id}/${f.name}`);
+			const { error: deleteError } = await supabase.storage.from("uploads").remove(filePaths);
+			if (deleteError) throw deleteError;
+		}
+
+		console.log("history clearning process [all pic deleted] ...");
 
 		return { success: true, message: "Message deleted successfully." };
 	} catch (error) {

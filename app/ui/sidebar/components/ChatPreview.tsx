@@ -84,11 +84,19 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 
 	return (
 		<>
-			<DropdownMenu.Root modal={false}>
+			<DropdownMenu.Root
+				modal={false}
+				onOpenChange={(open) => {
+					if (!open) {
+						setSelectedChat(null);
+					}
+				}}
+			>
 				{localChats.length >= 1 &&
 					localChats.map((chat) => (
 						<ChatPreview
 							isSelected={pathname.includes(chat.room_id)}
+							selectedChat={selectedChat?.id === chat.id}
 							key={chat.room_id}
 							chat={chat}
 							selectChat={() => setSelectedChat(chat)}
@@ -168,13 +176,13 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 				</DropdownMenu.Portal>
 			</DropdownMenu.Root>
 
-			<Tooltip
+			{/* <Tooltip
 				className="my-tooltip"
 				border={"var(--tooltip-border)"}
 				id="chat-panel-item-tooltip"
 				place="left"
 				delayShow={100}
-			/>
+			/> */}
 		</>
 	);
 };
@@ -183,13 +191,15 @@ export const ChatPreview = ({
 	isSelected,
 	chat,
 	selectChat,
+	selectedChat,
 }: {
 	isSelected: boolean;
+	selectedChat: boolean;
 	chat: ChatType;
 	selectChat: () => void;
 }) => {
 	return (
-		<Link className="cursor-pointer no-underline" href={`/chat/${chat.room_id}`}>
+		<Link className="cursor-pointer no-underline group/parent" href={`/chat/${chat.room_id}`}>
 			<div
 				className={clsx(
 					"rounded-lg py-1.5 px-2.5  flex items-center gap-2.5 group max-lg:[#sidebar.active_&]:mb-1.5",
@@ -216,9 +226,10 @@ export const ChatPreview = ({
 						}}
 						data-tooltip-id="chat-panel-item-tooltip"
 						data-tooltip-content={"More"}
-						className="text-muted group-hover/icon:text-text hover:text-text ml-auto
-							data-[state=open]:opacity-100 data-[state=open]:text-text
-							group-hover:opacity-100 opacity-0 text-xl"
+						className={clsx(
+							"text-muted group-hover/icon:text-text hover:text-text ml-auto group-hover:opacity-100 opacity-0 text-xl",
+							selectedChat && "opacity-100 text-text"
+						)}
 					/>
 				</DropdownMenu.Trigger>
 			</div>

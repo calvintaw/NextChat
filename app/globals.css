@@ -316,6 +316,27 @@ html {
 		@apply !scale-95 !transition !duration-250 !ease-[cubic-bezier(0.16,1,0.3,1)] !origin-top !bg-surface dark:!bg-accent !p-2 !px-3 !max-w-80 !text-text !rounded-lg !text-base !font-semibold !shadow-lg !shadow-black/25 dark:!shadow-black !z-50;
 	}
 
+	.small-tooltip {
+		@apply !scale-80 
+		!transition 
+		!duration-250 
+		!ease-[cubic-bezier(0.16,1,0.3,1)] 
+		!origin-top 
+		!bg-surface 
+		dark:!bg-accent 
+		!p-1.5 
+		!px-2 
+		!max-w-60 
+		!text-text 
+		!rounded-md 
+		!text-sm 
+		!font-semibold 
+		!shadow-md 
+		!shadow-black/25 
+		dark:!shadow-black 
+		!z-50;
+	}
+
 	/* --- Tooltip Styles --- */
 	.my-tooltip__chat {
 		@apply !scale-95 !transition  !duration-250 !ease-[cubic-bezier(0.16,1,0.3,1)] !origin-top 

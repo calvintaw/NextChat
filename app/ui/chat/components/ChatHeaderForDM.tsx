@@ -1,6 +1,12 @@
 "use client";
 
-import { getServersInCommon, blockFriendship, removeFriendshipRequest, unblockFriendship } from "@/app/lib/actions";
+import {
+	getServersInCommon,
+	blockFriendship,
+	removeFriendshipRequest,
+	unblockFriendship,
+	clearMsgHistory,
+} from "@/app/lib/actions";
 import { Room } from "@/app/lib/definitions";
 import { User } from "@/app/lib/definitions";
 import { useState, useEffect } from "react";
@@ -13,6 +19,8 @@ import clsx from "clsx";
 import { useToast } from "@/app/lib/hooks/useToast";
 import { examplePassages } from "@/app/lib/utilities";
 import { useChatProvider } from "../ChatBoxWrapper";
+import { GrHistory } from "react-icons/gr";
+import { IconWithSVG } from "../../general/Buttons";
 
 export function DirectMessageCard({
 	roomId,
@@ -65,82 +73,113 @@ export function DirectMessageCard({
 	}, [user.id]);
 
 	return (
-		<div className="bg-contrast text-white px-4 pb-2 rounded-lg max-w-full">
-			<div className="flex items-center justify-between mb-4">
-				<div className="flex items-center gap-3">
+		<>
+			<Tooltip
+				id={`header-icons-tooltip`}
+				place="left-start"
+				className="small-tooltip"
+				border="var(--tooltip-border)"
+				offset={0}
+			/>
+
+			<div className="flex items-center justify-between mb-4 sticky border -top-4 z-20 bg-contrast border-b border-contrast px-4 py-2">
+				<div className="flex items-center gap-1.5">
 					<Avatar
 						id={user.id}
-						size={"size-12"}
+						size={"size-5.5"}
 						displayName={user.username}
 						src={user.image}
 						statusIndicator={false}
 					></Avatar>
-					<div>
-						<h2 className="text-xl font-semibold">{user.displayName}</h2>
-						<div role="contentinfo" className="text-sm text-gray-400 cursor-pointer" data-tooltip-id={user.username}>
-							@<span onClick={() => handleCopy(user.username)}>{user.username}</span>
-							<Tooltip className="my-tooltip" id={user.username} place="right" border={`var(--tooltip-border)`}>
-								<span className="flex items-center gap-1">
-									{clipboard === user.username ? (
-										<>
-											<FaCheck className="text-green-500" />
-											Copied: {user.username}
-										</>
-									) : (
-										<>Copy: {user.username}</>
-									)}
-								</span>
-							</Tooltip>
+					<h2 className="text-sm">{user.username}</h2>
+				</div>
+
+				<div className="flex gap-1.5">
+					<IconWithSVG
+						className="!size-6.5"
+						data-tooltip-id="header-icons-tooltip"
+						data-tooltip-content={"Clear history"}
+					>
+						<GrHistory className="text-lg" />
+					</IconWithSVG>
+				</div>
+			</div>
+			<div className="bg-contrast text-white px-4 pb-2 rounded-lg max-w-full">
+				<div className="flex items-center justify-between mb-4">
+					<div className="flex items-center gap-3">
+						<Avatar
+							id={user.id}
+							size={"size-12"}
+							displayName={user.username}
+							src={user.image}
+							statusIndicator={false}
+						></Avatar>
+						<div>
+							<h2 className="text-xl font-semibold">{user.displayName}</h2>
+							<div role="contentinfo" className="text-sm text-gray-400 cursor-pointer" data-tooltip-id={user.username}>
+								@<span onClick={() => handleCopy(user.username)}>{user.username}</span>
+								<Tooltip className="my-tooltip" id={user.username} place="right" border={`var(--tooltip-border)`}>
+									<span className="flex items-center gap-1">
+										{clipboard === user.username ? (
+											<span>
+												<FaCheck className="text-green-500" />
+												Copied: {user.username}
+											</span>
+										) : (
+											<>Copy: {user.username}</>
+										)}
+									</span>
+								</Tooltip>
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-			<div className="text-gray-400 text-sm mb-4">
-				This is the beginning of your direct message history with{" "}
-				{roomId.startsWith("system-room") && <span className="text-text font-medium">Our AI Chatbot</span>}
-				{!roomId.startsWith("system-room") && <span className="text-text font-medium">{user.username}</span>}.
-			</div>
-			{!roomId.startsWith("system-room") && (
-				<div className="flex items-center gap-2">
-					<button
-						className={clsx("btn", isBlocked ? "btn-inverted" : "btn-secondary")}
-						onClick={() => {
-							if (isBlocked) {
-								unblockFriendship(currentUserId, user.id);
-							} else {
-								blockFriendship(currentUserId, user.id);
-							}
-						}}
-					>
-						{isBlocked ? "Unblock" : "Block"}
-					</button>
-					<button
-						className="btn btn-secondary"
-						onClick={async () => {
-							const result = await removeFriendshipRequest({ username: user.username, id: user.id }, "friend");
-							if (result.success) {
-								toast({ title: result.message, mode: "positive", subtitle: "" });
-							}
-						}}
-					>
-						Unfriend
-					</button>
+				<div className="text-gray-400 text-sm mb-4">
+					This is the beginning of your direct message history with{" "}
+					{roomId.startsWith("system-room") && <span className="text-text font-medium">Our AI Chatbot</span>}
+					{!roomId.startsWith("system-room") && <span className="text-text font-medium">{user.username}</span>}.
 				</div>
-			)}
+				{!roomId.startsWith("system-room") && (
+					<div className="flex items-center gap-2">
+						<button
+							className={clsx("btn", isBlocked ? "btn-inverted" : "btn-secondary")}
+							onClick={() => {
+								if (isBlocked) {
+									unblockFriendship(currentUserId, user.id);
+								} else {
+									blockFriendship(currentUserId, user.id);
+								}
+							}}
+						>
+							{isBlocked ? "Unblock" : "Block"}
+						</button>
+						<button
+							className="btn btn-secondary"
+							onClick={async () => {
+								const result = await removeFriendshipRequest({ username: user.username, id: user.id }, "friend");
+								if (result.success) {
+									toast({ title: result.message, mode: "positive", subtitle: "" });
+								}
+							}}
+						>
+							Unfriend
+						</button>
+					</div>
+				)}
 
-			{!roomId.startsWith("system-room") &&
-				(isPending ? (
-					<p className="text-xs text-gray-500 mt-2">Loading servers in common...</p>
-				) : (
-					<ServerList servers={commonServers} />
-				))}
-			{roomId.startsWith("system-room") && (
-				<>
-					<p className="text-base text-primary">
-						Hi! I can answer questions, but only if the answer is already known 😄 {`(TensorFlow Q&A Model)`}
-					</p>
+				{!roomId.startsWith("system-room") &&
+					(isPending ? (
+						<p className="text-xs text-gray-500 mt-2">Loading servers in common...</p>
+					) : (
+						<ServerList servers={commonServers} />
+					))}
+				{roomId.startsWith("system-room") && (
+					<>
+						<p className="text-base text-primary">
+							Hi! I can answer your questions using DeepSeek — now powered via Hugging Face
+						</p>
 
-					{/* <div className="flex flex-wrap gap-2 mt-2">
+						{/* <div className="flex flex-wrap gap-2 mt-2">
 						{Object.keys(examplePassages).map((topic, idx) => (
 							<button
 								onClick={() => setChatBotTopic(topic)}
@@ -156,13 +195,14 @@ export function DirectMessageCard({
 							</button>
 						))}
 					</div> */}
-				</>
-			)}
-			{roomId.startsWith("system-room") && isBlocked && isSystem && (
-				<p className="text-base text-amber-400 not-dark:text-amber-500">
-					Due to difficulties in finding free apis and hosting own llms, the AI chatbot does not work 😢
-				</p>
-			)}
-		</div>
+					</>
+				)}
+				{roomId.startsWith("system-room") && isBlocked && isSystem && (
+					<p className="text-base text-amber-400 not-dark:text-amber-500">
+						Due to difficulties in finding free apis and hosting own llms, the AI chatbot may be not work 😢
+					</p>
+				)}
+			</div>
+		</>
 	);
 }

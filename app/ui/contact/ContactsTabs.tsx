@@ -569,6 +569,47 @@ const AllContactsTab = ({ friendsCount, contacts, user, setContacts }: AllContac
 	);
 };
 
+export const gamesData = [
+	{
+		imgSrc: "/tictactoe.png",
+		title: "Tic Tac Toe",
+		description: "Play the classic 2-player game of strategy and skill. Get three in a row to win!",
+		href: "/games/tictactoe" as Route,
+	},
+	{
+		imgSrc: "/snake.png",
+		title: "Snake",
+		description: "Guide the snake to eat food and grow longer — but don’t run into yourself or the walls!",
+		href: "/games/snake" as Route,
+	},
+	{
+		imgSrc: "/snake.png",
+		title: "Snake",
+		description: "Guide the snake to eat food and grow longer — but don’t run into yourself or the walls!",
+		href: "/games/snake" as Route,
+	},
+	{
+		imgSrc: "/snake.png",
+		title: "Snake",
+		description: "Guide the snake to eat food and grow longer — but don’t run into yourself or the walls!",
+		href: "/games/snake" as Route,
+	},
+	{
+		imgSrc: "/snake.png",
+		title: "Snake",
+		description: "Guide the snake to eat food and grow longer — but don’t run into yourself or the walls!",
+		href: "/games/snake" as Route,
+	},
+
+	// Add more games easily here:
+	// {
+	//   imgSrc: "/chess.png",
+	//   title: "Chess",
+	//   description: "Challenge your mind with the timeless game of strategy and tactics.",
+	//   href: "/games/chess" as Route,
+	// },
+];
+
 const GamesTab = () => {
 	return (
 		<>
@@ -581,12 +622,17 @@ const GamesTab = () => {
 				<hr className="hr-separator my-2 bg-transparent" />
 			</div>
 
-			<GameCard
-				imgSrc="/tictactoe.png"
-				title="Tic Tac Toe"
-				description="A classic 2-player game of Xs and Os. t is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now u"
-				href={"/games/tictactoe" as Route}
-			/>
+			<div className="flex gap-4 flex-wrap ">
+				{gamesData.map((game, index) => (
+					<GameCard
+						key={index}
+						imgSrc={game.imgSrc}
+						title={game.title}
+						description={game.description}
+						href={game.href}
+					/>
+				))}
+			</div>
 
 			<div className="flex flex-col p-2 px-0 pr-1 h-full overflow-y-auto has-scroll-container fade-bg-bottom pb-[100px]"></div>
 		</>

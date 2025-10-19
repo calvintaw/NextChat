@@ -80,7 +80,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		}
 
 		if (roomId.startsWith("system-room")) {
-			// setIsSystem(true); //p
+			setIsSystem(true);
 			// setIsBlocked(true);
 			setInitialLoading(false);
 		}
@@ -99,21 +99,21 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 		const fetchMessages = async () => {
 			// cache feature: disabled as I do not know how to sync msgs if the other users change the msg
-			if (roomId.startsWith("system-room")) {
-				try {
-					const cached: MessageType[] | undefined = await getCache(getRoomMessagesKey(roomId));
-					if (cached && cached.length > 0) {
-						offsetRef.current = cached.length;
-						lastBatchLength.current = cached.length;
-						oldestMsgCreatedAt.current = cached[cached.length - 1].createdAt;
-						setMessages(cached);
-						setInitialLoading(false);
-						return;
-					}
-				} catch (err) {
-					console.error("IDB load error:", err);
-				}
-			}
+			// if (roomId.startsWith("system-room")) {
+			// 	try {
+			// 		const cached: MessageType[] | undefined = await getCache(getRoomMessagesKey(roomId));
+			// 		if (cached && cached.length > 0) {
+			// 			offsetRef.current = cached.length;
+			// 			lastBatchLength.current = cached.length;
+			// 			oldestMsgCreatedAt.current = cached[cached.length - 1].createdAt;
+			// 			setMessages(cached);
+			// 			setInitialLoading(false);
+			// 			return;
+			// 		}
+			// 	} catch (err) {
+			// 		console.error("IDB load error:", err);
+			// 	}
+			// }
 
 			try {
 				const recent = await getRecentMessages(roomId, { limit: LIMIT });
@@ -357,9 +357,11 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 				>
 					<div
 						ref={containerRef}
-						className="flex-1 h-full flex flex-col overflow-y-auto py-4 px-1 pb-10 has-scroll-container relative "
+						className="flex-1 h-full flex flex-col overflow-y-auto pt-0 py-4 px-1 pb-10 has-scroll-container relative "
 						// className="flex-1 min-h-0 flex flex-col overflow-y-auto py-4 pb-10"
 					>
+						
+
 						{type === "dm" && recipient && (
 							<DirectMessageCard
 								isBlocked={isBlocked}
@@ -371,6 +373,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 						{type === "server" && isServerRoom(roomId) && recipient && (
 							<ServerCardHeader isBlocked={isBlocked} user={user} server={recipient as Room} />
 						)}
+
 						<hr className="hr-separator bg-contrast"></hr>
 
 						{isLoadingOldMsg && (
@@ -436,6 +439,7 @@ import { useToast } from "@/app/lib/hooks/useToast";
 import { DirectMessageCard } from "./components/ChatHeaderForDM";
 import { ServerCardHeader } from "./components/ChatHeaderForServer";
 import useOnScreen from "@/app/lib/hooks/useOnScreen";
+import { FaCheck } from "react-icons/fa";
 
 export const ServerList = ({ servers }: { servers: Room[] }) => {
 	if (!servers || servers.length === 0) {

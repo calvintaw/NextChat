@@ -199,7 +199,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 					)}
 				>
 					<AttachmentDropdown
-						isDisabled={isBlocked || (isSystem && isBlocked) || isPending}
+						isDisabled={isBlocked || isSystem || (isSystem && isBlocked) || isPending}
 						roomId={roomId}
 						handleFileUpload={handleFileUpload}
 					/>

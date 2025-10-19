@@ -153,6 +153,7 @@ const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: R
 									)}
 								/>
 								<Avatar
+									disableTooltip
 									size="size-11.5"
 									radius="rounded-xl"
 									src={server.profile ?? ""}
