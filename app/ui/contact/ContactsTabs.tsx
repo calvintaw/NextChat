@@ -582,24 +582,6 @@ export const gamesData = [
 		description: "Guide the snake to eat food and grow longer — but don’t run into yourself or the walls!",
 		href: "/games/snake" as Route,
 	},
-	{
-		imgSrc: "/snake.png",
-		title: "Snake",
-		description: "Guide the snake to eat food and grow longer — but don’t run into yourself or the walls!",
-		href: "/games/snake" as Route,
-	},
-	{
-		imgSrc: "/snake.png",
-		title: "Snake",
-		description: "Guide the snake to eat food and grow longer — but don’t run into yourself or the walls!",
-		href: "/games/snake" as Route,
-	},
-	{
-		imgSrc: "/snake.png",
-		title: "Snake",
-		description: "Guide the snake to eat food and grow longer — but don’t run into yourself or the walls!",
-		href: "/games/snake" as Route,
-	},
 
 	// Add more games easily here:
 	// {
