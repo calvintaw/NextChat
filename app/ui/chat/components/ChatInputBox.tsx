@@ -162,7 +162,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 				<div
 					id="ChatInputBox"
 					className={clsx(
-						"flex items-start gap-2 rounded-lg px-3 py-1.5 bg-background dark:bg-accent/50 border border-foreground/15 not-dark:!border-foreground/30  focus-within:border-muted/25 relative shadow-lg",
+						"flex items-end gap-2 rounded-lg px-3 py-1.5 bg-background dark:bg-accent/50 border border-foreground/15 not-dark:!border-foreground/30  focus-within:border-muted/25 relative shadow-lg",
 						replyToMsg && "rounded-t-none !border-muted/25"
 					)}
 				>
@@ -201,6 +201,10 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 						)}
 					/>
 					<ChatToolbar
+						isPending={isPending}
+						isFocused={isFocused}
+						isSystem={isSystem}
+						isBlocked={isBlocked}
 						setEmoji={(emoji: string) => {
 							if (!textRef.current) return;
 
@@ -216,19 +220,6 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 							textarea.selectionStart = textarea.selectionEnd = cursorPos;
 						}}
 					/>
-					<IconWithSVG
-						title="Send message"
-						className={clsx(
-							"icon-chatbox group my-auto animate-none border bg-foreground !rounded-full",
-							!isPending && ((!isFocused && !isPending) || (isSystem && isBlocked) || isBlocked)
-								? "opacity-50"
-								: "opacity-100",
-							isPending && "dark:!bg-background/75 !opacity-100 !bg-black/25 border-0"
-						)}
-					>
-						{!isPending && <IoArrowUp className="text-xs text-background"></IoArrowUp>}{" "}
-						{isPending && <GoSquareFill className="text-xs text-foreground"></GoSquareFill>}
-					</IconWithSVG>
 				</div>
 			</div>
 		</div>

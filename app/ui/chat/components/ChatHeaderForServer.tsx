@@ -26,6 +26,7 @@ export function ServerCardHeader({ server, user, isBlocked }: { server: Room; us
 					<Avatar
 						id={localServer.id}
 						size={"size-5.5"}
+						fontSize={"text-[11px]"}
 						displayName={localServer.name}
 						src={localServer.profile ?? ""}
 						statusIndicator={false}
