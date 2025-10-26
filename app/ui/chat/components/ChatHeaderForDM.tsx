@@ -82,7 +82,7 @@ export function DirectMessageCard({
 				offset={0}
 			/>
 
-			<div className="flex items-center justify-between mb-4 sticky border -top-4 z-20 bg-contrast border-b border-contrast px-4 py-2">
+			<div className="flex items-center justify-between mb-4 sticky border top-0 z-20 bg-contrast border-b border-contrast px-4 py-2 border-t-0 border-l-0 border-r-0">
 				<div className="flex items-center gap-1.5">
 					<Avatar
 						id={user.id}

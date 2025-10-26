@@ -80,6 +80,9 @@ export function IconWithSVG(props: React.PropsWithChildren<IconProps>) {
 export const DarkModeBtn = ({ className }: { className?: string }) => {
 	const [darkMode, toggle] = useDarkMode();
 	const icon_class = "absolute inset-0 m-auto text-2xl not-dark:group-hover:text-background";
+
+
+
 	return (
 		<button
 			onClick={toggle}

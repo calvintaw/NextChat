@@ -177,6 +177,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 							text-sm bg-black/25  not-dark:text-black text-white rounded-md p-1.5 py-1 border-background
 							z-[1]
 							opacity-50
+							pointer-events-none
 							"
 						>
 							Press Ctrl + / to type

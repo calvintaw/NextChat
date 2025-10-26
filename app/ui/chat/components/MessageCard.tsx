@@ -236,7 +236,7 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 								<div className="w-full flex max-sm:justify-between relative">
 									<div
 										className={clsx(
-											"relative max-w-full break-words break-all whitespace-pre-wrap text-sm",
+											"relative max-w-full break-words whitespace-pre-wrap text-sm",
 											isFirstGroup && "max-sm:pl-3 max-sm:mt-1"
 										)}
 									>
