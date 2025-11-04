@@ -16,8 +16,6 @@ import useEventListener from "@/app/lib/hooks/useEventListener";
 import { insertMessageInDB } from "@/app/lib/actions";
 import { useToast } from "@/app/lib/hooks/useToast";
 import { sendWithRetry } from "@/app/lib/utilities";
-import { IoArrowUp } from "react-icons/io5";
-import { GoSquareFill } from "react-icons/go";
 
 type ChatInputBoxProps = {
 	activePersons: string[];

@@ -9,6 +9,15 @@ import isYesterday from "dayjs/plugin/isYesterday";
 import weekday from "dayjs/plugin/weekday";
 import { Tooltip } from "react-tooltip";
 import { get as getCache, set as setCache } from "idb-keyval";
+import Loading from "@/app/(root)/chat/[room_id]/loading";
+import useOnScreen from "@/app/lib/hooks/useOnScreen";
+import { useToast } from "@/app/lib/hooks/useToast";
+import { examplePassages, isServerRoom } from "@/app/lib/utilities";
+import ChatProvider from "./ChatBoxWrapper";
+import { DirectMessageCard } from "./components/ChatHeaderForDM";
+import { ServerCardHeader } from "./components/ChatHeaderForServer";
+import ChatInputBox from "./components/ChatInputBox";
+import ChatMessages from "./components/ChatMessages";
 
 dayjs.extend(isToday);
 dayjs.extend(isYesterday);
@@ -16,22 +25,6 @@ dayjs.extend(weekday);
 
 type ChatboxProps = { recipient: User | Room; user: User; roomId: string; type: "dm" | "server" };
 const getRoomMessagesKey = (roomId: string) => `chat_messages_${roomId}`;
-
-// const exampleMessages: MessageType[] = Array.from({ length: 35 }, (_, i) => ({
-// 	id: `msg_${i + 1}`,
-// 	sender_id: i % 2 === 0 ? "a6d4886d-1049-4f32-89e0-28a8394e0346" : "c10c579b-5a89-4439-925f-75c5d643d850",
-// 	sender_display_name: i % 2 === 0 ? "Alice" : "Bob",
-// 	sender_image:
-// 		i % 2 === 0 ? "https://randomuser.me/api/portraits/women/1.jpg" : "https://randomuser.me/api/portraits/men/2.jpg",
-// 	content: `This is message number ${i + 1}`,
-// 	createdAt: new Date(Date.now() - (35 - i) * 60000).toISOString(), // spaced 1 minute apart
-// 	type: "text",
-// 	edited: false,
-// 	reactions: {}, // some reactions
-// 	replyTo: null,
-// 	tempId: i >= 30 ? `temp_${i + 1}` : undefined, // last 5 messages tempId
-// 	synced: i >= 30 ? "pending" : true,
-// }));
 
 export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	const [messages, setMessages] = useState<MessageType[]>([]);
@@ -424,50 +417,3 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		</>
 	);
 }
-
-//=====================
-
-import ChatMessages from "./components/ChatMessages";
-import ChatInputBox from "./components/ChatInputBox";
-import { Avatar } from "../general/Avatar";
-import { clsx } from "clsx";
-import Link from "next/link";
-import { examplePassages, isServerRoom } from "@/app/lib/utilities";
-import ChatProvider from "./ChatBoxWrapper";
-import Loading from "@/app/(root)/chat/[room_id]/loading";
-import { useToast } from "@/app/lib/hooks/useToast";
-import { DirectMessageCard } from "./components/ChatHeaderForDM";
-import { ServerCardHeader } from "./components/ChatHeaderForServer";
-import useOnScreen from "@/app/lib/hooks/useOnScreen";
-import { FaCheck } from "react-icons/fa";
-
-export const ServerList = ({ servers }: { servers: Room[] }) => {
-	if (!servers || servers.length === 0) {
-		return <p className="text-xs text-gray-500 mt-2">No servers in common</p>;
-	}
-
-	return (
-		<div className="flex flex-wrap gap-2">
-			{servers.map((server) => (
-				<Link
-					key={server.id}
-					href={server.type === "dm" ? `/chat/${server.id}` : `/chat/server/${server.id}`}
-					className={clsx(
-						"flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors duration-150",
-						"bg-background/50 hover:bg-background/70 dark:bg-accent/50 dark:hover:bg-accent/70"
-					)}
-				>
-					<Avatar
-						src={server.profile ?? ""}
-						displayName={server.name}
-						size="size-8"
-						radius="rounded-md"
-						fontSize="text-sm"
-						statusIndicator={false}
-					/>
-					<span className="font-medium text-sm truncate">{server.name}</span>
-				</Link>
-			))}
-		</div>
-	);
-};
