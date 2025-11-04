@@ -21,6 +21,10 @@ type MessageCardType = {
 };
 
 const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
+	useEffect(() => {
+		console.log("MessageCard: ", msg);
+	}, []);
+
 	const msg_date = getLocalTimeString(msg.createdAt, { hour: "numeric", minute: "numeric", hour12: true });
 	const editInputRef = useRef<HTMLInputElement | null>(null);
 	const { msgToEdit, messages, setMessages, setMsgToEdit, roomId, replyToMsg, user } = useChatProvider();
@@ -59,8 +63,6 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 			setMessages(originalMsgs);
 			toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			console.log(result.error);
-		} else {
-			socket.emit("edit message", msg.id, roomId, newContent);
 		}
 	};
 
@@ -94,7 +96,7 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 				<div className="flex items-center gap-1 text-sm font-extralight font-chunk">
 					<Avatar
 						size="size-4"
-						id={msg.replyTo}
+						id={msg.replyTo ?? undefined}
 						src={reply_img_url}
 						statusIndicator={false}
 						displayName={reply_displayName}
@@ -147,15 +149,15 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 			);
 		} else if (result.success) {
 			// if errors, it console logs but need to be fixed if the goal is to make sure the receiver receives the msg
-			if (roomId.startsWith("system-room")) {
-				sendWithRetry("system", msg, 3, 2000)
-					.then((res) => console.log("System message delivered:", res))
-					.catch((err) => console.error("System message failed:", err));
-			} else {
-				sendWithRetry("message", msg, 3, 2000)
-					.then((res) => console.log("Message delivered:", res))
-					.catch((err) => console.error("Message failed:", err));
-			}
+			// if (roomId.startsWith("system-room")) {
+			// 	sendWithRetry("system", msg, 3, 2000)
+			// 		.then((res) => console.log("System message delivered:", res))
+			// 		.catch((err) => console.error("System message failed:", err));
+			// } else {
+			// 	sendWithRetry("message", msg, 3, 2000)
+			// 		.then((res) => console.log("Message delivered:", res))
+			// 		.catch((err) => console.error("Message failed:", err));
+			// }
 
 			setMessages((prev: MessageType[]) =>
 				prev.map((prevMsg) => (prevMsg.id === msg.id ? { ...prevMsg, synced: true } : prevMsg))
@@ -252,7 +254,7 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 										)}
 										title={msg_date}
 									>
-										{isFirstGroup ? null : msg_date}{" "}
+										{isFirstGroup ? null : "msg_date"}{" "}
 										{((typeof msg.synced === "boolean" && msg.synced) ||
 											// msg is from server, then synced is undefine as there is no such column as synced on DB
 											typeof msg.synced === "undefined") &&
@@ -485,7 +487,7 @@ const ReactionsRow = ({ msg, isFirstGroup }: { msg: MessageType; isFirstGroup: b
 
 	return (
 		<div
-			className={clsx("mt-1 h-fit w-fit flex gap-1 flex-wrap max-sm:pl-3", !isFirstGroup && !msg.replyTo && "ml-15")}
+			className={clsx("mt-1 h-fit w-fit flex gap-1 flex-wrap max-sm:pl-3", !isFirstGroup && !msg.replyTo && "sm:ml-15")}
 		>
 			{Object.entries(msg.reactions).map(([emoji, users], idx) => {
 				if (users.length === 0) return null;

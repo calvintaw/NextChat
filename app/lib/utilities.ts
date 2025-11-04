@@ -34,8 +34,16 @@ export function isServerRoom(roomId: string) {
 	return !roomId.startsWith("@me:");
 }
 
-export function getLocalTimeString(date: string | Date, options?: Intl.DateTimeFormatOptions): string {
+export function getLocalTimeString(date?: string | Date, options?: Intl.DateTimeFormatOptions): string {
+	if (!date) {
+		console.log("DATE IS NOT TRUE ");
+		return "";
+	} // handle undefined/null
 	const d = typeof date === "string" ? new Date(date) : date;
+	if (isNaN(d.getTime())) {
+		console.log("DATE IS NOT NAN");
+		return "";
+	} // invalid date check
 	return d.toLocaleTimeString([], options);
 }
 

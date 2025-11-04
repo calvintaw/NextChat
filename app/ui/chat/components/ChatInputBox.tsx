@@ -1,10 +1,11 @@
+"use client";
 import { AttachmentDropdown } from "./AttachmentDropdown";
 import TextareaAutosize from "react-textarea-autosize";
 import { ChatToolbar } from "./ChatToolBar";
 import { useEffect, useState } from "react";
 import { clsx } from "clsx";
 import React from "react";
-import { socket } from "@/app/lib/socket";
+// REMOVED: import { socket } from "@/app/lib/socket";
 import { MessageContentType, MessageType, User } from "@/app/lib/definitions";
 import useDebounce from "@/app/lib/hooks/useDebounce";
 import { useChatProvider } from "../ChatBoxWrapper";
@@ -15,7 +16,8 @@ import { v4 as uuidv4 } from "uuid";
 import useEventListener from "@/app/lib/hooks/useEventListener";
 import { insertMessageInDB } from "@/app/lib/actions";
 import { useToast } from "@/app/lib/hooks/useToast";
-import { sendWithRetry } from "@/app/lib/utilities";
+// NEW: Import Supabase client
+import { supabase } from "@/app/lib/supabase";
 
 type ChatInputBoxProps = {
 	activePersons: string[];
@@ -23,27 +25,47 @@ type ChatInputBoxProps = {
 	user: User;
 	setMessages: React.Dispatch<React.SetStateAction<MessageType[]>>;
 	isBlocked: boolean;
-	initialLoading: boolean;
 };
 
-const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading, isBlocked }: ChatInputBoxProps) => {
-	const { input, setInput, replyToMsg, setReplyToMsg, textRef, isSystem, setActivePersons, ChatBotTopic } =
-		useChatProvider();
+const ChatInputBox = ({ activePersons, roomId, user, setMessages, isBlocked }: ChatInputBoxProps) => {
+	const { input, setInput, replyToMsg, setReplyToMsg, textRef, isSystem, setActivePersons } = useChatProvider();
 	const [isFocused, setIsFocused] = useState(false);
 	const [style, setStyle] = useState("!max-h-10");
 	const [isPending, setIsPending] = useState(false);
 	const { canSendMessage } = useMessageLimiter(25, 60_000);
+	const toast = useToast();
+
+	// --- Supabase Broadcast Typing Logic ---
+	const channel = React.useMemo(() => supabase.channel(`room:${roomId}`), [roomId]);
+
+	const sendTypingStart = () => {
+		channel.send({
+			type: "broadcast",
+			event: "typing", // MUST match listener in ChatBox.tsx
+			payload: { status: "started", displayName: user.displayName },
+		});
+	};
+
+	const sendTypingStop = () => {
+		channel.send({
+			type: "broadcast",
+			event: "typing", // MUST match listener in ChatBox.tsx
+			payload: { status: "stopped", displayName: user.displayName },
+		});
+	};
+
 	const { trigger: triggerTypingAnimation, cancel: cancelTypingAnimation } = useDebounce({
-		startCallback: () => socket.emit("typing started", roomId, user.displayName),
-		endCallback: () => socket.emit("typing stopped", roomId, user.displayName),
+		// REPLACED: socket.emit calls with Supabase send functions
+		startCallback: sendTypingStart,
+		endCallback: sendTypingStop,
 		delay: 2000,
 	});
-	const toast = useToast();
 
 	useEffect(() => {
 		setStyle("!min-h-10");
 	}, []);
 
+	// textbox typing animation code
 	useEffect(() => {
 		if (!textRef.current) return;
 
@@ -55,7 +77,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 		return () => {
 			textarea.removeEventListener("input", handleInput);
 		};
-	}, []);
+	}, [triggerTypingAnimation]); // Added triggerTypingAnimation to dependencies
 
 	const sendMessage = async (input: string, type: MessageContentType = "text") => {
 		const tempId = uuidv4();
@@ -78,6 +100,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 
 		cancelTypingAnimation(750); // stop the typing animation 1.5s after use has stopped typing
 
+		// Optimistic UI update
 		setMessages((prev) => {
 			return [
 				...prev,
@@ -88,23 +111,13 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 			];
 		});
 
-		// frequent changing of react state is hurting performance I think
-		// TODO: maybe find a way to boost performance
-
+		// Database insertion triggers the Supabase Realtime listener in ChatBox.tsx
 		const result = await insertMessageInDB(temp_msg);
 		if (!result.success && result.message) {
 			toast({ title: result.message, subtitle: "", mode: "negative" });
 			setMessages((prev) => prev.map((msg) => (msg.id === tempId ? { ...msg, synced: false } : msg)));
 		} else if (result.success) {
-			if (roomId.startsWith("system-room")) {
-				sendWithRetry("system", { msg_content: temp_msg.content, room_id: temp_msg.room_id }, 3, 2000)
-					.then((res) => console.log("System message delivered:", res))
-					.catch((err) => console.error("System message failed:", err));
-			} else {
-				sendWithRetry("message", temp_msg, 3, 2000)
-					.then((res) => console.log("Message delivered:", res))
-					.catch((err) => console.error("Message failed:", err));
-			}
+			// Mark as synced, assuming insertMessageInDB was successful
 			setMessages((prev) => prev.map((msg) => (msg.id === tempId ? { ...msg, synced: true } : msg)));
 		}
 		setIsPending(false);
@@ -125,7 +138,9 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 			if (textRef.current.value.trim() === "") return;
 			if (!canSendMessage()) return;
 
-			socket.emit("join", roomId); // joining the same user id room as the socket server on renderer.com shutdown within 15min of inactivity so the msg would never reach anywhere.
+			// REMOVED: socket.emit("join", roomId);
+			// Joining is now handled on mount of ChatBox.tsx via Supabase channel subscription.
+
 			sendMessage(textRef.current?.value);
 			textRef.current.value = "";
 
@@ -160,7 +175,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 				<div
 					id="ChatInputBox"
 					className={clsx(
-						"flex items-end gap-2 rounded-lg px-3 py-1.5 bg-background dark:bg-accent/50 border border-foreground/15 not-dark:!border-foreground/30  focus-within:border-muted/25 relative shadow-lg",
+						"flex items-end gap-2 rounded-lg px-3 py-1.5 bg-background dark:bg-accent/50 border border-foreground/15 not-dark:!border-foreground/30 focus-within:border-muted/25 relative shadow-lg",
 						replyToMsg && "rounded-t-none !border-muted/25"
 					)}
 				>
@@ -172,11 +187,11 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, initialLoading
 					{!isFocused && (
 						<div
 							className="max-[500px]:hidden absolute border top-1/2 -translate-y-1/2 right-22
-							text-sm bg-black/25  not-dark:text-black text-white rounded-md p-1.5 py-1 border-background
-							z-[1]
-							opacity-50
-							pointer-events-none
-							"
+			             text-sm bg-black/25  not-dark:text-black text-white rounded-md p-1.5 py-1 border-background
+			             z-[1]
+			             opacity-50
+			             pointer-events-none
+			             "
 						>
 							Press Ctrl + / to type
 						</div>
@@ -259,15 +274,15 @@ const TypingIndicator = ({ displayName }: { displayName: string[] }) => {
 	return (
 		<span
 			className="
-        absolute
-        -bottom-2
-        left-5
-        flex
-        w-full
-        max-w-lg
-        overflow-hidden
-				
-      "
+			        absolute
+			        -bottom-2
+			        left-5
+			        flex
+			        w-full
+			        max-w-lg
+			        overflow-hidden
+			        
+			       "
 			style={{
 				// Apply a fade-out mask from fully visible to transparent
 				WebkitMaskImage: "linear-gradient(to right, black 80%, transparent 100%)",

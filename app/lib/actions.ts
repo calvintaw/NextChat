@@ -228,7 +228,7 @@ export async function getRecentMessages(room_id: string, options: GetMessagesOpt
       m.sender_id, 
       users.display_name AS "sender_display_name", 
       m.content, 
-      m.created_at AS "createdAt",
+      m.created_at as "createdAt",
       m.type,
       m.edited,
       m.reactions,
@@ -246,6 +246,12 @@ type LocalMessageType = MessageType & {
 	room_id: string;
 };
 
+import { OpenAI } from "openai";
+const client = new OpenAI({
+	baseURL: "https://router.huggingface.co/v1",
+	apiKey: process.env.HF_API_KEY,
+});
+
 export async function insertMessageInDB(msg: LocalMessageType): Promise<{ success: boolean; message?: string }> {
 	try {
 		//TODO: make socket better
@@ -255,6 +261,33 @@ export async function insertMessageInDB(msg: LocalMessageType): Promise<{ succes
 					VALUES (${msg.id}, ${msg.room_id}, ${msg.sender_id}, ${msg.content}, ${msg.type}, ${msg.replyTo})
 				`;
 		});
+
+		if (msg.room_id.startsWith("system-room")) {
+			const response = await client.chat.completions.create({
+				model: "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B:nscale",
+				messages: [
+					{
+						role: "system",
+						content:
+							"You are a helpful assistant. Answer the question in 1–2 short sentences. Do not include lengthy reasoning.",
+					},
+					{ role: "user", content: msg.content },
+				],
+				temperature: 0.2,
+			});
+
+			console.log("AI Response: ", response.choices[0].message);
+			const answer =
+				response.choices[0].message.content?.trimStart().replace(/\r?\n|\r/g, " ") ??
+				"Sorry, I couldn't generate an answer.";
+
+			// Insert AI reply into DB
+			await sql`
+				INSERT INTO messages (room_id, sender_id, content, type)
+				VALUES (${msg.room_id}, ${SYSTEM_USER.id}, ${answer}, 'text')
+				RETURNING id, created_at
+			`;
+		}
 
 		console.log("Sent:", { name: msg.sender_display_name, msg: msg.content });
 		return { success: true };
@@ -1206,6 +1239,7 @@ export async function addReactionToMSG({
 								) 
 						)
 				)
+				updated_at = now()
 				WHERE id = ${id};
 			`;
 		});
@@ -1245,6 +1279,7 @@ SET reactions = jsonb_set(
         '[]'::jsonb
     )
 )
+updated_at = now()
 WHERE id = ${id};
 
 			`;
@@ -1265,6 +1300,16 @@ export async function getUsername(id: string) {
 		return { success: false };
 	}
 	return { success: true, username: result[0].username };
+}
+
+export async function getUserProfileForMsg(id: string) {
+	const result = await sql<User[]>`
+		SELECT display_name as "displayName", image from users where id = ${id} LIMIT 1
+	`;
+	if (result.length === 0) {
+		return { success: false };
+	}
+	return { success: true, displayName: result[0].displayName, image: result[0].image };
 }
 
 export async function getUserIdByUsername(username: string) {

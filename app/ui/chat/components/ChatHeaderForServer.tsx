@@ -9,10 +9,13 @@ import { Avatar } from "../../general/Avatar";
 import { ServerEditForm } from "./Server_edit_form";
 import { GrHistory } from "react-icons/gr";
 import { IconWithSVG } from "../../general/Buttons";
+import { clearMsgHistory } from "@/app/lib/actions";
+import { useRouter } from "next/navigation";
 
-export function ServerCardHeader({ server, user, isBlocked }: { server: Room; user: User; isBlocked: boolean }) {
+export function ServerCardHeader({ server, user }: { server: Room; user: User }) {
 	const [clipboard, setClipboard] = useState("");
 	const [localServer, setLocalServer] = useState(() => server);
+	const router = useRouter();
 
 	const handleCopy = (string: string) => {
 		window.navigator.clipboard.writeText(string);
@@ -36,6 +39,10 @@ export function ServerCardHeader({ server, user, isBlocked }: { server: Room; us
 
 				<div className="flex gap-1.5">
 					<IconWithSVG
+						onClick={() => {
+							clearMsgHistory(server.id);
+							router.refresh();
+						}}
 						className="!size-6.5"
 						data-tooltip-id="header-icons-tooltip"
 						data-tooltip-content={"Clear history"}
