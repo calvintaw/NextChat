@@ -91,58 +91,81 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 				table: "messages",
 				filter: `room_id=eq.${roomId}`,
 			},
-			({ eventType, new: newMsg, old }) => {
-				if (eventType === "DELETE") {
-					messageIdsRef.current.delete(old.id);
-					setMessages((prev) => prev.filter((tx) => tx.id !== old.id));
-				} else if (eventType === "UPDATE") {
+			async (payload) => {
+				const dbMsg = payload.new as any;
+				const userInfo = await getUserInfo(dbMsg.sender_id);
+
+				const msg: MessageType = {
+					...dbMsg,
+					createdAt: dbMsg.created_at, // map snake_case to camelCase
+					sender_image: dbMsg.sender_image ?? userInfo.image,
+					sender_display_name: dbMsg.sender_display_name ?? userInfo.display_name,
+				};
+
+				if (payload.eventType === "INSERT") {
+					if (!messageIdsRef.current.has(msg.id) && msg.sender_id !== user.id) {
+						messageIdsRef.current.add(msg.id);
+						setMessages((prev) => [...prev, msg]);
+					}
+				} else if (payload.eventType === "DELETE") {
+					messageIdsRef.current.delete(payload.old.id);
+					setMessages((prev) => prev.filter((tx) => tx.id !== payload.old.id));
+				} else if (payload.eventType === "UPDATE") {
 					setMessages((prev) =>
 						prev.map((m) =>
-							m.id === newMsg.id ? { ...m, ...newMsg, reactions: JSON.parse(JSON.stringify(newMsg.reactions)) } : m
+							m.id === msg.id ? { ...m, ...msg, reactions: JSON.parse(JSON.stringify(msg.reactions)) } : m
 						)
 					);
-				} else if (eventType === "INSERT") {
-					if (!messageIdsRef.current.has(newMsg.id) && newMsg.sender_id !== user.id) {
-						messageIdsRef.current.add(newMsg.id);
-						setMessages((prev) => [...prev, newMsg]);
-					}
 				}
 			}
 		);
 
+		channel.on("broadcast", { event: "typing" }, ({ payload }) => {
+			if (payload.status === "started") {
+				setActivePersons((prev) => {
+					if (!prev.includes(payload.displayName)) {
+						return [...prev, payload.displayName];
+					}
+					return prev;
+				});
+			} else if (payload.status === "stopped") {
+				setActivePersons((prev) => prev.filter((name) => name !== payload.displayName));
+			}
+		});
+
 		// B. Broadcast Events
-		channel
-			.on("broadcast", { event: "msg_inserted" }, ({ payload }) => {
-				const msg = payload.msg;
-				if (!messageIdsRef.current.has(msg.id) && msg.sender_id !== user.id) {
-					messageIdsRef.current.add(msg.id);
-					setMessages((prev) => [...prev, msg]);
-				}
-			})
-			.on("broadcast", { event: "msg_deleted" }, ({ payload }) => {
-				messageIdsRef.current.delete(payload.msg_id);
-				setMessages((prev) => prev.filter((tx) => tx.id !== payload.msg_id));
-			})
-			.on("broadcast", { event: "msg_edited" }, ({ payload }) => {
-				setMessages((prev) =>
-					prev.map((tx) => (tx.id === payload.msg_id ? { ...tx, content: payload.msg_content } : tx))
-				);
-			})
-			.on("broadcast", { event: "reaction_updated" }, ({ payload }) => {
-				setMessages((prev) =>
-					prev.map((msg) => {
-						if (msg.id !== payload.messageId) return msg;
-						const currentReactions = { ...msg.reactions };
-						const users = new Set(currentReactions[payload.emoji] || []);
+		// channel
+		// 	.on("broadcast", { event: "msg_inserted" }, ({ payload }) => {
+		// 		const msg = payload.msg;
+		// 		if (!messageIdsRef.current.has(msg.id) && msg.sender_id !== user.id) {
+		// 			messageIdsRef.current.add(msg.id);
+		// 			setMessages((prev) => [...prev, msg]);
+		// 		}
+		// 	})
+		// 	.on("broadcast", { event: "msg_deleted" }, ({ payload }) => {
+		// 		messageIdsRef.current.delete(payload.msg_id);
+		// 		setMessages((prev) => prev.filter((tx) => tx.id !== payload.msg_id));
+		// 	})
+		// 	.on("broadcast", { event: "msg_edited" }, ({ payload }) => {
+		// 		setMessages((prev) =>
+		// 			prev.map((tx) => (tx.id === payload.msg_id ? { ...tx, content: payload.msg_content } : tx))
+		// 		);
+		// 	})
+		// 	.on("broadcast", { event: "reaction_updated" }, ({ payload }) => {
+		// 		setMessages((prev) =>
+		// 			prev.map((msg) => {
+		// 				if (msg.id !== payload.messageId) return msg;
+		// 				const currentReactions = { ...msg.reactions };
+		// 				const users = new Set(currentReactions[payload.emoji] || []);
 
-						if (payload.type === "added") users.add(payload.userId);
-						else if (payload.type === "removed") users.delete(payload.userId);
+		// 				if (payload.type === "added") users.add(payload.userId);
+		// 				else if (payload.type === "removed") users.delete(payload.userId);
 
-						currentReactions[payload.emoji] = Array.from(users);
-						return { ...msg, reactions: currentReactions };
-					})
-				);
-			});
+		// 				currentReactions[payload.emoji] = Array.from(users);
+		// 				return { ...msg, reactions: currentReactions };
+		// 			})
+		// 		);
+		// 	});
 
 		// Subscribe to the channel
 		channel.subscribe((status) => {
