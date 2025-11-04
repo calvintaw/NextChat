@@ -95,7 +95,7 @@ export function MessageDropdownMenu({ msg, retrySendingMessage }: Props) {
 						`
 							hidden
 							group-hover:!flex
-							absolute bg-background dark:bg-surface z-40 -top-6.5 max-sm:-top-7.5 max-sm:right-5 right-30 rounded-lg border border-border/30 gap-1 items-center p-[0.2rem]
+							absolute bg-background dark:bg-surface z-40 -top-6.5 max-sm:right-5 right-30 rounded-lg border border-border/30 gap-1 items-center p-[0.2rem]
 							`,
 						open ? "!flex" : ""
 					)}
