@@ -79,106 +79,81 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	useEffect(() => {
 		if (isBlocked || (isSystem && isBlocked)) return;
 
-		// 1. Create a channel dedicated to the room ID
 		const channel = supabase.channel(`room:${roomId}`);
 		console.log("Subscribing to channel:", `room:${roomId}`);
 
-		// A. Postgres Changes (For Message/Edit/Delete)
+		// A. Postgres Changes
+		channel.on(
+			"postgres_changes",
+			{
+				event: "*",
+				schema: "public",
+				table: "messages",
+				filter: `room_id=eq.${roomId}`,
+			},
+			({ eventType, new: newMsg, old }) => {
+				if (eventType === "DELETE") {
+					messageIdsRef.current.delete(old.id);
+					setMessages((prev) => prev.filter((tx) => tx.id !== old.id));
+				} else if (eventType === "UPDATE") {
+					setMessages((prev) =>
+						prev.map((m) =>
+							m.id === newMsg.id ? { ...m, ...newMsg, reactions: JSON.parse(JSON.stringify(newMsg.reactions)) } : m
+						)
+					);
+				} else if (eventType === "INSERT") {
+					if (!messageIdsRef.current.has(newMsg.id) && newMsg.sender_id !== user.id) {
+						messageIdsRef.current.add(newMsg.id);
+						setMessages((prev) => [...prev, newMsg]);
+					}
+				}
+			}
+		);
+
+		// B. Broadcast Events
 		channel
-			.on(
-				"postgres_changes",
-				{
-					event: "*", // Listen for INSERT, UPDATE, DELETE
-					schema: "public",
-					table: "messages",
-					filter: `room_id=eq.${roomId}`,
-				},
-				async (payload) => {
-					// Ensure we don't process messages sent by the current user (they are already added locally)
-					if (payload.new && (payload.new as MessageType).sender_id === user.id) return;
-
-					const dbMsg = payload.new as any; // Supabase returns snake_case
-					const userInfo = await getUserInfo(dbMsg.sender_id);
-
-					const msg: MessageType = {
-						...dbMsg,
-						createdAt: dbMsg.created_at, // map snake_case to camelCase
-						sender_image: dbMsg.sender_image ?? userInfo.image,
-						sender_display_name: dbMsg.sender_display_name ?? userInfo.display_name,
-					};
-
-					if (payload.eventType === "INSERT") {
-						// Filter out duplicates (though Supabase should handle this well)
-						if (messageIdsRef.current.has(msg.id)) return;
-						messageIdsRef.current.add(msg.id);
-						setMessages((prev) => [...prev, msg]);
-					} else if (payload.eventType === "DELETE") {
-						const deletedId = payload.old.id;
-						messageIdsRef.current.delete(deletedId);
-						setMessages((prev) => prev.filter((tx) => tx.id !== deletedId));
-					} else if (payload.eventType === "UPDATE") {
-						const dbMsg = payload.new as any;
-						setMessages((prev) => {
-							const index = prev.findIndex((m) => m.id === dbMsg.id);
-							if (index === -1) return prev;
-
-							const updated = [...prev];
-							const existingReactions = updated[index].reactions || {};
-
-							// merge reactions from db, overwrite with new counts
-							updated[index] = {
-								...updated[index],
-								...dbMsg,
-								reactions: {
-									...existingReactions,
-									...dbMsg.reactions,
-								},
-							};
-							return updated;
-						});
-					}
+			.on("broadcast", { event: "msg_inserted" }, ({ payload }) => {
+				const msg = payload.msg;
+				if (!messageIdsRef.current.has(msg.id) && msg.sender_id !== user.id) {
+					messageIdsRef.current.add(msg.id);
+					setMessages((prev) => [...prev, msg]);
 				}
-			)
-			// B. Broadcast Events (For Typing Indicators and Reactions/Non-DB-updates)
-			.on(
-				"broadcast",
-				{ event: "typing" }, // Matches where you'd emit it in ChatInputBox
-				({ payload }) => {
-					if (payload.status === "started") {
-						setActivePersons((prev) => {
-							if (!prev.includes(payload.displayName)) {
-								return [...prev, payload.displayName];
-							}
-							return prev;
-						});
-					} else if (payload.status === "stopped") {
-						setActivePersons((prev) => prev.filter((name) => name !== payload.displayName));
-					}
-				}
-			)
-			// Reactions are better handled by the UPDATE Postgres Change,
-			// but if you prefer a separate broadcast for performance or custom logic:
-			/*
-			.on(
-				'broadcast',
-				{ event: 'reaction_toggle' }, 
-				({ payload }) => {
-					// Logic to toggle reaction locally (toggleReaction function logic)
-					// Note: If reactions update the DB, stick to the UPDATE listener above.
-				}
-			)
-			*/
-			.subscribe((status) => {
-				if (status === "SUBSCRIBED") {
-					console.log(`Successfully subscribed to room ${roomId}`);
-				}
+			})
+			.on("broadcast", { event: "msg_deleted" }, ({ payload }) => {
+				messageIdsRef.current.delete(payload.msg_id);
+				setMessages((prev) => prev.filter((tx) => tx.id !== payload.msg_id));
+			})
+			.on("broadcast", { event: "msg_edited" }, ({ payload }) => {
+				setMessages((prev) =>
+					prev.map((tx) => (tx.id === payload.msg_id ? { ...tx, content: payload.msg_content } : tx))
+				);
+			})
+			.on("broadcast", { event: "reaction_updated" }, ({ payload }) => {
+				setMessages((prev) =>
+					prev.map((msg) => {
+						if (msg.id !== payload.messageId) return msg;
+						const currentReactions = { ...msg.reactions };
+						const users = new Set(currentReactions[payload.emoji] || []);
+
+						if (payload.type === "added") users.add(payload.userId);
+						else if (payload.type === "removed") users.delete(payload.userId);
+
+						currentReactions[payload.emoji] = Array.from(users);
+						return { ...msg, reactions: currentReactions };
+					})
+				);
 			});
 
+		// Subscribe to the channel
+		channel.subscribe((status) => {
+			if (status === "SUBSCRIBED") console.log(`Subscribed to room ${roomId}`);
+		});
+
+		// Cleanup
 		return () => {
-			// Cleanup: Remove the channel on component unmount
 			supabase.removeChannel(channel);
 		};
-	}, [roomId, isBlocked, isSystem, user.id]); // Added user.id to dependencies
+	}, [roomId, isBlocked, isSystem, user.id]);
 
 	// --- 2. Other Core Hooks (Mostly Unchanged) ---
 
@@ -279,7 +254,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		// local update (Optimistic UI update is still good practice)
 		setMessages((prev) => prev.filter((tx) => tx.id != id));
 
-		const result = await deleteMsg(id, type, content);
+		const result = await deleteMsg(id, roomId, type, content);
 		if (!result.success) {
 			setMessages(originalMsg);
 			toast({ title: "Error!", mode: "negative", subtitle: result.message });
@@ -463,7 +438,7 @@ export async function getUserInfo(userId: string) {
 	const result = await getUserProfileForMsg(userId);
 
 	if (!result.success) {
-		console.error("Failed to fetch user info:", error);
+		console.error("Failed to fetch user info:");
 		return { id: userId, display_name: "Unknown", image: null };
 	}
 
