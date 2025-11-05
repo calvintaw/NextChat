@@ -38,30 +38,13 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	const observerRef = useRef<HTMLDivElement>(null);
 	const scrollHeightBefore = useRef(0);
 	const offsetRef = useRef(0);
-	const limit = 15;
+	const limit = 25;
 	const lastBatchLength = useRef(limit);
 	const oldestMsgCreatedAt = useRef<string>("");
 	const [hasMore, setHasMore] = useState(true);
 	const [isLoadingOldMsg, setIsLoadingOldMsg] = useState(false);
 	const messageIdsRef = useRef<Set<string>>(new Set());
-
-	useEffect(() => {
-		const checkAuth = async () => {
-			const { data, error } = await supabase.auth.getSession();
-			if (error) {
-				console.error("Auth error:", error);
-				return;
-			}
-
-			if (!data.session) {
-				console.warn("⚠️ No active Supabase session. User not authenticated.");
-			} else {
-				console.log("✅ Authenticated as:", data.session.user.email);
-			}
-		};
-
-		checkAuth();
-	}, []);
+	const toast = useToast();
 
 	//checks duplicates (due to netwrok errors, etc)
 	const filterNewMessages = (msgs: MessageType[]) => {
@@ -80,7 +63,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		if (isBlocked || (isSystem && isBlocked)) return;
 
 		const channel = supabase.channel(`room:${roomId}`);
-		console.log("Subscribing to channel:", `room:${roomId}`);
+		// console.log("Subscribing to channel:", `room:${roomId}`);
 
 		// A. Postgres Changes
 		channel.on(
@@ -178,8 +161,6 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		};
 	}, [roomId, isBlocked, isSystem, user.id]);
 
-	// --- 2. Other Core Hooks (Mostly Unchanged) ---
-
 	// initial setup for blocking/system status
 	useEffect(() => {
 		// ... (unchanged)
@@ -201,8 +182,6 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		}
 	}, [type, recipient, user.id]);
 
-	const LIMIT = 15;
-
 	// fetching msgs at startup and add listeners for typing event (ONLY FETCHING REMAINS)
 	useEffect(() => {
 		if (isBlocked || (isSystem && isBlocked)) {
@@ -213,7 +192,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 		const fetchMessages = async () => {
 			try {
-				const recent = await getRecentMessages(roomId, { limit: LIMIT });
+				const recent = await getRecentMessages(roomId, { limit });
 				if (recent.length !== 0) {
 					offsetRef.current = recent.length;
 					lastBatchLength.current = recent.length;
@@ -225,49 +204,14 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 			} catch (err) {
 				console.error("Failed to fetch recent messages:", err);
 				// Added toast to show error to user
-				// toast({ title: "Error!", mode: "negative", subtitle: "Failed to load recent messages. Check connection." });
+				toast({ title: "Error!", mode: "negative", subtitle: "Failed to load messages. Please refresh the page." });
 			} finally {
 				setInitialLoading(false); // Ensure loading stops even on failure
 			}
 		};
 
 		fetchMessages();
-
-		// NOTE: Socket.IO typing listeners are removed here as they are replaced by Supabase Broadcasts in the main realtime useEffect.
-		// If you keep them, you'll have duplicate logic.
-		return () => {
-			// Clean up of original Socket.IO listeners (now removed)
-		};
 	}, [isBlocked, isSystem, roomId]);
-
-	// NOTE: The original `useEffect` that contained all the `socket.on(...)` handlers
-	// is now completely replaced by the first useEffect (Supabase Channel/Postgres Changes).
-	// The original effect:
-	/*
-	useEffect(() => {
-		if (isBlocked || (isSystem && isBlocked)) return;
-		// ... socket.on("message", handleIncomingMsg);
-		// ... socket.on("message deleted", handleMessageDeleted);
-		// ... socket.on("message edited", handleMessageEdited);
-		// ... socket.on("add_reaction_msg", toggleReaction);
-		// ... socket.on("remove_reaction_msg", toggleReaction);
-		return () => { // ... socket.off cleanup
-		};
-	}, [roomId, isBlocked, isSystem]);
-	*/
-
-	// NOTE: The original `useEffect` that handled join/leave using socket.emit is replaced
-	// by the Supabase channel subscription and removal in the first realtime useEffect.
-	/*
-	useEffect(() => {
-		socket.emit("join", roomId);
-		return () => {
-			socket.emit("leave", roomId);
-		};
-	}, [roomId]);
-	*/
-
-	const toast = useToast();
 
 	const deleteMessage = async (id: string, type: MessageContentType = "text", content: string) => {
 		if (isBlocked || (isSystem && isBlocked)) return;
@@ -349,14 +293,6 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 			isFirstRender.current = false;
 		}
 	}, [initialLoading, messages]);
-
-	// cache msg in client browser
-	useEffect(() => {
-		if (messages.length > 0) {
-			const messagesToSave = messages.slice(-50); // last 50 messages
-			setCache(getRoomMessagesKey(roomId), messagesToSave).catch((err) => console.error("IDB save error:", err));
-		}
-	}, [messages, roomId]);
 
 	return (
 		<>
@@ -451,13 +387,12 @@ type CachedUser = {
 };
 
 const USER_CACHE_KEY = (userId: string) => `user_${userId}`;
-
 export async function getUserInfo(userId: string) {
-	// 1️⃣ Check cache first
+	// Check cache first
 	const cached: CachedUser | undefined = await getCache(USER_CACHE_KEY(userId));
 	if (cached) return cached;
 
-	// 2️⃣ If not cached, fetch from Supabase
+	// If not cached, fetch from Supabase
 	const result = await getUserProfileForMsg(userId);
 
 	if (!result.success) {
@@ -471,7 +406,7 @@ export async function getUserInfo(userId: string) {
 		image: result.image ?? null,
 	};
 
-	// 3️⃣ Store in cache for future use
+	// Store in cache for future use
 	await setCache(USER_CACHE_KEY(userId), userInfo);
 
 	return userInfo;

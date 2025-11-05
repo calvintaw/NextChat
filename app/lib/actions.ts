@@ -142,7 +142,8 @@ export async function deleteMsg(
 }
 
 export async function clearMsgHistory(
-	room_id: string
+	room_id: string,
+	path: string
 ): Promise<{ success: true; message: string } | { success: false; message: string }> {
 	try {
 		console.log("history clearning process starting ...");
@@ -166,6 +167,7 @@ export async function clearMsgHistory(
 		}
 
 		console.log("history clearning process [all pic deleted] ...");
+		revalidatePath(path);
 
 		return { success: true, message: "Message deleted successfully." };
 	} catch (error) {
@@ -256,6 +258,7 @@ type LocalMessageType = MessageType & {
 import { OpenAI } from "openai";
 import { emoji } from "zod/v4";
 import { id } from "zod/v4/locales";
+import { revalidatePath } from "next/cache";
 const client = new OpenAI({
 	baseURL: "https://router.huggingface.co/v1",
 	apiKey: process.env.HF_API_KEY,

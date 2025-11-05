@@ -78,12 +78,13 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 				</div>
 				<div className="flex items-center gap-1 text-sm font-extralight font-chunk">
 					<Avatar
-						size="size-4"
+						size="size-5"
+						fontSize="text-xs"
 						id={msg.replyTo}
 						src={reply_img_url}
 						statusIndicator={false}
 						displayName={reply_displayName}
-						parentClassName="ml-1"
+						parentClassName="ml-1 text-xs relative top-0.25"
 					/>
 					<Link className="no-underline" title={`Go to ${reply_displayName}'s Profile`} href={`/users/${msg.replyTo}`}>
 						<span className="text-muted">@{reply_displayName}</span>
@@ -121,7 +122,6 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 		setMessages((prev: MessageType[]) =>
 			prev.map((prevMsg) => (prevMsg.id === msg.id ? { ...prevMsg, synced: "pending" } : prevMsg))
 		);
-
 		// frequent changing of react state is hurting performance I think
 		// TODO: maybe find a way to boost performance
 		const result = await insertMessageInDB({ room_id: roomId, ...msg });

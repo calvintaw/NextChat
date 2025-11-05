@@ -20,7 +20,7 @@ import { useChatProvider } from "../ChatBoxWrapper";
 import { GrHistory } from "react-icons/gr";
 import { IconWithSVG } from "../../general/Buttons";
 import { ServerList } from "./ChatHeaderServerList";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export function DirectMessageCard({
 	roomId,
@@ -39,7 +39,7 @@ export function DirectMessageCard({
 	const { setPath } = usePathProvider();
 	const { isSystem } = useChatProvider();
 	const toast = useToast();
-	const router = useRouter()
+	const pathname = usePathname();
 
 	useEffect(() => {
 		setPath(`@${user.username}`);
@@ -83,7 +83,7 @@ export function DirectMessageCard({
 				offset={0}
 			/>
 
-			<div className="flex items-center justify-between mb-4 sticky border top-0 z-20 bg-contrast border-b border-contrast px-4 py-2 border-t-0 border-l-0 border-r-0">
+			<div className="flex items-center justify-between mb-4 sticky border top-0 z-20 bg-contrast border-b border-contrast px-4 py-1.5 border-t-0 border-l-0 border-r-0">
 				<div className="flex items-center gap-1.5">
 					<Avatar
 						id={user.id}
@@ -99,8 +99,7 @@ export function DirectMessageCard({
 				<div className="flex gap-1.5">
 					<IconWithSVG
 						onClick={() => {
-							clearMsgHistory(roomId);
-							router.refresh()
+							clearMsgHistory(roomId, pathname);
 						}}
 						className="!size-6.5"
 						data-tooltip-id="header-icons-tooltip"
@@ -184,8 +183,6 @@ export function DirectMessageCard({
 						<p className="text-base text-primary">
 							Hi! I can answer your questions using DeepSeek — now powered via Hugging Face
 						</p>
-
-						
 					</>
 				)}
 				{roomId.startsWith("system-room") && isBlocked && isSystem && (
