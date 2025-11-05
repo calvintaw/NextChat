@@ -3,6 +3,8 @@
 
 A full-stack Discord-inspired chat app built with [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com/), [React](https://react.dev/), [postgres.js](https://github.com/porsager/postgres), and [Supabase](https://supabase.com/).
 
+⚠️ **Note:** Some features may not work in realtime and may require refreshing the page.  
+(The backend socket server is on a free tier.)
 
 ## Table of Contents
 
