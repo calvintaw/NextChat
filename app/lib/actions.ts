@@ -98,6 +98,7 @@ export async function getServersInCommon(currentUserId: string, targetUserId: st
 
 export async function deleteMsg(
 	id: string,
+	roomId: string,
 	type: MessageContentType,
 	content: string
 ): Promise<{ success: true; message: string } | { success: false; message: string }> {
@@ -127,6 +128,12 @@ export async function deleteMsg(
 			}
 		}
 
+		// await supabase.channel(`room:${roomId}`).send({
+		// 	type: "broadcast",
+		// 	event: "msg_deleted",
+		// 	payload: { msg_id: id },
+		// });
+
 		return { success: true, message: "Message deleted successfully." };
 	} catch (error) {
 		console.error("Error deleting message:", error);
@@ -135,7 +142,8 @@ export async function deleteMsg(
 }
 
 export async function clearMsgHistory(
-	room_id: string
+	room_id: string,
+	path: string
 ): Promise<{ success: true; message: string } | { success: false; message: string }> {
 	try {
 		console.log("history clearning process starting ...");
@@ -159,6 +167,7 @@ export async function clearMsgHistory(
 		}
 
 		console.log("history clearning process [all pic deleted] ...");
+		revalidatePath(path);
 
 		return { success: true, message: "Message deleted successfully." };
 	} catch (error) {
@@ -228,7 +237,7 @@ export async function getRecentMessages(room_id: string, options: GetMessagesOpt
       m.sender_id, 
       users.display_name AS "sender_display_name", 
       m.content, 
-      m.created_at AS "createdAt",
+      m.created_at as "createdAt",
       m.type,
       m.edited,
       m.reactions,
@@ -246,6 +255,15 @@ type LocalMessageType = MessageType & {
 	room_id: string;
 };
 
+import { OpenAI } from "openai";
+import { emoji } from "zod/v4";
+import { id } from "zod/v4/locales";
+import { revalidatePath } from "next/cache";
+const client = new OpenAI({
+	baseURL: "https://router.huggingface.co/v1",
+	apiKey: process.env.HF_API_KEY,
+});
+
 export async function insertMessageInDB(msg: LocalMessageType): Promise<{ success: boolean; message?: string }> {
 	try {
 		//TODO: make socket better
@@ -255,6 +273,39 @@ export async function insertMessageInDB(msg: LocalMessageType): Promise<{ succes
 					VALUES (${msg.id}, ${msg.room_id}, ${msg.sender_id}, ${msg.content}, ${msg.type}, ${msg.replyTo})
 				`;
 		});
+
+		if (msg.room_id.startsWith("system-room")) {
+			const response = await client.chat.completions.create({
+				model: "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B:nscale",
+				messages: [
+					{
+						role: "system",
+						content:
+							"You are a helpful assistant. Answer the question in 1–2 short sentences. Do not include lengthy reasoning.",
+					},
+					{ role: "user", content: msg.content },
+				],
+				temperature: 0.2,
+			});
+
+			console.log("AI Response: ", response.choices[0].message);
+			const answer =
+				response.choices[0].message.content?.trimStart().replace(/\r?\n|\r/g, " ") ??
+				"Sorry, I couldn't generate an answer.";
+
+			// Insert AI reply into DB
+			await sql`
+				INSERT INTO messages (room_id, sender_id, content, type)
+				VALUES (${msg.room_id}, ${SYSTEM_USER.id}, ${answer}, 'text')
+				RETURNING id, created_at
+			`;
+		}
+
+		// await supabase.channel(`room:${msg.room_id}`).send({
+		// 	type: "broadcast",
+		// 	event: "msg_inserted",
+		// 	payload: { msg },
+		// });
 
 		console.log("Sent:", { name: msg.sender_display_name, msg: msg.content });
 		return { success: true };
@@ -1157,9 +1208,11 @@ export async function mockFetchNews() {
 
 export async function editMsg({
 	id,
+	roomId,
 	content,
 }: {
 	id: string;
+	roomId: string;
 	content: string;
 }): Promise<{ success: true; message: string } | { success: false; error: any; message: string }> {
 	return withCurrentUser(async (user: User) => {
@@ -1171,6 +1224,13 @@ export async function editMsg({
 				WHERE id = ${id} AND sender_id = ${user.id}
 			`;
 			});
+
+			// await supabase.channel(`room:${roomId}`).send({
+			// 	type: "broadcast",
+			// 	event: "msg_edited",
+			// 	payload: { msg_id: id, msg_content: content },
+			// });
+
 			return { success: true, message: "Message edited successfully." };
 		} catch (error) {
 			console.log("error in edit msg: ", error);
@@ -1189,71 +1249,87 @@ export async function addReactionToMSG({
 	userId: string;
 	roomId: string;
 	emoji: string;
-}): Promise<{ success: true; message: string } | { success: false; error: any; message: string }> {
+}) {
 	try {
 		await sql.begin(async (tx) => {
 			await tx`
-				UPDATE messages
-				SET reactions = jsonb_set(
-						reactions,
-						ARRAY[${emoji}],
-						(
-								SELECT to_jsonb(array_agg(DISTINCT elem))
-								FROM (
-										SELECT jsonb_array_elements_text(COALESCE(reactions->${emoji}, '[]'::jsonb)) AS elem
-										UNION ALL
-										SELECT ${userId}
-								) 
-						)
-				)
-				WHERE id = ${id};
-			`;
+        UPDATE messages
+        SET reactions = jsonb_set(
+            reactions || '{}'::jsonb,
+            ARRAY[${emoji}],
+            (
+              SELECT to_jsonb(array_agg(DISTINCT elem))
+              FROM (
+                SELECT jsonb_array_elements_text(COALESCE(reactions->${emoji}, '[]'::jsonb)) AS elem
+                UNION ALL
+                SELECT ${userId}
+              ) sub
+            ),
+            true
+          ),
+          reaction_updated_at = now()
+        WHERE id = ${id};
+      `;
 		});
 
-		return { success: true, message: "Reaction added successfully." };
-	} catch (error) {
-		console.log("error in add reactiont to msg: ", error);
+		// Broadcast outside the transaction
+		// await supabase.channel(`room:${roomId}`).send({
+		// 	type: "broadcast",
+		// 	event: "reaction_updated",
+		// 	payload: { messageId: id, emoji, userId, type: "added" },
+		// });
 
-		return { success: false, message: "Failed to add reaction. Please try again.", error };
+		return { success: true, message: "Reaction added and broadcasted." };
+	} catch (error) {
+		console.log("error in add reaction to msg: ", error);
+		return { success: false, message: "Failed to add reaction.", error };
 	}
 }
 
 export async function removeReactionFromMSG({
 	id,
-	userId,
 	roomId,
+	userId,
 	emoji,
 }: {
 	id: string;
-	userId: string;
 	roomId: string;
+	userId: string;
 	emoji: string;
-}): Promise<{ success: true; message: string } | { success: false; error: any; message: string }> {
+}) {
 	try {
 		await sql.begin(async (tx) => {
 			await tx`
-UPDATE messages
-SET reactions = jsonb_set(
-    reactions,
-    ARRAY[${emoji}],
-    COALESCE(
-        (
-            SELECT to_jsonb(array_agg(elems))
-            FROM jsonb_array_elements_text(COALESCE(reactions->${emoji}, '[]'::jsonb)) elems
-            WHERE elems <> ${userId}
-        ),
-        '[]'::jsonb
-    )
-)
-WHERE id = ${id};
-
-			`;
+        UPDATE messages
+        SET reactions = jsonb_set(
+            reactions || '{}'::jsonb,
+            ARRAY[${emoji}],
+            COALESCE(
+              (
+                SELECT to_jsonb(array_agg(elem))
+                FROM jsonb_array_elements_text(COALESCE(reactions->${emoji}, '[]'::jsonb)) elem
+                WHERE elem <> ${userId}
+              ),
+              '[]'::jsonb
+            ),
+            true
+          ),
+          reaction_updated_at = now()
+        WHERE id = ${id};
+      `;
 		});
-		return { success: true, message: "Reaction removed successfully." };
+
+		// Broadcast outside the transaction
+		// await supabase.channel(`room:${roomId}`).send({
+		// 	type: "broadcast",
+		// 	event: "reaction_updated",
+		// 	payload: { messageId: id, emoji, userId, type: "removed" },
+		// });
+
+		return { success: true, message: "Reaction removed and broadcasted." };
 	} catch (error) {
 		console.log("error in remove reaction msg: ", error);
-
-		return { success: false, message: "Failed to remove reaction. Please try again.", error };
+		return { success: false, message: "Failed to remove reaction.", error };
 	}
 }
 
@@ -1265,6 +1341,16 @@ export async function getUsername(id: string) {
 		return { success: false };
 	}
 	return { success: true, username: result[0].username };
+}
+
+export async function getUserProfileForMsg(id: string) {
+	const result = await sql<User[]>`
+		SELECT display_name as "displayName", image from users where id = ${id} LIMIT 1
+	`;
+	if (result.length === 0) {
+		return { success: false };
+	}
+	return { success: true, displayName: result[0].displayName, image: result[0].image };
 }
 
 export async function getUserIdByUsername(username: string) {

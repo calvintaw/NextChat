@@ -10,6 +10,8 @@ import MessageCard from "./MessageCard";
 import { useChatProvider } from "../ChatBoxWrapper";
 import { HiExclamationCircle } from "react-icons/hi";
 import clsx from "clsx";
+import MessageSkeleton from "./MsgCardSkeleton";
+import { HiOutlineChatBubbleLeftRight } from "react-icons/hi2";
 
 dayjs.extend(isToday);
 dayjs.extend(isYesterday);
@@ -19,7 +21,9 @@ const ChatMessages = ({ messages }: { messages: MessageType[] }) => {
 	const { isBlocked, isSystem } = useChatProvider();
 
 	return (
-		<div className={clsx("flex-1 flex flex-col relative")}>
+		<div
+			className={clsx("flex-1 flex flex-col relative", !isBlocked && messages.length === 0 && "pointer-events-none")}
+		>
 			{isBlocked && (
 				<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
 					<div className="bg-accent text-text px-4 py-2 rounded-lg flex items-center gap-2 max-w-[90vw] mx-3">
@@ -38,23 +42,37 @@ const ChatMessages = ({ messages }: { messages: MessageType[] }) => {
 				</div>
 			)}
 
-			{!isBlocked &&
-				messages.map((msg, i) => {
-					const prevMsg = i - 1 >= 0 ? messages[i - 1] : null;
-					const isFirstGroup =
-						i % 7 === 0 ||
-						(!!prevMsg && prevMsg.sender_id !== msg.sender_id) ||
-						(!!prevMsg && dayjs(msg.createdAt).diff(dayjs(prevMsg.createdAt), "minute") >= 5);
-					const separateLogic = prevMsg && dayjs(msg.createdAt).diff(dayjs(prevMsg.createdAt), "day") >= 1;
+			{!isBlocked && (
+				<>
+					{messages.length === 0 ? (
+						// <MessageSkeleton count={5} />
+						<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+							<div className="bg-accent/30 text-text px-4 py-2 rounded-lg flex items-center gap-2 max-w-[90vw] mx-3">
+								<HiOutlineChatBubbleLeftRight size={20} />
+								<span>No messages yet — start the conversation!</span>
+							</div>
+						</div>
+					) : (
+						messages.map((msg, i) => {
+							const prevMsg = i > 0 ? messages[i - 1] : null;
+							const isFirstGroup =
+								i === 0 ||
+								prevMsg?.sender_id !== msg.sender_id ||
+								dayjs(msg.createdAt).diff(dayjs(prevMsg.createdAt), "minute") >= 5;
 
-					return (
-						<React.Fragment key={msg.id}>
-							{separateLogic && <MessageSeparator date={msg.createdAt} />}
+							const separateLogic = prevMsg && dayjs(msg.createdAt).diff(dayjs(prevMsg.createdAt), "day") >= 1;
 
-							<MessageCard msg={msg} isFirstGroup={isFirstGroup}></MessageCard>
-						</React.Fragment>
-					);
-				})}
+							return (
+								<React.Fragment key={msg.id}>
+									{separateLogic && <MessageSeparator date={msg.createdAt} />}
+									<MessageCard msg={msg} isFirstGroup={isFirstGroup} />
+								</React.Fragment>
+							);
+						})
+					)}
+				</>
+			)}
+
 			<RefAnchor></RefAnchor>
 		</div>
 	);

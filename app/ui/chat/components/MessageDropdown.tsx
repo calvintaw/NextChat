@@ -63,17 +63,18 @@ export function MessageDropdownMenu({ msg, retrySendingMessage }: Props) {
 			};
 			return newMsg;
 		});
-		
+
 		const result = didChange
 			? await addReactionToMSG({ id: msg.id, roomId, userId: user.id, emoji })
 			: await removeReactionFromMSG({ id: msg.id, roomId, userId: user.id, emoji });
 		if (!result.success) {
 			setMessages(originalMsg);
 			toast({ title: "Error!", mode: "negative", subtitle: result.message });
-		} else {
-			if (didChange) socket.emit("add_reaction_msg", msg.id, user.id, roomId, emoji);
-			if (!didChange) socket.emit("remove_reaction_msg", msg.id, user.id, roomId, emoji);
 		}
+		// else {
+		// 	if (didChange) socket.emit("add_reaction_msg", msg.id, user.id, roomId, emoji);
+		// 	if (!didChange) socket.emit("remove_reaction_msg", msg.id, user.id, roomId, emoji);
+		// }
 	};
 
 	const handleCopy = async (text: string) => {
@@ -94,7 +95,7 @@ export function MessageDropdownMenu({ msg, retrySendingMessage }: Props) {
 						`
 							hidden
 							group-hover:!flex
-							absolute bg-background dark:bg-surface z-40 -top-6.5 max-sm:-top-7.5 max-sm:right-5 right-30 rounded-lg border border-border/30 gap-1 items-center p-[0.2rem]
+							absolute bg-background dark:bg-surface z-40 -top-6.5 max-sm:right-5 right-30 rounded-lg border border-border/30 gap-1 items-center p-[0.2rem]
 							`,
 						open ? "!flex" : ""
 					)}

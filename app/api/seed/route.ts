@@ -52,6 +52,7 @@ async function seedMessages() {
 			created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
 			replyTo TEXT DEFAULT NULL,
 			reactions JSONB DEFAULT '{}',
+			reaction_updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
 			FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE,
 			FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE
 		);

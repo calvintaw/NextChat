@@ -9,10 +9,13 @@ import { Avatar } from "../../general/Avatar";
 import { ServerEditForm } from "./Server_edit_form";
 import { GrHistory } from "react-icons/gr";
 import { IconWithSVG } from "../../general/Buttons";
+import { clearMsgHistory } from "@/app/lib/actions";
+import { usePathname, useRouter } from "next/navigation";
 
-export function ServerCardHeader({ server, user, isBlocked }: { server: Room; user: User; isBlocked: boolean }) {
+export function ServerCardHeader({ server, user }: { server: Room; user: User }) {
 	const [clipboard, setClipboard] = useState("");
 	const [localServer, setLocalServer] = useState(() => server);
+	const pathname = usePathname();
 
 	const handleCopy = (string: string) => {
 		window.navigator.clipboard.writeText(string);
@@ -21,7 +24,7 @@ export function ServerCardHeader({ server, user, isBlocked }: { server: Room; us
 
 	return (
 		<>
-			<div className="flex items-center justify-between mb-4 sticky border top-0 z-20 bg-contrast border-b border-contrast px-4 py-2 border-t-0 border-l-0 border-r-0">
+			<div className="flex items-center justify-between mb-4 sticky border top-0 z-20 bg-contrast border-b border-contrast px-4 py-1.5 border-t-0 border-l-0 border-r-0">
 				<div className="flex items-center gap-1.5">
 					<Avatar
 						id={localServer.id}
@@ -36,6 +39,9 @@ export function ServerCardHeader({ server, user, isBlocked }: { server: Room; us
 
 				<div className="flex gap-1.5">
 					<IconWithSVG
+						onClick={() => {
+							clearMsgHistory(server.id, pathname);
+						}}
 						className="!size-6.5"
 						data-tooltip-id="header-icons-tooltip"
 						data-tooltip-content={"Clear history"}

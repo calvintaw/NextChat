@@ -13,14 +13,14 @@ import { useState, useEffect } from "react";
 import { FaCheck } from "react-icons/fa6";
 import { Tooltip } from "react-tooltip";
 import { Avatar } from "../../general/Avatar";
-import { ServerList } from "../Chatbox";
 import { usePathProvider } from "@/app/lib/PathContext";
 import clsx from "clsx";
 import { useToast } from "@/app/lib/hooks/useToast";
-import { examplePassages } from "@/app/lib/utilities";
 import { useChatProvider } from "../ChatBoxWrapper";
 import { GrHistory } from "react-icons/gr";
 import { IconWithSVG } from "../../general/Buttons";
+import { ServerList } from "./ChatHeaderServerList";
+import { usePathname, useRouter } from "next/navigation";
 
 export function DirectMessageCard({
 	roomId,
@@ -37,8 +37,9 @@ export function DirectMessageCard({
 	const [commonServers, setCommonServers] = useState<Room[]>([]);
 	const [isPending, setIsPending] = useState(true);
 	const { setPath } = usePathProvider();
-	const { isSystem, setChatBotTopic, ChatBotTopic } = useChatProvider();
+	const { isSystem } = useChatProvider();
 	const toast = useToast();
+	const pathname = usePathname();
 
 	useEffect(() => {
 		setPath(`@${user.username}`);
@@ -82,7 +83,7 @@ export function DirectMessageCard({
 				offset={0}
 			/>
 
-			<div className="flex items-center justify-between mb-4 sticky border top-0 z-20 bg-contrast border-b border-contrast px-4 py-2 border-t-0 border-l-0 border-r-0">
+			<div className="flex items-center justify-between mb-4 sticky border top-0 z-20 bg-contrast border-b border-contrast px-4 py-1.5 border-t-0 border-l-0 border-r-0">
 				<div className="flex items-center gap-1.5">
 					<Avatar
 						id={user.id}
@@ -97,6 +98,9 @@ export function DirectMessageCard({
 
 				<div className="flex gap-1.5">
 					<IconWithSVG
+						onClick={() => {
+							clearMsgHistory(roomId, pathname);
+						}}
 						className="!size-6.5"
 						data-tooltip-id="header-icons-tooltip"
 						data-tooltip-content={"Clear history"}
@@ -179,23 +183,6 @@ export function DirectMessageCard({
 						<p className="text-base text-primary">
 							Hi! I can answer your questions using DeepSeek — now powered via Hugging Face
 						</p>
-
-						{/* <div className="flex flex-wrap gap-2 mt-2">
-						{Object.keys(examplePassages).map((topic, idx) => (
-							<button
-								onClick={() => setChatBotTopic(topic)}
-								key={idx}
-								className={clsx(
-									"btn-small  !w-fit !py-0.5  !px-2 btn-secondary border border-transparent",
-									ChatBotTopic === topic
-										? "!bg-accent !text-text border border-contrast pointer-events-none"
-										: "text-muted cursor-pointer"
-								)}
-							>
-								{topic}
-							</button>
-						))}
-					</div> */}
 					</>
 				)}
 				{roomId.startsWith("system-room") && isBlocked && isSystem && (
