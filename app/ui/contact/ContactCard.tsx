@@ -12,7 +12,6 @@ import { IconWithSVG } from "../general/Buttons";
 import { getDMRoom } from "@/app/lib/utilities";
 import { useFriendsProvider } from "@/app/lib/friendsContext";
 import { useToast } from "@/app/lib/hooks/useToast";
-import { useRouter } from "next/navigation";
 import clsx from "clsx";
 
 type MinimalUserType = { id: string; username: string };
@@ -23,26 +22,26 @@ type Props = {
 };
 
 export const ContactPreviewContainer = ({ setContacts, user, contacts }: Props) => {
-	useEffect(() => {
-		function handleStatusChange(userId: string, online: boolean) {
-			setContacts((prev) => {
-				const index = prev.findIndex((chat) => chat.id.includes(userId));
+	// useEffect(() => {
+	// 	function handleStatusChange(userId: string, online: boolean) {
+	// 		setContacts((prev) => {
+	// 			const index = prev.findIndex((person) => person.id === userId);
 
-				if (index === -1) return prev;
-				const newContacts = [...prev];
-				newContacts[index].online = online;
-				return newContacts;
-			});
-		}
+	// 			if (index === -1) return prev;
+	// 			const newContacts = [...prev];
+	// 			newContacts[index].online = online;
+	// 			return newContacts;
+	// 		});
+	// 	}
 
-		socket.on("online", handleStatusChange);
-		socket.on("offline", handleStatusChange);
+	// 	socket.on("online", handleStatusChange);
+	// 	socket.on("offline", handleStatusChange);
 
-		return () => {
-			socket.off("online", handleStatusChange);
-			socket.off("offline", handleStatusChange);
-		};
-	}, []);
+	// 	return () => {
+	// 		socket.off("online", handleStatusChange);
+	// 		socket.off("offline", handleStatusChange);
+	// 	};
+	// }, []);
 
 	const toast = useToast();
 	const [error, setError] = useState("");
@@ -61,7 +60,7 @@ export const ContactPreviewContainer = ({ setContacts, user, contacts }: Props) 
 
 				// local update
 				setContacts((prev) => prev.filter((req) => req.id !== friend.id));
-				toast({ title: "Success!", mode: "positive", subtitle: result.message });
+				toast({ title: "Success!", mode: "positive", subtitle: `Removed @${friend.username} from Contacts` });
 				if (friend.username === "system") {
 					toast({
 						title: "AI ChatBot",
@@ -86,7 +85,7 @@ export const ContactPreviewContainer = ({ setContacts, user, contacts }: Props) 
 		<section className="flex flex-col flex-1">
 			{error && <p className="text-sm text-error my-2">{error}</p>}
 			{contacts.map((contact) => (
-				<ContactPreview
+				<ContactCard
 					isPending={pendingDeletes.has(contact.id)}
 					user={user}
 					handleRemove={handleRemove}
@@ -96,14 +95,16 @@ export const ContactPreviewContainer = ({ setContacts, user, contacts }: Props) 
 			))}
 			{contacts.length <= 0 && (
 				<div className="flex flex-1 items-center justify-center -mt-15">
-					<p className="text-muted">Looks like your friend list is as quiet as space. Time to send some invites! 😆</p>
+					<p className="text-muted max-[700px]:text-center">
+						Looks like your friend list is as quiet as space. Time to send some invites! 😆
+					</p>
 				</div>
 			)}
 		</section>
 	);
 };
 
-export const ContactPreview = ({
+const ContactCard = ({
 	handleRemove,
 	user,
 	contact,

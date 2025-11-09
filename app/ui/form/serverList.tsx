@@ -40,6 +40,8 @@ export const ServerList = ({ user, servers }: { user: User; servers: Room[] }) =
 						parentClassName="w-full flex-1 px-2"
 					/>
 
+					{/* Commented out for future use (maybe) */}
+					{/* 
 					<select
 						name="type"
 						value={filterType}
@@ -61,7 +63,7 @@ export const ServerList = ({ user, servers }: { user: User; servers: Room[] }) =
 						<option value="all">All Servers</option>
 						<option value="public">Public</option>
 						<option value="private">Private</option>
-					</select>
+					</select> */}
 				</form>
 			</div>
 
@@ -77,9 +79,16 @@ export const ServerList = ({ user, servers }: { user: User; servers: Room[] }) =
 			)}
 			{filteredServers.length === 0 && (
 				<div className="flex-1 flex items-center justify-center">
-					<div className="flex flex-col items-center justify-center">
+					<div className="flex flex-col items-center justify-center text-center">
 						<HiServerStack className="text-6xl text-muted mb-4" />
-						<p className="text-muted text-lg font-medium">No servers available.</p>
+						<p className="text-lg font-medium text-muted mb-2">
+							{search.trim() !== ""
+								? `We couldn’t find any servers matching "${search.trim()}".`
+								: "There aren’t any servers here yet."}
+						</p>
+						{search.trim() !== "" && (
+							<p className="text-sm text-muted">Try checking your spelling or searching for something else.</p>
+						)}
 					</div>
 				</div>
 			)}
@@ -106,7 +115,7 @@ const Card = ({ server, user }: any) => {
 	}, [src]);
 	return (
 		<div
-			className="bg-background p-0 rounded-xl overflow-hidden min-w-63 shadow-md flex flex-col border-2 border-border group hover:border-foreground/40 not-dark:hover:border-foreground/80 cursor-pointer 
+			className="bg-background p-0 rounded-xl overflow-hidden min-w-70 shadow-md flex flex-col border-2 border-border group hover:border-foreground/40 not-dark:hover:border-foreground/80 cursor-pointer 
 							"
 		>
 			{/* Server Banner */}

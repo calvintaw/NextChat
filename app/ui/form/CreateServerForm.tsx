@@ -168,7 +168,7 @@ export default function CreateServerFormDialog({ className, user }: { className:
 				<Dialog.Content
 					className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-119  max-h-[95vh] 
 				bg-surface text-text rounded-2xl px-5 py-4 pt-7.5 shadow-lg shadow-black/95 not-dark:shadow-black/25
-				animate-in fade-in-0 zoom-in-95 z-[100] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+				animate-in fade-in-0 zoom-in-95 z-[12000] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
 				>
 					<div className="!absolute top-3 right-3 z-[100] flex gap-2">
 						<IconWithSVG

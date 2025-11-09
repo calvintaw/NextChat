@@ -164,9 +164,9 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, isBlocked }: C
 	}, [replyToMsg]);
 
 	return (
-		<div className={clsx((isBlocked || (isSystem && isBlocked)) && "cursor-not-allowed")}>
+		<div className={clsx("relative", (isBlocked || (isSystem && isBlocked)) && "cursor-not-allowed")}>
 			<div
-				className={clsx("p-4 relative mb-3 ", (isBlocked || (isSystem && isBlocked)) && "pointer-events-none")}
+				className={clsx("p-4  mb-3 ", (isBlocked || (isSystem && isBlocked)) && "pointer-events-none")}
 				data-tooltip-id={"typing-indicator"}
 			>
 				<TypingIndicator displayName={activePersons} />

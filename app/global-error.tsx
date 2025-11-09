@@ -26,7 +26,7 @@ const roboto = localFont({
 	display: "swap",
 });
 
-export default async function GlobalNotFound() {
+export default function GlobalNotFound() {
 	const mainMessage = "Oops! Something went wrong.";
 	const digest = "Try refreshing the page or head back home while we fix this.";
 	const [darkMode] = useDarkMode();

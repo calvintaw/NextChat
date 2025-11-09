@@ -12,6 +12,7 @@ import "@/app/lib/passwordRules.js";
 import Toaster from "../ui/Toast";
 import PathProvider from "../lib/PathContext";
 import ProgressBar from "@/app/ui/ProgressBar";
+import SupabasePresenceWrapper from "../ui/SupabasePresenceWrapper";
 
 const roboto = localFont({
 	src: [
@@ -64,6 +65,7 @@ export default async function RootLayout({
 					<PathBanner />
 					<main className="flex flex-1 min-h-0 min-w-0 w-full h-full overflow-hidden">
 						<FriendsProvider>
+							<SupabasePresenceWrapper />
 							<Sidebar />
 							<div className="flex flex-1 min-h-0 min-w-0 w-full h-full border-t border-contrast overflow-hidden">
 								<Suspense fallback={<Loading className="!w-full !h-full" />}>{children}</Suspense>

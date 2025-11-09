@@ -30,6 +30,11 @@ export default function ProgressBar() {
 			if (target?.closest("#remove-friend-btn-contact-card")) {
 				return;
 			}
+	
+			const path = e.composedPath?.() as HTMLElement[];
+			if (path.some((el) => el instanceof HTMLElement && el.closest("[data-id='no-progress-bar']"))) {
+				return; // skip NProgress
+			}
 
 			const anchor = target?.closest("a");
 

@@ -16,12 +16,15 @@ import { FaUserFriends } from "react-icons/fa";
 import { FaRegNewspaper, FaPlus } from "react-icons/fa6";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import clsx from "clsx";
-import { blockFriendship, deleteDM, getChats, removeFriendshipRequest } from "@/app/lib/actions";
+import { blockFriendship, deleteDM, getChats, getUser, removeFriendshipRequest } from "@/app/lib/actions";
 import { usePathname, useRouter } from "next/navigation";
 import { Route } from "next";
 import { useFriendsProvider } from "@/app/lib/friendsContext";
 import { useToast } from "@/app/lib/hooks/useToast";
 import { useRouterWithProgress } from "@/app/lib/hooks/useRouterWithProgressBar";
+import { supabase } from "@/app/lib/supabase";
+import { getDMRoom } from "@/app/lib/utilities";
+import { status } from "nprogress";
 
 dayjs.extend(isToday);
 dayjs.extend(isYesterday);
@@ -30,26 +33,73 @@ dayjs.extend(weekday);
 export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatType[] }) => {
 	const { friends: localChats, setFriends: setLocalChats } = useFriendsProvider();
 	const [selectedChat, setSelectedChat] = useState<ChatType | null>(null); // store clicked chat
+	const path = usePathname();
 
 	useEffect(() => {
 		setLocalChats(chats);
 	}, [chats]);
 
 	useEffect(() => {
-		socket.emit("join", user.id);
+		const channel = supabase.channel(`chats:${user.id}`);
+		//@ts-ignore
+		const handler = async (payload) => {
+			const data = payload.new;
+			const recipient_id = data.user1_id === user.id ? data.user2_id : data.user1_id;
+			const recipient = await getUser(recipient_id);
+			if (!recipient) return;
 
-		async function refetchContacts() {
-			const newContacts = await getChats(user.id);
-			setLocalChats(newContacts);
-		}
+			if (data.status === "accepted") {
+				const { bio, readme, password, createdAt, ...rest } = recipient;
+				setLocalChats((prev) => [...prev, { ...rest, room_id: getDMRoom(user.id, recipient.id) }]);
+			}
+		};
 
-		socket.on(`refresh-contacts-page`, refetchContacts);
+		// A. Postgres Changes
+		channel
+			.on(
+				"postgres_changes",
+				{
+					event: "UPDATE",
+					schema: "public",
+					table: "friends",
+					filter: `user1_id=eq.${user.id}`,
+				},
+				handler
+			)
+			.on(
+				"postgres_changes",
+				{
+					event: "UPDATE",
+					schema: "public",
+					table: "friends",
+					filter: `user2_id=eq.${user.id}`,
+				},
+				handler
+			)
+			.on(
+				"postgres_changes",
+				{
+					event: "DELETE",
+					schema: "public",
+					table: "room_members",
+					filter: `user_id=eq.${user.id}`,
+				},
+				async (payload) => {
+					const data = payload.old;
+					if (path.includes(data.room_id)) router.push("/");
+					setLocalChats((prev) => prev.filter((chat) => chat.room_id !== data.room_id));
+				}
+			);
+
+		channel.subscribe((status) => {
+			if (status === "SUBSCRIBED") console.log(`Subscribed to chats-${user.username}`);
+		});
 
 		return () => {
-			socket.off(`refresh-contacts-page`, refetchContacts);
-			socket.disconnect();
+			supabase.removeChannel(channel);
 		};
 	}, []);
+
 	const toast = useToast();
 
 	const handleDMdelete = async () => {
@@ -57,7 +107,7 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 
 		const previousChats = [...localChats];
 		// local ui instant updates
-		setLocalChats((prev) => prev.filter((chat) => chat.id !== selectedChat.id));
+		setLocalChats((prev) => prev.filter((chat) => chat.room_id !== selectedChat.room_id));
 
 		try {
 			const result = await deleteDM({ id: selectedChat.id, username: selectedChat.username });
@@ -66,6 +116,9 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 				console.error(result.message);
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
+				if (path.includes("system-room") || path.includes(getDMRoom(selectedChat.id, user.id))) {
+					router.push("/");
+				}
 				toast({
 					title: "Success!",
 					mode: "positive",
@@ -224,6 +277,7 @@ export const ChatPreview = ({
 							e.stopPropagation();
 							selectChat();
 						}}
+						data-id="no-progress-bar"
 						data-tooltip-id="chat-panel-item-tooltip"
 						data-tooltip-content={"More"}
 						className={clsx(

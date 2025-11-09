@@ -5,6 +5,7 @@ import {
 	getFriendRequests,
 	acceptFriendshipRequest,
 	removeFriendshipRequest,
+	getUser,
 } from "@/app/lib/actions";
 import { ContactType } from "@/app/lib/definitions";
 import { socket } from "@/app/lib/socket";
@@ -28,7 +29,7 @@ type friendRequestsType = { sent: User[]; incoming: User[] };
 
 type ContactTabsProps = {
 	user: User;
-	initialContacts: ContactType[];
+	// initialContacts: ContactType[];
 	initialFriendRequests: friendRequestsType;
 };
 
@@ -53,14 +54,14 @@ type AllContactsTabProps = {
 	user: User;
 };
 
-const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTabsProps) => {
+const ContactTabs = ({ user, initialFriendRequests }: ContactTabsProps) => {
 	const toast = useToast();
 
 	const [request, formAction, isPending] = useActionState(
 		async (prevState: { success: boolean; message: string }, formData: FormData) => {
 			const result = await requestFriendship(prevState, formData);
 			if (result.success && result.targetUser) {
-				socket.emit("refresh-contacts-page", user.id, result.targetUser.id);
+				// socket.emit("refresh-contacts-page", user.id, result.targetUser.id);
 				// local update
 				setFriendRequests((prev) => ({
 					incoming: [...prev.incoming],
@@ -81,24 +82,125 @@ const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTa
 	);
 
 	const [friendRequests, setFriendRequests] = useState<friendRequestsType>(initialFriendRequests);
-	const [contacts, setContacts] = useState(initialContacts);
+	// const [contacts, setContacts] = useState(initialContacts);
+
+	const { contacts, setContacts } = useFriendsProvider();
 	const addFriendInputRef = useRef<HTMLInputElement | null>(null);
 	const friendsCount = contacts.length;
 
-	useEffect(() => {
-		socket.emit("join", user.id);
-		async function refrechContactsPage() {
-			const [newContacts, newRequests] = await Promise.all([getContacts(user.id), getFriendRequests(user.id)]);
-			setContacts(newContacts);
-			setFriendRequests(newRequests);
-		}
+	// useEffect(() => {
+	// 	socket.emit("join", user.id);
+	// 	async function refrechContactsPage() {
+	// 		const [newContacts, newRequests] = await Promise.all([getContacts(user.id), getFriendRequests(user.id)]);
+	// 		setContacts(newContacts);
+	// 		setFriendRequests(newRequests);
+	// 	}
 
-		// the code can be refactored to be more efficient, for example, sending the new info via socket instead of fetching from db or fetching from db but only the required ones
-		// TODO task (maybe)
-		socket.on(`refresh-contacts-page`, refrechContactsPage);
+	// 	// the code can be refactored to be more efficient, for example, sending the new info via socket instead of fetching from db or fetching from db but only the required ones
+	// 	// TODO task (maybe)
+	// 	socket.on(`refresh-contacts-page`, refrechContactsPage);
+	// 	return () => {
+	// 		socket.off(`refresh-contacts-page`, refrechContactsPage);
+	// 		socket.disconnect();
+	// 	};
+	// }, []);
+
+	useEffect(() => {
+		const fetchContacts = async () => {
+			const contacts = await getContacts(user.id);
+			setContacts(contacts);
+		};
+
+		fetchContacts();
+	}, []);
+
+	useEffect(() => {
+		const channel = supabase.channel(`friends:${user.id}`);
+		//@ts-ignore
+		const handler = async (payload) => {
+			if (payload.eventType === "INSERT") {
+				const data = payload.new;
+				if (data.status === "pending") {
+					const recipient_id = data.user1_id === user.id ? data.user2_id : data.user1_id;
+
+					// early return bc there's already local UI update if user is the one who sent the request
+					if (data.request_sender_id === user.id) return;
+
+					const recipient = await getUser(recipient_id);
+					if (!recipient) return;
+
+					if (data.request_sender_id === user.id) {
+						setFriendRequests((prev) => ({
+							sent: [...prev.sent, recipient],
+							incoming: prev.incoming,
+						}));
+					} else {
+						setFriendRequests((prev) => ({
+							sent: prev.sent,
+							incoming: [...prev.incoming, recipient],
+						}));
+					}
+				}
+			} else if (payload.eventType === "DELETE") {
+				const data = payload.old;
+				const recipient_id = data.user1_id === user.id ? data.user2_id : data.user1_id;
+
+				setFriendRequests((prev) => ({
+					sent: prev.sent,
+					incoming: prev.incoming.filter((person) => person.id !== recipient_id),
+				}));
+
+				setContacts((prev) => prev.filter((person) => person.id !== recipient_id));
+			} else if (payload.eventType === "UPDATE") {
+				const data = payload.new;
+				const recipient_id = data.user1_id === user.id ? data.user2_id : data.user1_id;
+
+				if (data.status === "accepted") {
+					// early return bc there's already local UI Update if user accepted an incoming friend request
+					if (data.request_sender_id !== user.id) return;
+
+					setFriendRequests((prev) => ({
+						sent: prev.sent.filter((person) => person.id !== recipient_id),
+						incoming: prev.incoming.filter((person) => person.id !== recipient_id),
+					}));
+
+					const recipient = await getUser(recipient_id);
+					if (!recipient) return;
+					const { createdAt, bio, password, readme, ...rest } = recipient;
+					setContacts((prev) => [...prev, { ...rest, online: "loading" }]);
+				}
+			}
+		};
+
+		// A. Postgres Changes
+		channel
+			.on(
+				"postgres_changes",
+				{
+					event: "*",
+					schema: "public",
+					table: "friends",
+					filter: `user1_id=eq.${user.id}`,
+				},
+				handler
+			)
+			.on(
+				"postgres_changes",
+				{
+					event: "*",
+					schema: "public",
+					table: "friends",
+					filter: `user2_id=eq.${user.id}`,
+				},
+				handler
+			);
+
+		channel.subscribe((status) => {
+			if (status === "SUBSCRIBED") console.log(`Subscribed to friends-${user.username}`);
+		});
+
 		return () => {
-			socket.off(`refresh-contacts-page`, refrechContactsPage);
-			socket.disconnect();
+			supabase.removeChannel(channel);
 		};
 	}, []);
 
@@ -208,11 +310,11 @@ const AddContactTab = ({ formAction, addFriendInputRef, request, isPending }: Ad
 				<h1 className="text-[clamp(1rem,4vw,1.5rem)] font-semibold ">Add Friends</h1>
 				<p className="text-base">You can add friends with their username.</p>
 			</div>
-			<form action={formAction}>
+			<form action={formAction} className="group">
 				<InputField
 					disabled={isPending}
 					ref={addFriendInputRef}
-					parentClassName="h-fit py-0.5 px-1.5 sm:py-2 group rounded-lg"
+					parentClassName="h-fit py-0.5 px-1.5 sm:py-2 rounded-lg"
 					name="username"
 					placeholder="You can add friends with their username."
 					place="right"
@@ -263,6 +365,10 @@ import { IoGameController } from "react-icons/io5";
 import { TbMinusVertical } from "react-icons/tb";
 import GameCard from "../games/GameCard";
 import { Route } from "next";
+import { supabase } from "@/app/lib/supabase";
+import { getDMRoom } from "@/app/lib/utilities";
+import SupabasePresence from "../SupabasePresence";
+import { useFriendsProvider } from "@/app/lib/friendsContext";
 
 const RequestTab = ({ user, friendRequests, setFriendRequests, setContacts }: RequestTabProps) => {
 	const [error, setError] = useState("");
@@ -290,7 +396,7 @@ const RequestTab = ({ user, friendRequests, setFriendRequests, setContacts }: Re
 				setError(result.message);
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
-				socket.emit("refresh-contacts-page", user.id, friend.id);
+				// socket.emit("refresh-contacts-page", user.id, friend.id);
 				const { createdAt, ...contact } = friend;
 
 				// local update
@@ -323,7 +429,7 @@ const RequestTab = ({ user, friendRequests, setFriendRequests, setContacts }: Re
 				setError(result.message);
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
-				socket.emit("refresh-contacts-page", user.id, friend.id);
+				// socket.emit("refresh-contacts-page", user.id, friend.id);
 				// local update
 				setFriendRequests((prev) => ({
 					...prev,
@@ -535,7 +641,7 @@ const RequestTab = ({ user, friendRequests, setFriendRequests, setContacts }: Re
 
 				{friendRequests.sent.length === 0 && friendRequests.incoming.length === 0 && (
 					<div className="flex flex-1 items-center justify-center">
-						<p className="text-muted">
+						<p className="text-muted max-[700px]:text-center">
 							There are no pending friend requests. Click "Add Friend" to send friend requests
 						</p>
 					</div>

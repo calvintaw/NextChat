@@ -179,7 +179,6 @@ export async function clearMsgHistory(
 export async function getChats(currentUserId: string): Promise<ChatType[]> {
 	return await sql`
 			SELECT 
-				us.online as "online", 
 				rm.room_id as "room_id", 
 				u.id, 
 				u.username, 
@@ -342,7 +341,14 @@ export async function getSpecificMessage(id: string): Promise<MessageType | null
 
 export async function getServer(id: string): Promise<Room[]> {
 	return await sql`
-    SELECT * FROM rooms WHERE id = ${id} LIMIT 1
+    SELECT 
+      r.*,
+      COUNT(rm.user_id) AS total_members
+    FROM rooms r
+    LEFT JOIN room_members rm ON rm.room_id = r.id
+    WHERE r.id = ${id}
+    GROUP BY r.id
+    LIMIT 1;
   `;
 }
 
@@ -1044,6 +1050,62 @@ export async function removeFriendshipRequest(
 	});
 }
 
+
+export async function acceptFriendshipRequest(
+	targetUser: User,
+	system?: User
+): Promise<{ success: boolean; message: string }> {
+	return withCurrentUser(async (currentUser: User) => {
+		try {
+			console.log("Starting friendship accept...");
+
+			const room_id = system ? getDMRoom(targetUser.id, system.id) : getDMRoom(targetUser.id, currentUser.id);
+			const [user1_id, user2_id] = system
+				? [currentUser.id, system.id].sort((a, b) => a.localeCompare(b))
+				: [currentUser.id, targetUser.id].sort((a, b) => a.localeCompare(b));
+
+			await sql.begin(async (tx) => {
+				await tx`
+        UPDATE friends
+        SET status = 'accepted'
+        WHERE user1_id = ${user1_id} 
+					AND user2_id = ${user2_id}
+      `;
+
+				await tx`
+        INSERT INTO rooms (id, type)
+        VALUES (${room_id}, 'dm')
+        ON CONFLICT DO NOTHING
+      `;
+
+				await tx`
+        INSERT INTO room_members (room_id, user_id)
+        VALUES
+          (${room_id}, ${currentUser.id}),
+          (${room_id}, ${targetUser.id})
+        ON CONFLICT DO NOTHING
+      `;
+			});
+
+			console.log(`Success! Accepted friend request from ${targetUser.username}.`);
+			// socket.emit("refresh-contacts-page", currentUser.id, targetUser.id);
+
+			return {
+				success: true,
+				message: system
+					? "Ai ChatBot has been added as friend."
+					: `Friend request from ${targetUser.username} accepted.`,
+			};
+		} catch (error) {
+			console.error("error in accept friend req", error);
+			return {
+				success: false,
+				message: `Failed to accept friend request from ${targetUser.username}. Please try again.`,
+			};
+		}
+	});
+}
+
 export async function blockFriendship(
 	currentUserId: string,
 	targetUserId: string
@@ -1105,60 +1167,6 @@ export async function unblockFriendship(
 	}
 }
 
-export async function acceptFriendshipRequest(
-	targetUser: User,
-	system?: User
-): Promise<{ success: boolean; message: string }> {
-	return withCurrentUser(async (currentUser: User) => {
-		try {
-			console.log("Starting friendship accept...");
-
-			const room_id = system ? getDMRoom(targetUser.id, system.id) : getDMRoom(targetUser.id, currentUser.id);
-			const [user1_id, user2_id] = system
-				? [currentUser.id, system.id].sort((a, b) => a.localeCompare(b))
-				: [currentUser.id, targetUser.id].sort((a, b) => a.localeCompare(b));
-
-			await sql.begin(async (tx) => {
-				await tx`
-        UPDATE friends
-        SET status = 'accepted'
-        WHERE user1_id = ${user1_id} 
-					AND user2_id = ${user2_id}
-      `;
-
-				await tx`
-        INSERT INTO rooms (id, type)
-        VALUES (${room_id}, 'dm')
-        ON CONFLICT DO NOTHING
-      `;
-
-				await tx`
-        INSERT INTO room_members (room_id, user_id)
-        VALUES
-          (${room_id}, ${currentUser.id}),
-          (${room_id}, ${targetUser.id})
-        ON CONFLICT DO NOTHING
-      `;
-			});
-
-			console.log(`Success! Accepted friend request from ${targetUser.username}.`);
-			// socket.emit("refresh-contacts-page", currentUser.id, targetUser.id);
-
-			return {
-				success: true,
-				message: system
-					? "Ai ChatBot has been added as friend."
-					: `Friend request from ${targetUser.username} accepted.`,
-			};
-		} catch (error) {
-			console.error("error in accept friend req", error);
-			return {
-				success: false,
-				message: `Failed to accept friend request from ${targetUser.username}. Please try again.`,
-			};
-		}
-	});
-}
 
 export async function fetchNews(config?: NewsApiParams): Promise<NewsArticle[]> {
 	if (process.env.NODE_ENV === "production") {
