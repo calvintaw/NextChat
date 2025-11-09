@@ -37,13 +37,13 @@ const NavigationSections = [
 		icon: RiCompassDiscoverFill,
 		description: "Discover",
 	},
-	{
-		name: "Star",
-		href: "https://github.com/calvintaw/discord_clone",
-		icon: FaStar,
-		description: "Star my repo ;)",
-		external: true,
-	},
+	// {
+	// 	name: "Star",
+	// 	href: "https://github.com/calvintaw/discord_clone",
+	// 	icon: FaStar,
+	// 	description: "Star my repo ;)",
+	// 	external: true,
+	// },
 ];
 
 const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: Room[] }) => {

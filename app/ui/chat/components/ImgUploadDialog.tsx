@@ -45,7 +45,7 @@ const ImageUploadDialog = ({
 				<Dialog.Overlay className="fixed inset-0 bg-black/70 z-[999] animate-in fade-in-0" />
 				<Dialog.Content
 					onInteractOutside={(e) => e.preventDefault()}
-					className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[95vw] max-w-md h-fit bg-surface text-text rounded-2xl p-6 shadow-xl z-[1000] flex flex-col animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+					className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[95vw] max-w-md h-fit bg-surface text-text rounded-2xl p-6 shadow-xl z-[12000] flex flex-col animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
 				>
 					<Dialog.Title className="text-xl font-semibold text-foreground">Send an Image</Dialog.Title>
 

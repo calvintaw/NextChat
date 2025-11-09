@@ -341,7 +341,14 @@ export async function getSpecificMessage(id: string): Promise<MessageType | null
 
 export async function getServer(id: string): Promise<Room[]> {
 	return await sql`
-    SELECT * FROM rooms WHERE id = ${id} LIMIT 1
+    SELECT 
+      r.*,
+      COUNT(rm.user_id) AS total_members
+    FROM rooms r
+    LEFT JOIN room_members rm ON rm.room_id = r.id
+    WHERE r.id = ${id}
+    GROUP BY r.id
+    LIMIT 1;
   `;
 }
 

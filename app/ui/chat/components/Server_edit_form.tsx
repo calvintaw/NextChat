@@ -126,7 +126,10 @@ export function ServerEditForm({
 
 				<Dialog.Portal>
 					<Dialog.Overlay className="fixed inset-0 bg-black/50" />
-					<Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface rounded-xl p-6 w-full max-w-md shadow-lg border border-border">
+					<Dialog.Content
+						className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface rounded-xl p-6 w-full max-w-md shadow-lg border border-border
+z-[12000]					"
+					>
 						<Dialog.Title className="text-xl font-semibold text-text mb-4">Edit Server</Dialog.Title>
 
 						{/* Server Edit Form */}
