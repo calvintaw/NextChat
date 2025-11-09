@@ -16,7 +16,7 @@ import { FaUserFriends } from "react-icons/fa";
 import { FaRegNewspaper, FaPlus } from "react-icons/fa6";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import clsx from "clsx";
-import { blockFriendship, deleteDM, getChats, getUser, removeFriendshipRequest } from "@/app/lib/actions";
+import { blockFriendship, deleteDM, getUser, removeFriendshipRequest } from "@/app/lib/actions";
 import { usePathname, useRouter } from "next/navigation";
 import { Route } from "next";
 import { useFriendsProvider } from "@/app/lib/friendsContext";
@@ -50,7 +50,16 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 
 			if (data.status === "accepted") {
 				const { bio, readme, password, createdAt, ...rest } = recipient;
-				setLocalChats((prev) => [...prev, { ...rest, room_id: getDMRoom(user.id, recipient.id) }]);
+				setLocalChats((prev) => [
+					...prev,
+					{
+						...rest,
+						room_id: getDMRoom(user.id, recipient.id),
+						room_image: "",
+						room_name: "",
+						room_type: "dm",
+					},
+				]);
 			}
 		};
 
@@ -252,7 +261,10 @@ export const ChatPreview = ({
 	selectChat: () => void;
 }) => {
 	return (
-		<Link className="cursor-pointer no-underline group/parent" href={`/chat/${chat.room_id}`}>
+		<Link
+			className="cursor-pointer no-underline group/parent"
+			href={chat.room_type === "dm" ? `/chat/${chat.room_id}` : `/chat/server/${chat.room_id}`}
+		>
 			<div
 				className={clsx(
 					"rounded-lg py-1.5 px-2.5  flex items-center gap-2.5 group max-lg:[#sidebar.active_&]:mb-1.5",
@@ -262,30 +274,34 @@ export const ChatPreview = ({
 				<Avatar
 					disableTooltip={true}
 					statusIndicator={false}
-					id={chat.id}
-					src={chat.image}
+					id={chat.room_type === "dm" ? chat.id : chat.room_id}
+					src={chat.room_type === "dm" ? chat.image : chat.room_image}
 					size="size-8.5"
-					displayName={chat.displayName}
+					displayName={chat.room_type === "dm" ? chat.displayName : chat.room_name}
 				/>
 
-				<div className="text-sm font-medium text-text truncate">{chat.displayName}</div>
+				<div className="text-sm font-medium text-text truncate">
+					{chat.room_type === "dm" ? chat.displayName : chat.room_name}
+				</div>
 
-				<DropdownMenu.Trigger asChild>
-					<HiDotsVertical
-						onClick={(e) => {
-							e.preventDefault();
-							e.stopPropagation();
-							selectChat();
-						}}
-						data-id="no-progress-bar"
-						data-tooltip-id="chat-panel-item-tooltip"
-						data-tooltip-content={"More"}
-						className={clsx(
-							"text-muted group-hover/icon:text-text hover:text-text ml-auto group-hover:opacity-100 opacity-0 text-xl",
-							selectedChat && "opacity-100 text-text"
-						)}
-					/>
-				</DropdownMenu.Trigger>
+				{chat.room_type === "dm" && (
+					<DropdownMenu.Trigger asChild>
+						<HiDotsVertical
+							onClick={(e) => {
+								e.preventDefault();
+								e.stopPropagation();
+								selectChat();
+							}}
+							data-id="no-progress-bar"
+							data-tooltip-id="chat-panel-item-tooltip"
+							data-tooltip-content={"More"}
+							className={clsx(
+								"text-muted group-hover/icon:text-text hover:text-text ml-auto group-hover:opacity-100 opacity-0 text-xl",
+								selectedChat && "opacity-100 text-text"
+							)}
+						/>
+					</DropdownMenu.Trigger>
+				)}
 			</div>
 		</Link>
 	);

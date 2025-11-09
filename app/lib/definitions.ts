@@ -140,6 +140,9 @@ export type MessageType = {
 
 export type ChatType = Omit<User, "createdAt"> & {
 	room_id: string;
+	room_name: string;
+	room_image: string;
+	room_type: "public" | "private" | "dm";
 };
 
 export type ContactType = Omit<User, "createdAt"> & {

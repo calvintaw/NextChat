@@ -25,7 +25,7 @@ const ChatMessages = ({ messages }: { messages: MessageType[] }) => {
 			className={clsx("flex-1 flex flex-col relative", !isBlocked && messages.length === 0 && "pointer-events-none")}
 		>
 			{isBlocked && (
-				<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+				<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none pt-6">
 					<div className="bg-accent text-text px-4 py-2 rounded-lg flex items-center gap-2 max-w-[90vw] mx-3">
 						<HiExclamationCircle size={20} />
 						<span>You cannot send messages in this chat</span>
@@ -34,7 +34,7 @@ const ChatMessages = ({ messages }: { messages: MessageType[] }) => {
 			)}
 
 			{isSystem && isBlocked && (
-				<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+				<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none pt-6">
 					<div className="bg-accent text-text px-4 py-2 rounded-lg flex items-center gap-2 max-w-[90vw] mx-3">
 						<HiExclamationCircle size={20} />
 						<span>Our AI assistant isn’t available right now — looks like the server is out of credits.</span>
@@ -46,7 +46,7 @@ const ChatMessages = ({ messages }: { messages: MessageType[] }) => {
 				<>
 					{messages.length === 0 ? (
 						// <MessageSkeleton count={5} />
-						<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+						<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none pt-6">
 							<div className="bg-accent/30 text-text px-4 py-2 rounded-lg flex items-center gap-2 max-w-[90vw] mx-3">
 								<HiOutlineChatBubbleLeftRight size={20} />
 								<span>No messages yet — start the conversation!</span>
