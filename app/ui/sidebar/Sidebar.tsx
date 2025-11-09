@@ -1,5 +1,4 @@
 import { auth } from "@/auth";
-import OnlineIndicator from "../OnlineIndicator";
 import ChatPanel from "./components/ChatPanel";
 import NavigationBar from "./components/NavigationBar";
 import UserPanel from "./components/UserPanel";
@@ -17,7 +16,6 @@ const Sidebar = async () => {
 			id="sidebar"
 			className="relative max-w-86  h-full flex flex-row items-start w-min border-contrast lg:border-r bg-background"
 		>
-			<OnlineIndicator name={user.displayName} userId={user.id}></OnlineIndicator>
 
 			<NavigationBar joined_servers={joined_servers} user={user}></NavigationBar>
 			<ChatPanel user={user} />

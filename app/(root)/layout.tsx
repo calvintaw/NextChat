@@ -12,6 +12,8 @@ import "@/app/lib/passwordRules.js";
 import Toaster from "../ui/Toast";
 import PathProvider from "../lib/PathContext";
 import ProgressBar from "@/app/ui/ProgressBar";
+import OnlineIndicator from "../ui/OnlineIndicator";
+import { auth } from "@/auth";
 
 const roboto = localFont({
 	src: [
@@ -44,6 +46,7 @@ export default async function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const session = await auth()
 	const cookieStore = await cookies();
 	const theme = cookieStore.get("theme")?.value?.trim() || "dark";
 	const starsBackgroundEnabled = cookieStore.get("starsBackgroundEnabled")?.value || "disable-stars-bg";
@@ -59,6 +62,7 @@ export default async function RootLayout({
 					<div id="stars3"></div>
 					<div id="stars4"></div>
 				</div>
+				<OnlineIndicator session={session}></OnlineIndicator>
 				<ProgressBar></ProgressBar>
 				<PathProvider>
 					<PathBanner />
