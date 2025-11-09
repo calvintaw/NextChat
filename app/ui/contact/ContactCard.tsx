@@ -120,16 +120,10 @@ const ContactCard = ({
 		contact.username === "system" ? `system-room-${contact.id}:${user.id}` : getDMRoom(user.id, contact.id);
 
 	const handleClick = async () => {
-		// Check if DM already exists in state
-		const dmExists = contacts.some((person) => person.id === contact.id);
-		if (dmExists) {
-			console.log("DM already exists. No need to create.");
-			return;
-		}
 
+		console.log(contacts)
 		// Create DM if it doesn't exist
 		const result = await createDM({ id: contact.id, username: contact.username });
-
 		if (result.success) {
 			setContacts((prev) => {
 				// Check if contact with same id already exists
