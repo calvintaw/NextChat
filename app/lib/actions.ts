@@ -922,7 +922,6 @@ export async function createDM(
 				await sql`
 					INSERT INTO rooms (id, type)
 					VALUES (${room_id}, 'dm')
-				ON CONFLICT DO NOTHING
 				`;
 
 				// Insert members
@@ -931,8 +930,6 @@ export async function createDM(
 					VALUES 
 						(${room_id}, ${currentUser.id}),
 						(${room_id}, ${targetUser.id})
-				ON CONFLICT DO NOTHING
-					
 				`;
 			});
 

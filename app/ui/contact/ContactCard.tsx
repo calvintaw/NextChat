@@ -115,19 +115,25 @@ const ContactCard = ({
 	isPending: boolean;
 	contact: ContactType;
 }) => {
-	const { friends: contacts, setFriends: setContacts } = useFriendsProvider();
+	const { friends: chats, setFriends: setChats } = useFriendsProvider();
 	const room_id =
 		contact.username === "system" ? `system-room-${contact.id}:${user.id}` : getDMRoom(user.id, contact.id);
 
 	const handleClick = async () => {
+		// Check if DM already exists in state
+		const dmExists = chats.some((chat) => chat.id === contact.id && chat.room_type === "dm");
+		if (dmExists) {
+			console.log("DM already exists. No need to create.");
+			return;
+		}
 
-		console.log(contacts)
 		// Create DM if it doesn't exist
 		const result = await createDM({ id: contact.id, username: contact.username });
+
 		if (result.success) {
-			setContacts((prev) => {
+			setChats((prev) => {
 				// Check if contact with same id already exists
-				const exists = prev.some((c) => c.id === contact.id);
+				const exists = prev.some((c) => c.id === contact.id && c.room_type === "dm");
 
 				if (exists) {
 					return prev; // do nothing if already exists
