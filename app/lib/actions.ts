@@ -197,7 +197,6 @@ export async function getChats(currentUserId: string): Promise<ChatType[]> {
 		`;
 }
 
-
 export async function getContacts(currentUserId: string): Promise<ContactType[]> {
 	return await sql`
 			    SELECT 
@@ -1055,7 +1054,6 @@ export async function removeFriendshipRequest(
 	});
 }
 
-
 export async function acceptFriendshipRequest(
 	targetUser: User,
 	system?: User
@@ -1172,7 +1170,6 @@ export async function unblockFriendship(
 	}
 }
 
-
 export async function fetchNews(config?: NewsApiParams): Promise<NewsArticle[]> {
 	if (process.env.NODE_ENV === "production") {
 		return newsData.articles;
@@ -1220,36 +1217,36 @@ export async function mockFetchNews() {
 }
 
 export async function editMsg({
+	userId,
 	id,
 	roomId,
 	content,
 }: {
 	id: string;
+	userId: string;
 	roomId: string;
 	content: string;
 }): Promise<{ success: true; message: string } | { success: false; error: any; message: string }> {
-	return withCurrentUser(async (user: User) => {
-		try {
-			await sql.begin(async (tx) => {
-				await tx`
+	try {
+		await sql.begin(async (tx) => {
+			await tx`
 				UPDATE messages
 				set content = ${content}, edited = ${true}
-				WHERE id = ${id} AND sender_id = ${user.id}
+				WHERE id = ${id} AND sender_id = ${userId}
 			`;
-			});
+		});
 
-			// await supabase.channel(`room:${roomId}`).send({
-			// 	type: "broadcast",
-			// 	event: "msg_edited",
-			// 	payload: { msg_id: id, msg_content: content },
-			// });
+		// await supabase.channel(`room:${roomId}`).send({
+		// 	type: "broadcast",
+		// 	event: "msg_edited",
+		// 	payload: { msg_id: id, msg_content: content },
+		// });
 
-			return { success: true, message: "Message edited successfully." };
-		} catch (error) {
-			console.log("error in edit msg: ", error);
-			return { success: false, error, message: "Failed to edit the message. Please try again." };
-		}
-	});
+		return { success: true, message: "Message edited successfully." };
+	} catch (error) {
+		console.log("error in edit msg: ", error);
+		return { success: false, error, message: "Failed to edit the message. Please try again." };
+	}
 }
 
 export async function addReactionToMSG({
@@ -1385,6 +1382,16 @@ export async function getReadmeByUsername(username: string) {
 	}
 	return { success: true, readme: result[0].readme };
 }
+
+// export async function test() {
+// 	console.log(await sql`
+// 	SELECT (SELECT auth.uid()) as uid, current_setting('jwt.claims', true) as jwt_claims
+// 	`)
+
+// 	console.log("TEST FUNCTION CALLED");
+// }
+
+// test();
 
 export async function updateReadmeByUsername(readme: string) {
 	return withCurrentUser(async (user: User) => {

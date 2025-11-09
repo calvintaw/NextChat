@@ -54,7 +54,7 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 			return updatedMessages;
 		});
 
-		const result = await editMsg({ id: msg.id, roomId, content: newContent });
+		const result = await editMsg({ userId: user.id, id: msg.id, roomId, content: newContent });
 		if (!result.success) {
 			setMessages(originalMsgs);
 			toast({ title: "Error!", mode: "negative", subtitle: result.message });
