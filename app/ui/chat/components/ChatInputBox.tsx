@@ -5,7 +5,6 @@ import { ChatToolbar } from "./ChatToolBar";
 import { useEffect, useState } from "react";
 import { clsx } from "clsx";
 import React from "react";
-// REMOVED: import { socket } from "@/app/lib/socket";
 import { MessageContentType, MessageType, User } from "@/app/lib/definitions";
 import useDebounce from "@/app/lib/hooks/useDebounce";
 import { useChatProvider } from "../ChatBoxWrapper";
@@ -16,7 +15,6 @@ import { v4 as uuidv4 } from "uuid";
 import useEventListener from "@/app/lib/hooks/useEventListener";
 import { insertMessageInDB } from "@/app/lib/actions";
 import { useToast } from "@/app/lib/hooks/useToast";
-// NEW: Import Supabase client
 import { supabase } from "@/app/lib/supabase";
 
 type ChatInputBoxProps = {
@@ -58,7 +56,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, isBlocked }: C
 		// REPLACED: socket.emit calls with Supabase send functions
 		startCallback: sendTypingStart,
 		endCallback: sendTypingStop,
-		delay: 2000,
+		delay: 1500,
 	});
 
 	useEffect(() => {
@@ -77,7 +75,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, isBlocked }: C
 		return () => {
 			textarea.removeEventListener("input", handleInput);
 		};
-	}, [triggerTypingAnimation]); // Added triggerTypingAnimation to dependencies
+	}, [triggerTypingAnimation]);
 
 	const sendMessage = async (input: string, type: MessageContentType = "text") => {
 		const tempId = uuidv4();
@@ -98,10 +96,9 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, isBlocked }: C
 			type,
 		};
 
-		cancelTypingAnimation(750); // stop the typing animation 1.5s after use has stopped typing
+		cancelTypingAnimation(500);
 
 		// Optimistic UI update
-		setMessages((prev) => {
 			return [
 				...prev,
 				{

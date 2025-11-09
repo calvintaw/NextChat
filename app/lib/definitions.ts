@@ -140,7 +140,6 @@ export type MessageType = {
 
 export type ChatType = Omit<User, "createdAt"> & {
 	room_id: string;
-	online: boolean;
 };
 
 export type ContactType = Omit<User, "createdAt"> & {

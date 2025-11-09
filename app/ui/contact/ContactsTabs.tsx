@@ -5,6 +5,7 @@ import {
 	getFriendRequests,
 	acceptFriendshipRequest,
 	removeFriendshipRequest,
+	getUser,
 } from "@/app/lib/actions";
 import { ContactType } from "@/app/lib/definitions";
 import { socket } from "@/app/lib/socket";
@@ -99,6 +100,75 @@ const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTa
 		return () => {
 			socket.off(`refresh-contacts-page`, refrechContactsPage);
 			socket.disconnect();
+		};
+	}, []);
+
+	useEffect(() => {
+		const channel = supabase.channel(`friends:${user.id}`);
+
+		// A. Postgres Changes
+		channel.on(
+			"postgres_changes",
+			{
+				event: "*",
+				schema: "public",
+				table: "friends",
+				filter: `user1_id=eq.${user.id}| user2_id=eq.${user.id}`,
+			},
+			async (payload) => {
+				if (payload.eventType === "INSERT") {
+					const data = payload.new;
+					if (data.status === "pending") {
+						const recipient_id = data.user1_id === user.id ? data.user2_id : data.user1_id;
+						const recipient = await getUser(recipient_id);
+						if (!recipient) return;
+
+						if (data.request_sender_id === user.id) {
+							setFriendRequests((prev) => ({
+								sent: [...prev.sent, recipient],
+								incoming: prev.incoming,
+							}));
+						} else {
+							setFriendRequests((prev) => ({
+								sent: prev.sent,
+								incoming: [...prev.incoming, recipient],
+							}));
+						}
+					}
+				} else if (payload.eventType === "DELETE") {
+					const data = payload.old;
+					const recipient_id = data.user1_id === user.id ? data.user2_id : data.user1_id;
+
+				
+						setFriendRequests((prev) => ({
+							sent: prev.sent,
+							incoming: prev.incoming.filter((person) => person.id !== recipient_id),
+						}));
+				} else if (payload.eventType === "UPDATE") {
+					const data = payload.new;
+					const recipient_id = data.user1_id === user.id ? data.user2_id : data.user1_id;
+
+					if (data.status === "accepted") {
+						setFriendRequests((prev) => ({
+							sent: prev.sent.filter((person) => person.id !== recipient_id),
+							incoming: prev.incoming.filter((person) => person.id !== recipient_id),
+						}));
+
+						const recipient = await getUser(recipient_id);
+						if (!recipient) return;
+						const { createdAt, bio, password, readme, ...rest } = recipient;
+						setContacts((prev) => [...prev, {...rest, online: "loading"}]);
+					}
+				}
+			}
+		);
+
+		channel.subscribe((status) => {
+			if (status === "SUBSCRIBED") console.log(`Subscribed to friends-${user.username}`);
+		});
+
+		return () => {
+			supabase.removeChannel(channel);
 		};
 	}, []);
 
@@ -263,6 +333,8 @@ import { IoGameController } from "react-icons/io5";
 import { TbMinusVertical } from "react-icons/tb";
 import GameCard from "../games/GameCard";
 import { Route } from "next";
+import { supabase } from "@/app/lib/supabase";
+import { getDMRoom } from "@/app/lib/utilities";
 
 const RequestTab = ({ user, friendRequests, setFriendRequests, setContacts }: RequestTabProps) => {
 	const [error, setError] = useState("");

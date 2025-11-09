@@ -16,12 +16,14 @@ import { FaUserFriends } from "react-icons/fa";
 import { FaRegNewspaper, FaPlus } from "react-icons/fa6";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import clsx from "clsx";
-import { blockFriendship, deleteDM, getChats, removeFriendshipRequest } from "@/app/lib/actions";
+import { blockFriendship, deleteDM, getChats, getUser, removeFriendshipRequest } from "@/app/lib/actions";
 import { usePathname, useRouter } from "next/navigation";
 import { Route } from "next";
 import { useFriendsProvider } from "@/app/lib/friendsContext";
 import { useToast } from "@/app/lib/hooks/useToast";
 import { useRouterWithProgress } from "@/app/lib/hooks/useRouterWithProgressBar";
+import { supabase } from "@/app/lib/supabase";
+import { getDMRoom } from "@/app/lib/utilities";
 
 dayjs.extend(isToday);
 dayjs.extend(isYesterday);
@@ -36,20 +38,54 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 	}, [chats]);
 
 	useEffect(() => {
-		socket.emit("join", user.id);
+		// socket.emit("join", user.id);
+		// async function refetchContacts() {
+		// 	const newContacts = await getChats(user.id);
+		// 	setLocalChats(newContacts);
+		// }
+		// socket.on(`refresh-contacts-page`, refetchContacts);
+		// return () => {
+		// 	socket.off(`refresh-contacts-page`, refetchContacts);
+		// 	socket.disconnect();
+		// };
+	}, []);
 
-		async function refetchContacts() {
-			const newContacts = await getChats(user.id);
-			setLocalChats(newContacts);
-		}
+	useEffect(() => {
+		const channel = supabase.channel(`chats:${user.id}`);
 
-		socket.on(`refresh-contacts-page`, refetchContacts);
+		// A. Postgres Changes
+		channel.on(
+			"postgres_changes",
+			{
+				event: "*",
+				schema: "public",
+				table: "friends",
+				filter: `user1_id=eq.${user.id}| user2_id=eq.${user.id}`,
+			},
+			async (payload) => {
+				if (payload.eventType === "UPDATE") {
+					const data = payload.new;
+					const recipient_id = data.user1_id === user.id ? data.user2_id : data.user1_id;
+					const recipient = await getUser(recipient_id);
+					if (!recipient) return;
+
+					if (data.status === "accepted") {
+						const { bio, readme, password, createdAt, ...rest } = recipient;
+						setLocalChats((prev) => [...prev, { ...rest, room_id: getDMRoom(user.id, recipient.id) }]);
+					}
+				}
+			}
+		);
+
+		channel.subscribe((status) => {
+			if (status === "SUBSCRIBED") console.log(`Subscribed to chats-${user.username}`);
+		});
 
 		return () => {
-			socket.off(`refresh-contacts-page`, refetchContacts);
-			socket.disconnect();
+			supabase.removeChannel(channel);
 		};
 	}, []);
+
 	const toast = useToast();
 
 	const handleDMdelete = async () => {
