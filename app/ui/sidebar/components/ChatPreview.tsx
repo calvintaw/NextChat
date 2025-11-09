@@ -41,6 +41,7 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 
 	useEffect(() => {
 		const channel = supabase.channel(`chats:${user.id}`);
+		//@ts-ignore
 		const handler = async (payload) => {
 			const data = payload.new;
 			const recipient_id = data.user1_id === user.id ? data.user2_id : data.user1_id;

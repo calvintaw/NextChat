@@ -22,26 +22,26 @@ type Props = {
 };
 
 export const ContactPreviewContainer = ({ setContacts, user, contacts }: Props) => {
-	useEffect(() => {
-		function handleStatusChange(userId: string, online: boolean) {
-			setContacts((prev) => {
-				const index = prev.findIndex((chat) => chat.id.includes(userId));
+	// useEffect(() => {
+	// 	function handleStatusChange(userId: string, online: boolean) {
+	// 		setContacts((prev) => {
+	// 			const index = prev.findIndex((person) => person.id === userId);
 
-				if (index === -1) return prev;
-				const newContacts = [...prev];
-				newContacts[index].online = online;
-				return newContacts;
-			});
-		}
+	// 			if (index === -1) return prev;
+	// 			const newContacts = [...prev];
+	// 			newContacts[index].online = online;
+	// 			return newContacts;
+	// 		});
+	// 	}
 
-		socket.on("online", handleStatusChange);
-		socket.on("offline", handleStatusChange);
+	// 	socket.on("online", handleStatusChange);
+	// 	socket.on("offline", handleStatusChange);
 
-		return () => {
-			socket.off("online", handleStatusChange);
-			socket.off("offline", handleStatusChange);
-		};
-	}, []);
+	// 	return () => {
+	// 		socket.off("online", handleStatusChange);
+	// 		socket.off("offline", handleStatusChange);
+	// 	};
+	// }, []);
 
 	const toast = useToast();
 	const [error, setError] = useState("");

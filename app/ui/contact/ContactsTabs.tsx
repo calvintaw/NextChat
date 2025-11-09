@@ -29,7 +29,7 @@ type friendRequestsType = { sent: User[]; incoming: User[] };
 
 type ContactTabsProps = {
 	user: User;
-	initialContacts: ContactType[];
+	// initialContacts: ContactType[];
 	initialFriendRequests: friendRequestsType;
 };
 
@@ -54,14 +54,14 @@ type AllContactsTabProps = {
 	user: User;
 };
 
-const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTabsProps) => {
+const ContactTabs = ({ user, initialFriendRequests }: ContactTabsProps) => {
 	const toast = useToast();
 
 	const [request, formAction, isPending] = useActionState(
 		async (prevState: { success: boolean; message: string }, formData: FormData) => {
 			const result = await requestFriendship(prevState, formData);
 			if (result.success && result.targetUser) {
-				socket.emit("refresh-contacts-page", user.id, result.targetUser.id);
+				// socket.emit("refresh-contacts-page", user.id, result.targetUser.id);
 				// local update
 				setFriendRequests((prev) => ({
 					incoming: [...prev.incoming],
@@ -82,7 +82,9 @@ const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTa
 	);
 
 	const [friendRequests, setFriendRequests] = useState<friendRequestsType>(initialFriendRequests);
-	const [contacts, setContacts] = useState(initialContacts);
+	// const [contacts, setContacts] = useState(initialContacts);
+
+	const { contacts, setContacts } = useFriendsProvider();
 	const addFriendInputRef = useRef<HTMLInputElement | null>(null);
 	const friendsCount = contacts.length;
 
@@ -104,13 +106,23 @@ const ContactTabs = ({ user, initialContacts, initialFriendRequests }: ContactTa
 	// }, []);
 
 	useEffect(() => {
+		const fetchContacts = async () => {
+			const contacts = await getContacts(user.id);
+			setContacts(contacts);
+		};
+
+		fetchContacts();
+	}, []);
+
+	useEffect(() => {
 		const channel = supabase.channel(`friends:${user.id}`);
+		//@ts-ignore
 		const handler = async (payload) => {
 			if (payload.eventType === "INSERT") {
 				const data = payload.new;
 				if (data.status === "pending") {
 					const recipient_id = data.user1_id === user.id ? data.user2_id : data.user1_id;
-					
+
 					// early return bc there's already local UI update if user is the one who sent the request
 					if (data.request_sender_id === user.id) return;
 
@@ -355,6 +367,8 @@ import GameCard from "../games/GameCard";
 import { Route } from "next";
 import { supabase } from "@/app/lib/supabase";
 import { getDMRoom } from "@/app/lib/utilities";
+import SupabasePresence from "../SupabasePresence";
+import { useFriendsProvider } from "@/app/lib/friendsContext";
 
 const RequestTab = ({ user, friendRequests, setFriendRequests, setContacts }: RequestTabProps) => {
 	const [error, setError] = useState("");
