@@ -54,24 +54,24 @@ export function DirectMessageCard({
 		setClipboard(string);
 	};
 
-	useEffect(() => {
-		if (roomId.startsWith("system-room")) return;
+	// useEffect(() => {
+	// 	if (roomId.startsWith("system-room")) return;
 
-		const fetchCommonServers = async () => {
-			setIsPending(true);
-			try {
-				const servers = await getServersInCommon(currentUserId, user.id);
-				setCommonServers(servers);
-			} catch (err) {
-				console.error(err);
-				setCommonServers([]);
-			} finally {
-				setIsPending(false);
-			}
-		};
+	// 	const fetchCommonServers = async () => {
+	// 		setIsPending(true);
+	// 		try {
+	// 			const servers = await getServersInCommon(currentUserId, user.id);
+	// 			setCommonServers(servers);
+	// 		} catch (err) {
+	// 			console.error(err);
+	// 			setCommonServers([]);
+	// 		} finally {
+	// 			setIsPending(false);
+	// 		}
+	// 	};
 
-		fetchCommonServers();
-	}, [user.id]);
+	// 	fetchCommonServers();
+	// }, [user.id]);
 
 	return (
 		<>
