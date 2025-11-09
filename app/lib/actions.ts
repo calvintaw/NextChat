@@ -179,6 +179,9 @@ export async function clearMsgHistory(
 export async function getChats(currentUserId: string): Promise<ChatType[]> {
 	return await sql`
 			SELECT 
+				r.name as "room_name",
+				r.type as "room_type",
+				r.profile as "room_image",
 				rm.room_id as "room_id", 
 				u.id, 
 				u.username, 
@@ -188,10 +191,12 @@ export async function getChats(currentUserId: string): Promise<ChatType[]> {
 			JOIN users u ON rm.user_id = u.id
 			JOIN user_status us ON u.id = us.user_id
 			JOIN room_members rm2 ON rm.room_id = rm2.room_id
+			JOIN rooms r ON rm.room_id = r.id
 			WHERE rm2.user_id = ${currentUserId}
 			AND u.id != ${currentUserId};
 		`;
 }
+
 
 export async function getContacts(currentUserId: string): Promise<ContactType[]> {
 	return await sql`

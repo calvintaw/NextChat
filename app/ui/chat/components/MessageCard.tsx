@@ -172,7 +172,7 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 					{(isFirstGroup || msg.replyTo) && (
 						<div className="text-sm text-muted flex items-center gap-2 mb-1">
 							<Avatar
-								size="size-8"
+								size="size-6"
 								id={msg.sender_id}
 								src={msg.sender_image}
 								statusIndicator={false}

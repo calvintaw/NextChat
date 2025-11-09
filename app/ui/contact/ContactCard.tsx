@@ -121,7 +121,7 @@ const ContactCard = ({
 
 	const handleClick = async () => {
 		// Check if DM already exists in state
-		const dmExists = contacts.some((item) => item.room_id === room_id);
+		const dmExists = contacts.some((person) => person.id === contact.id);
 		if (dmExists) {
 			console.log("DM already exists. No need to create.");
 			return;
@@ -150,6 +150,9 @@ const ContactCard = ({
 						email: contact.email,
 						online: false,
 						room_id,
+						room_image: "",
+						room_name: "",
+						room_type: "dm",
 					},
 				];
 			});

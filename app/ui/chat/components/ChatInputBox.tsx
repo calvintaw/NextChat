@@ -269,18 +269,18 @@ const ReplyToBox = () => {
 };
 
 const TypingIndicator = ({ displayName }: { displayName: string[] }) => {
-	if (!displayName || displayName.length === 0) return null;
+	// if (!displayName || displayName.length === 0) return null;
 
 	return (
-		<span
+		<div
 			className="
-			        absolute
-			        -bottom-2
-			        left-5
+			        
 			        flex
 			        w-full
+			 				h-[22px]
 			        max-w-lg
 			        overflow-hidden
+			 mb-0.5
 			        
 			       "
 			style={{
@@ -293,20 +293,21 @@ const TypingIndicator = ({ displayName }: { displayName: string[] }) => {
 				maskSize: "100% 100%",
 			}}
 		>
-			{displayName.map((name, index) => (
-				<div
-					key={index}
-					className="inline-flex flex-shrink-0 items-center gap-1 px-2 py-0.5 rounded-full text-xs text-text shadow-sm border-accent border mr-1"
-				>
-					<span className="typing-dot w-1.5 h-1.5 rounded-full bg-text" />
-					<span className="typing-dot w-1.5 h-1.5 rounded-full bg-text" />
-					<span className="typing-dot w-1.5 h-1.5 rounded-full bg-text" />
-					<span className="font-semibold tracking-wide">
-						{name !== "system" && name} {name !== "system" ? "is typing" : "Crafting a response"}
-					</span>
-				</div>
-			))}
-		</span>
+			{displayName &&
+				displayName.map((name, index) => (
+					<div
+						key={index}
+						className="inline-flex flex-shrink-0 items-center gap-1 px-2 py-0.5 rounded-full text-xs text-text shadow-sm border-accent border mr-1"
+					>
+						<span className="typing-dot w-1.5 h-1.5 rounded-full bg-text" />
+						<span className="typing-dot w-1.5 h-1.5 rounded-full bg-text" />
+						<span className="typing-dot w-1.5 h-1.5 rounded-full bg-text" />
+						<span className="font-semibold tracking-wide">
+							{name !== "system" && name} {name !== "system" ? "is typing" : "Crafting a response"}
+						</span>
+					</div>
+				))}
+		</div>
 	);
 };
 
