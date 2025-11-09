@@ -18,9 +18,9 @@ import { RxCross2 } from "react-icons/rx";
 import { Tooltip } from "react-tooltip";
 import InputField from "../form/InputField";
 import { Avatar } from "../general/Avatar";
-import { Button, IconWithSVG } from "../general/Buttons";
+import { Badge, Button, IconWithSVG } from "../general/Buttons";
 import Search from "../general/Search";
-import { ContactPreviewContainer } from "./ContactCard";
+import { ContactPreviewContainer, ContactPreviewSkeleton } from "./ContactCard";
 import { User } from "@/app/lib/definitions";
 import { BiLoaderAlt } from "react-icons/bi";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
@@ -48,6 +48,7 @@ type RequestTabProps = {
 };
 
 type AllContactsTabProps = {
+	initialLoad: boolean;
 	friendsCount: number;
 	setContacts: React.Dispatch<React.SetStateAction<ContactType[]>>;
 	contacts: ContactType[];
@@ -81,6 +82,8 @@ const ContactTabs = ({ user, initialFriendRequests }: ContactTabsProps) => {
 		{ success: false, message: "" }
 	);
 
+	const [initialLoad, setInitialLoad] = useState(true);
+
 	const [friendRequests, setFriendRequests] = useState<friendRequestsType>(initialFriendRequests);
 	// const [contacts, setContacts] = useState(initialContacts);
 
@@ -109,6 +112,7 @@ const ContactTabs = ({ user, initialFriendRequests }: ContactTabsProps) => {
 		const fetchContacts = async () => {
 			const contacts = await getContacts(user.id);
 			setContacts(contacts);
+			setInitialLoad(false);
 		};
 
 		fetchContacts();
@@ -225,8 +229,9 @@ const ContactTabs = ({ user, initialFriendRequests }: ContactTabsProps) => {
 
 						{/* {(friendRequests.sent.length > 0 || friendRequests.incoming.length > 0) && ( */}
 						<Tabs.Trigger value="request" asChild>
-							<Button className="bg-accent/15 border-transparent text-text hover:bg-accent/80 data-[state=active]:bg-accent/80 data-[state=active]:cursor-default">
+							<Button className="bg-accent/15 border-transparent text-text hover:bg-accent/80 data-[state=active]:bg-accent/80 data-[state=active]:cursor-default flex items-center gap-2">
 								Pending
+								{friendRequests.incoming.length >= 1 && <Badge count={friendRequests.incoming.length}></Badge>}
 							</Button>
 						</Tabs.Trigger>
 						{/* )} */}
@@ -270,7 +275,13 @@ const ContactTabs = ({ user, initialFriendRequests }: ContactTabsProps) => {
 					</Tabs.List>
 
 					<Tabs.Content value="all" asChild>
-						<AllContactsTab setContacts={setContacts} friendsCount={friendsCount} contacts={contacts} user={user} />
+						<AllContactsTab
+							initialLoad={initialLoad}
+							setContacts={setContacts}
+							friendsCount={friendsCount}
+							contacts={contacts}
+							user={user}
+						/>
 					</Tabs.Content>
 
 					<Tabs.Content value="request" asChild>
@@ -651,7 +662,7 @@ const RequestTab = ({ user, friendRequests, setFriendRequests, setContacts }: Re
 	);
 };
 
-const AllContactsTab = ({ friendsCount, contacts, user, setContacts }: AllContactsTabProps) => {
+const AllContactsTab = ({ initialLoad, friendsCount, contacts, user, setContacts }: AllContactsTabProps) => {
 	const [input, setInput] = useState("");
 	const filteredContacts = contacts.filter(
 		(s) =>
@@ -661,13 +672,24 @@ const AllContactsTab = ({ friendsCount, contacts, user, setContacts }: AllContac
 	return (
 		<div className="flex flex-col flex-1">
 			<Search setInput={setInput} />
-
 			<div className="mt-5 flex flex-col gap-4">
-				<p className="text-sm">All Friends - {friendsCount}</p>
+				<p className="text-sm flex items-center gap-2">
+					All Friends -{" "}
+					{initialLoad ? (
+						<span className="h-6 w-8 bg-gray-300 dark:bg-gray-800 rounded animate-pulse inline-block" />
+					) : (
+						friendsCount
+					)}
+				</p>
+
 				<hr className="hr-separator !m-0" />
 			</div>
 
-			<ContactPreviewContainer setContacts={setContacts} user={user} contacts={filteredContacts} />
+			{initialLoad ? (
+				<ContactPreviewSkeleton />
+			) : (
+				<ContactPreviewContainer setContacts={setContacts} user={user} contacts={filteredContacts} />
+			)}
 		</div>
 	);
 };

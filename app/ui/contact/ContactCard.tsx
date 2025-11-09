@@ -56,7 +56,7 @@ export const ContactPreviewContainer = ({ setContacts, user, contacts }: Props) 
 				setError(result.message);
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
-				socket.emit("refresh-contacts-page", user.id, friend.id);
+				// socket.emit("refresh-contacts-page", user.id, friend.id);
 
 				// local update
 				setContacts((prev) => prev.filter((req) => req.id !== friend.id));
@@ -227,5 +227,30 @@ const ContactCard = ({
 				/>
 			</div>
 		</Link>
+	);
+};
+
+export const ContactPreviewSkeleton = () => {
+	return (
+		<section className="flex flex-col flex-1 animate-pulse">
+			{Array.from({ length: 6 }).map((_, i) => (
+				<div key={i} className="flex items-center gap-3 rounded-lg h-15 px-2.5 mb-2.5 bg-gray-100 dark:bg-gray-900">
+					{/* Avatar */}
+					<div className="w-8.5 h-8.5 rounded-full bg-gray-300 dark:bg-gray-800" />
+
+					{/* Name and status */}
+					<div className="flex-1">
+						<div className="w-2/3 h-3.5 bg-gray-300 dark:bg-gray-500/40 rounded mb-1" />
+						<div className="w-1/3 h-3 bg-gray-200 dark:bg-gray-500/25 rounded" />
+					</div>
+
+					{/* Action icons */}
+					<div className="flex gap-2">
+						<div className="w-5 h-5 rounded bg-gray-300 dark:bg-gray-800" />
+						<div className="w-5 h-5 rounded bg-gray-300 dark:bg-gray-800" />
+					</div>
+				</div>
+			))}
+		</section>
 	);
 };

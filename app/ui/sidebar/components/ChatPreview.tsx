@@ -205,7 +205,7 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 
 										if (result.success) {
 											router.refresh();
-											socket.emit("refresh-contacts-page", user.id, selectedChat.id);
+											// socket.emit("refresh-contacts-page", user.id, selectedChat.id);
 											toast({
 												title: "",
 												mode: "positive",

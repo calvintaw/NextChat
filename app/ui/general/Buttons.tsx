@@ -81,8 +81,6 @@ export const DarkModeBtn = ({ className }: { className?: string }) => {
 	const [darkMode, toggle] = useDarkMode();
 	const icon_class = "absolute inset-0 m-auto text-2xl not-dark:group-hover:text-background";
 
-
-
 	return (
 		<button
 			onClick={toggle}
@@ -95,5 +93,19 @@ export const DarkModeBtn = ({ className }: { className?: string }) => {
 			{darkMode && <MdLightMode className={icon_class}></MdLightMode>}
 			{!darkMode && <MdDarkMode className={icon_class}></MdDarkMode>}
 		</button>
+	);
+};
+
+type BadgeProps = {
+	count: number;
+	max?: number; // optional max value to display
+};
+
+export const Badge = ({ count, max = 9 }: BadgeProps) => {
+	const display = count > max ? `${max}+` : count;
+	return (
+		<span className="inline-flex min-w-[1.25rem] h-5 px-2 text-xs font-light text-white bg-error rounded-full items-center justify-center">
+			{display}
+		</span>
 	);
 };
