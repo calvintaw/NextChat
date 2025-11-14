@@ -22,7 +22,6 @@ import {
 	deleteDM,
 	getUser,
 	getUserByUsername,
-	handleFindUser,
 	removeFriendshipRequest,
 } from "@/app/lib/actions";
 import { usePathname, useRouter } from "next/navigation";
@@ -554,7 +553,7 @@ export const CreateDMButton = ({ currentUser }: { currentUser: User }) => {
 
 const UserCard = ({ user }: { user: User }) => {
 	const [isPending, setIsPending] = useState(false);
-	const [result, setResult] = useState<{ success: boolean; message: string }>({});
+	const [result, setResult] = useState<{ success: boolean; message: string }>({ success: false, message: ""});
 	return (
 		<>
 			<div className="rounded-lg h-15 px-2.5  bg-accent/30 flex items-center gap-2.5">
@@ -575,7 +574,7 @@ const UserCard = ({ user }: { user: User }) => {
 				</div>
 
 				<button
-					disabled={isPending}
+				disabled={isPending}
 					onClick={async () => {
 						setIsPending(true);
 						const result = await createDM({ id: user.id, username: user.username });
