@@ -208,12 +208,23 @@ const ContactTabs = ({ user, initialFriendRequests }: ContactTabsProps) => {
 		};
 	}, []);
 
+	const searchParams = useSearchParams();
+	const initialTab = searchParams.get("tab") || "all";
 	const [activeTab, setActiveTab] = useState<string | undefined>(undefined);
+
+	const router = useRouter();
 
 	return (
 		<>
 			<section className="border-r-2 border-border/10 h-full flex flex-col px-[clamp(6px,2vw,16px)] py-2 pt-0 bg-contrast">
-				<Tabs.Root defaultValue="all" onValueChange={(tab) => setActiveTab(tab)} className="flex flex-col h-full">
+				<Tabs.Root
+					defaultValue={initialTab}
+					onValueChange={(tab) => {
+						setActiveTab(tab);
+						router.replace(`/?tab=${tab}`);
+					}}
+					className="flex flex-col h-full"
+				>
 					<Tabs.List className="my-3 flex gap-2 items-center">
 						<div className="flex items-center gap-2 mr-2 max-sm:hidden">
 							<FaUserFriends className="text-[clamp(1rem,4vw,1.5rem)] text-muted" />
@@ -370,7 +381,7 @@ const AddContactTab = ({ formAction, addFriendInputRef, request, isPending }: Ad
 
 import { BsFilterLeft } from "react-icons/bs";
 import clsx from "clsx";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/app/lib/hooks/useToast";
 import { IoGameController } from "react-icons/io5";
 import { TbMinusVertical } from "react-icons/tb";

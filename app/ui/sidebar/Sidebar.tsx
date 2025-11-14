@@ -9,7 +9,7 @@ const Sidebar = async () => {
 	const session = await auth();
 	if (!session) redirect("/login");
 	const user = session.user;
-	const joined_servers = await getJoinedServers(user.id);
+	// const joined_servers = await getJoinedServers(user.id);
 
 	return (
 		<nav
@@ -17,7 +17,7 @@ const Sidebar = async () => {
 			className="relative max-w-86  h-full flex flex-row items-start w-min border-contrast lg:border-r bg-background"
 		>
 
-			<NavigationBar joined_servers={joined_servers} user={user}></NavigationBar>
+			{/* <NavigationBar joined_servers={joined_servers} user={user}></NavigationBar> */}
 			<ChatPanel user={user} />
 
 			<UserPanel user={user}></UserPanel>

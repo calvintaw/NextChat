@@ -62,6 +62,18 @@ export async function getUser(user_id: string): Promise<User | null> {
 	return result[0] ?? null;
 }
 
+type FindUserState = { error: undefined | string; user: User | null };
+
+
+export async function getUserByUsername(username: string): Promise<User | null> {
+	const result = await sql<User[]>`
+		SELECT id, username, display_name as "displayName", email, created_at as "createdAt", image FROM users WHERE username = ${username} LIMIT 1
+	`;
+	console.log("getUserByUsername: called: ");
+
+	return result[0] ?? null;
+}
+
 // one time use fn for displaying individual user info
 export async function getUserForProfilePage(id: string): Promise<User | null> {
 	const result = await sql<User[]>`
@@ -1171,12 +1183,9 @@ export async function unblockFriendship(
 }
 
 export async function fetchNews(config?: NewsApiParams): Promise<NewsArticle[]> {
-	if (process.env.NODE_ENV === "production") {
-		return newsData.articles;
-	}
 	try {
-		const q = config?.q || "";
-		const url = new URL(`https://newsapi.org/v2/${q === "home" ? "top-headlines?sources=bbc-news" : "everything"}`);
+		const q = config?.q || "home";
+		const url = new URL(`https://newsapi.org/v2/${q === "home" ? "top-headlines" : "everything"}`);
 
 		const defaults: NewsApiParams = {
 			q,
@@ -1202,12 +1211,19 @@ export async function fetchNews(config?: NewsApiParams): Promise<NewsArticle[]> 
 		}
 
 		if (data.status === "ok") {
+			if (!data.articles && process.env.NODE_ENV === "production") {
+				return newsData.articles;
+			}
+
 			return data.articles ?? [];
 		}
 
 		throw new Error("Unexpected API response structure");
 	} catch (err) {
 		console.error("Network/server error:", err);
+		if (process.env.NODE_ENV === "production") {
+			return newsData.articles;
+		}
 		return [];
 	}
 }

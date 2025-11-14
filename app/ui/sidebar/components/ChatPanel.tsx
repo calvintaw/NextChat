@@ -30,7 +30,7 @@ const ChatPanel = async ({ user }: { user: User }) => {
 
   "
 		>
-			<ChatPanelHeader />
+			<ChatPanelHeader user={user} />
 			<ChatPreviewContainer user={user} chats={chats} />
 		</section>
 	);

@@ -6,6 +6,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { User } from "@/app/lib/definitions";
 import { FaPlay, FaPause, FaRedo, FaTrash, FaSkull, FaPlayCircle } from "react-icons/fa";
+import { useLocalStorage } from "@/app/lib/hooks/useStorage";
 
 const gridSize = 10;
 const canvasWidth = 400;
@@ -174,86 +175,101 @@ export default function SnakeHome({ user }: { user: User }) {
 		setGameState("over");
 	}
 
+	const [disableInstructions, setDisableInstructions] = useLocalStorage("disableInstructions-tictactoe");
+
 	return (
-		<div className="flex flex-col items-center gap-4 relative flex-1 justify-center">
-			{/* --- Game Canvas --- */}
-			{/* --- Score Display --- */}
-			<p className="text-lg font-semibold text-gray-700">
-				Score: <span className="text-green-600">{score}</span>
-			</p>
-
-			<div className="relative">
-				<canvas
-					ref={canvasRef}
-					width={canvasWidth}
-					height={canvasHeight}
-					className="border-4 border-primary rounded-md bg-contrast"
-				></canvas>
-
-				{/* --- Overlay for idle, paused, and over states --- */}
-				{gameState !== "running" && (
-					<div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white rounded-md space-y-3">
-						{gameState === "over" && (
-							<>
-								<FaSkull className="text-4xl text-red-400 animate-pulse" />
-								<p className="text-xl font-bold">Game Over</p>
-								<p className="text-sm">Score: {score}</p>
-							</>
-						)}
-
-						{gameState === "paused" && (
-							<>
-								<FaPause className="text-4xl text-yellow-300" />
-								<p className="text-lg">Paused</p>
-							</>
-						)}
-
-						{gameState === "idle" && (
-							<>
-								<FaPlay className="text-4xl text-green-400" />
-								<p className="text-lg">Press Start to Play</p>
-							</>
-						)}
+		<>
+			<div className="flex flex-col items-center gap-4 relative flex-1 justify-center">
+				{!disableInstructions && (
+					<div className="w-full h-fit absolute top-0 flex justify-between left-0 right-0 py-1 px-2 items-center text-sm font-semibold bg-yellow-200 text-yellow-900">
+						<p className="text-center">Use the arrow keys to move the snake around</p>
+						<button onClick={() => setDisableInstructions(true)} className="size-6 text-center !p-0 text-xs">
+							X
+						</button>
 					</div>
 				)}
-			</div>
 
-			{/* --- Controls with icons --- */}
-			<div className="flex gap-3 mt-2">
-				<button className="btn btn-secondary flex items-center gap-2" onClick={startGame}>
-					<FaPlay /> Start
-				</button>
-				<button
-					className="btn btn-secondary flex items-center gap-2"
-					onClick={() => {
-						if (gameState === "running") pauseGame();
-						else if (gameState === "paused") unPauseGame();
-					}}
-					disabled={gameState === "idle" || gameState === "over"}
-				>
-					{gameState === "running" ? (
-						<>
-							<FaPause /> Pause
-						</>
-					) : gameState === "paused" ? (
-						<>
-							<FaPlayCircle /> Unpause
-						</>
-					) : (
-						<>
-							<FaPause /> Pause
-						</>
+				{/* --- Game Canvas --- */}
+				{/* --- Score Display --- */}
+				<p className="text-lg font-semibold text-gray-700">
+					Score: <span className="text-green-600">{score}</span>
+				</p>
+
+				<div className="relative">
+					<canvas
+						ref={canvasRef}
+						width={canvasWidth}
+						height={canvasHeight}
+						className="border-4 border-primary rounded-md bg-contrast"
+					></canvas>
+
+					{/* --- Overlay for idle, paused, and over states --- */}
+					{gameState !== "running" && (
+						<div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white rounded-md space-y-3">
+							{gameState === "over" && (
+								<>
+									<FaSkull className="text-4xl text-red-400 animate-pulse" />
+									<p className="text-xl font-bold">Game Over</p>
+									<p className="text-sm">Score: {score}</p>
+								</>
+							)}
+
+							{gameState === "paused" && (
+								<>
+									<FaPause className="text-4xl text-yellow-300" />
+									<p className="text-lg">Paused</p>
+								</>
+							)}
+
+							{gameState === "idle" && (
+								<>
+									<FaPlay className="text-4xl text-green-400" />
+									<p className="text-lg">Press Start to Play</p>
+								</>
+							)}
+						</div>
 					)}
-				</button>
+				</div>
 
-				<button className="btn btn-secondary flex items-center gap-2" onClick={restartGame}>
-					<FaRedo /> Restart
-				</button>
-				<button className="btn btn-error flex items-center gap-2" onClick={clearCanvas}>
-					<FaTrash /> Clear
-				</button>
+				{/* --- Controls with icons --- */}
+				<div className="flex gap-3 mt-2">
+					<button className="btn btn-secondary flex items-center gap-2" onClick={startGame}>
+						<FaPlay /> Start
+					</button>
+					<button
+						className="btn btn-secondary flex items-center gap-2"
+						onClick={() => {
+							if (gameState === "running") pauseGame();
+							else if (gameState === "paused") unPauseGame();
+						}}
+						disabled={gameState === "idle" || gameState === "over"}
+					>
+						{gameState === "running" ? (
+							<>
+								<FaPause /> Pause
+							</>
+						) : gameState === "paused" ? (
+							<>
+								<FaPlayCircle /> Unpause
+							</>
+						) : (
+							<>
+								<FaPause /> Pause
+							</>
+						)}
+					</button>
+
+					<button className="btn btn-secondary flex items-center gap-2" onClick={restartGame}>
+						<FaRedo /> Restart
+					</button>
+					<button className="btn btn-error flex items-center gap-2" onClick={clearCanvas}>
+						<FaTrash /> Clear
+					</button>
+				</div>
 			</div>
-		</div>
+
+			<aside className="w-75 border-l border-contrast"></aside>
+		</>
 	);
 }
 

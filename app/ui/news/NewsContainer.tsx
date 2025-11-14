@@ -170,7 +170,7 @@ const NewsGrid = () => {
 					<div className="flex w-full flex-wrap gap-2 mt-2 justify-center">
 						<button
 							onClick={() => {
-								router.push("/news");
+								router.push("/news?q=home");
 								setFilter("home");
 							}}
 							className={`btn px-3 py-1.5 text-base flex-1 min-w-[calc(50%-0.5rem)] sm:min-w-30 ${
@@ -206,7 +206,8 @@ const NewsGrid = () => {
 						<div className="flex flex-col items-center justify-center mt-25">
 							<MdOutlineArticle className="text-6xl text-muted mb-4" />
 							<p className="text-muted text-lg font-medium">
-								No news available. {`API provider doesn't allow prod usage`}
+								{/* No news available. {`API provider doesn't allow prod usage`} */}
+								Nothing to read here… yet! Check back later for updates.
 							</p>
 						</div>
 					) : (

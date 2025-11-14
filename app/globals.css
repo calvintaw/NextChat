@@ -1036,3 +1036,7 @@ html {
 .scroll-hidden::-webkit-scrollbar {
 	display: none; /* Chrome, Safari, new Edge */
 }
+
+#nprogress .bar {
+	background: linear-gradient(to right, #ec4899, #ef4444, #f97316) !important;
+}
