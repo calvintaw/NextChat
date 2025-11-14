@@ -949,6 +949,15 @@ export async function createDM(
 			return { success: true, message: `Created DM with ${targetUser.username}.`, roomId: room_id };
 		} catch (error) {
 			console.error("Error creating DM:", error);
+
+			if (error.code === "23505") {
+				return {
+					success: false,
+					message: `A DM with ${targetUser.username} already exists.`,
+					roomId: getDMRoom(currentUser.id, targetUser.id),
+				};
+			}
+			
 			return { success: false, message: "Failed to create DM. Please try again later." };
 		}
 	});

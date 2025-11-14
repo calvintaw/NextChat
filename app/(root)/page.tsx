@@ -4,7 +4,6 @@ import { getFriendRequests } from "../lib/actions";
 import ContactTabs from "../ui/contact/ContactsTabs";
 
 const Page = async () => {
-	return null;
 	const session = await auth();
 	if (!session) redirect("/login");
 

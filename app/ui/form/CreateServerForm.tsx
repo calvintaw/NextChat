@@ -164,7 +164,7 @@ export default function CreateServerFormDialog({ className, user }: { className:
 				</div>
 			</Dialog.Trigger>
 			<Dialog.Portal>
-				<Dialog.Overlay className="fixed inset-0 bg-black/80 z-[99]" />
+				<Dialog.Overlay className="fixed inset-0 bg-black/70 z-[11000]" />
 				<Dialog.Content
 					className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-119  max-h-[95vh] 
 				bg-surface text-text rounded-2xl px-5 py-4 pt-7.5 shadow-lg shadow-black/95 not-dark:shadow-black/25

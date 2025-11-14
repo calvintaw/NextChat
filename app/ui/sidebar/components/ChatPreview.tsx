@@ -346,7 +346,7 @@ export const ChatPanelHeader = ({ user }: { user: User }) => {
 							className={clsx(
 								"btn btn-secondary w-full text-base py-2 px-4 pl-3 text-left btn-with-icon no-underline rounded-md transition-colors duration-200",
 								pathname === href
-									? "bg-accent/85 text-text cursor-default"
+									? "bg-accent/80 text-text cursor-default"
 									: "bg-surface/25 not-dark:bg-surface/35 text-muted hover:bg-accent/30 not-dark:hover:bg-accent/50 hover:text-text"
 							)}
 							onClick={() => router.push(href as Route)}
@@ -516,7 +516,7 @@ export const CreateDMButton = ({ currentUser }: { currentUser: User }) => {
 			</Dialog.Trigger>
 
 			<Dialog.Portal>
-				<Dialog.Overlay className="fixed inset-0 bg-black/50" />
+				<Dialog.Overlay className="fixed inset-0 bg-black/70 z-[11000]" />
 				<Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface rounded-xl p-6 pt-4 w-full max-w-md shadow-lg border border-border z-[12000]">
 					<Dialog.Title className="text-xl font-semibold text-text mb-4">Create a new DM</Dialog.Title>
 
@@ -578,7 +578,7 @@ const UserCard = ({ user }: { user: User }) => {
 					onClick={async () => {
 						setIsPending(true);
 						const result = await createDM({ id: user.id, username: user.username });
-						setResult({success: result.success, message: result.message});
+						setResult({ success: result.success, message: result.message });
 						setIsPending(false);
 					}}
 					className="hover:bg-background/75 btn-with-icon justify-center items-center gap-2"
@@ -587,8 +587,8 @@ const UserCard = ({ user }: { user: User }) => {
 					{isPending && <BiLoaderAlt className="animate-spin text-lg" />}
 				</button>
 			</div>
-			{result.success && <p className="my-1 text-sm text-success">{result.message}</p>}
-			{!result.success && <p className="my-1 text-sm text-red-500">{result.message}</p>}
+			{result.success && <p className="mt-1 text-sm text-success">{result.message}</p>}
+			{!result.success && <p className="mt-1 text-xs text-red-500">{result.message}</p>}
 		</>
 	);
 };
