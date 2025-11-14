@@ -10,6 +10,8 @@ import { User } from "@/app/lib/definitions";
 import { FaPlay, FaPause, FaRedo, FaTrash, FaSkull, FaPlayCircle } from "react-icons/fa";
 import { useLocalStorage } from "@/app/lib/hooks/useStorage";
 import { updateSnakeScore, getSnakeLeaderboard } from "@/app/lib/actions";
+import { FaArrowLeft } from "react-icons/fa6";
+import Link from "next/link";
 
 const gridSize = 10;
 const canvasWidth = 400;
@@ -57,21 +59,34 @@ export default function SnakeHome({ user }: { user: User }) {
 	useEffect(() => {
 		const handleKey = (e: KeyboardEvent) => {
 			if (!running) return;
+
 			switch (e.key) {
 				case "ArrowUp":
+				case "w":
+				case "W":
 					if (direction !== "down") setDirection("up");
 					break;
+
 				case "ArrowDown":
+				case "s":
+				case "S":
 					if (direction !== "up") setDirection("down");
 					break;
+
 				case "ArrowLeft":
+				case "a":
+				case "A":
 					if (direction !== "right") setDirection("left");
 					break;
+
 				case "ArrowRight":
+				case "d":
+				case "D":
 					if (direction !== "left") setDirection("right");
 					break;
 			}
 		};
+
 		window.addEventListener("keydown", handleKey);
 		return () => window.removeEventListener("keydown", handleKey);
 	}, [direction, running]);
@@ -213,19 +228,24 @@ export default function SnakeHome({ user }: { user: User }) {
 	return (
 		<>
 			<div className="flex flex-col items-center gap-4 relative flex-1 justify-center">
-				{/* {!disableInstructions && (
-					
-				)} */}
+				{!disableInstructions && (
+					<div className="hidden  snake-instructions   w-full h-fit absolute top-0 justify-between left-0 right-0 py-1 px-2 items-center text-sm font-semibold bg-accent/25  text-muted">
+						<p className="text-center">Use the arrow keys or WASD to move the snake around</p>
+						<button
+							onClick={() => setDisableInstructions(true)}
+							className="size-5.5 text-center bg-background hover:bg-surface hover:border border-contrast !p-0 text-xs"
+						>
+							X
+						</button>
+					</div>
+				)}
 
-				<div className="w-full h-fit absolute top-0 flex justify-between left-0 right-0 py-1 px-2 items-center text-sm font-semibold bg-accent/25  text-muted">
-					<p className="text-center">Use the arrow keys to move the snake around</p>
-					<button
-						onClick={() => setDisableInstructions(true)}
-						className="size-5.5 text-center bg-background hover:bg-surface hover:border border-contrast !p-0 text-xs"
-					>
-						X
+				<Link href="/?tab=games" className="no-underline absolute left-2 top-2">
+					<button className=" btn-small text-sm btn-with-icon items-center gap-1 !w-fit px-2 pr-2.5">
+						<FaArrowLeft />
+						Go Back
 					</button>
-				</div>
+				</Link>
 
 				{/* --- Game Canvas --- */}
 				{/* --- Score Display --- */}
@@ -243,7 +263,12 @@ export default function SnakeHome({ user }: { user: User }) {
 
 					{/* --- Overlay for idle, paused, and over states --- */}
 					{gameState !== "running" && (
-						<div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white rounded-md space-y-3">
+						<div
+							onClick={() => {
+								if (gameState === "idle" || "paused") startGame();
+							}}
+							className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white rounded-md space-y-3"
+						>
 							{gameState === "over" && (
 								<>
 									<FaSkull className="text-4xl text-red-400 animate-pulse" />
@@ -254,16 +279,16 @@ export default function SnakeHome({ user }: { user: User }) {
 
 							{gameState === "paused" && (
 								<>
-									<FaPause className="text-4xl text-yellow-300" />
+									<FaPause className="text-4xl cursor-pointer text-yellow-300" />
 									<p className="text-lg">Paused</p>
 								</>
 							)}
 
 							{gameState === "idle" && (
 								<>
-									<FaPlay className="text-4xl text-green-400" />
+									<FaPlay className="text-4xl cursor-pointer text-green-400" />
 									<p className="text-lg">Press Start to Play</p>
-									<p>Controls: Up, Down, Left, Right</p>
+									{/* <p>Controls: Up, Down, Left, Right</p> */}
 								</>
 							)}
 						</div>

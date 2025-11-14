@@ -1040,3 +1040,13 @@ html {
 #nprogress .bar {
 	background: linear-gradient(to right, #ec4899, #ef4444, #f97316) !important;
 }
+
+.snake-instructions {
+	animation: showInstructions 5s forwards;
+}
+
+@keyframes showInstructions {
+	100% {
+		display: flex !important;
+	}
+}
