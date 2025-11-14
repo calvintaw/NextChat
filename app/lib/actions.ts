@@ -5,7 +5,6 @@ import {
 	SignupFormSchema,
 	FormState,
 	LoginFormUser,
-	sql,
 	createServerSchema,
 	User,
 	MessageType,
@@ -17,6 +16,7 @@ import {
 	NewsApiParams,
 	Room,
 	MessageContentType,
+	sql,
 } from "./definitions";
 import bcrypt from "bcryptjs";
 import z from "zod";
@@ -63,7 +63,6 @@ export async function getUser(user_id: string): Promise<User | null> {
 }
 
 type FindUserState = { error: undefined | string; user: User | null };
-
 
 export async function getUserByUsername(username: string): Promise<User | null> {
 	const result = await sql<User[]>`
@@ -957,7 +956,7 @@ export async function createDM(
 					roomId: getDMRoom(currentUser.id, targetUser.id),
 				};
 			}
-			
+
 			return { success: false, message: "Failed to create DM. Please try again later." };
 		}
 	});
@@ -1442,4 +1441,35 @@ export async function getBioByUsername(username: string) {
 		return { success: false };
 	}
 	return { success: true, readme: result[0].bio };
+}
+
+export async function updateSnakeScore(userId: string, score: number) {
+	await sql`
+    INSERT INTO snake_scores (user_id, best_score)
+    VALUES (${userId}, ${score})
+    ON CONFLICT (user_id)
+    DO UPDATE SET
+      best_score = GREATEST(snake_scores.best_score, ${score}),
+      updated_at = NOW();
+  `;
+}
+
+export async function getSnakeLeaderboard(userId: string) {
+	const rows = await sql`
+    WITH ranked AS (
+      SELECT
+        s.user_id,
+        u.username,
+        s.best_score,
+        RANK() OVER (ORDER BY s.best_score DESC) AS rank
+      FROM snake_scores s
+      JOIN users u ON u.id = s.user_id
+    )
+    SELECT
+      (SELECT json_agg(r ORDER BY rank)
+         FROM (SELECT * FROM ranked ORDER BY rank LIMIT 20) r
+      ) AS leaderboard,
+      (SELECT row_to_json(r) FROM (SELECT * FROM ranked r WHERE r.user_id = ${userId}) r) AS me;
+  `;
+	return rows[0];
 }

@@ -278,8 +278,8 @@ export const ChatPreview = ({
 		>
 			<div
 				className={clsx(
-					"rounded-lg py-1.5 px-2.5  flex items-center gap-2.5 group max-lg:[#sidebar.active_&]:mb-1.5",
-					isSelected ? "bg-accent/50 hover:bg-accent/20" : "hover:bg-accent/25"
+					"rounded-lg py-2 px-2.5 -mb-0.5 flex items-center gap-2.5 group max-lg:[#sidebar.active_&]:mb-1.5",
+					isSelected ? "bg-accent/50 hover:bg-accent/20" : "hover:bg-accent/25 bg-accent/2"
 				)}
 			>
 				<Avatar
@@ -287,7 +287,7 @@ export const ChatPreview = ({
 					statusIndicator={false}
 					id={chat.room_type === "dm" ? chat.id : chat.room_id}
 					src={chat.room_type === "dm" ? chat.image : chat.room_image}
-					size="size-8.5"
+					size="size-8"
 					displayName={chat.room_type === "dm" ? chat.displayName : chat.room_name}
 				/>
 
@@ -490,7 +490,8 @@ export const CreateDMButton = ({ currentUser }: { currentUser: User }) => {
 		setError(null);
 
 		try {
-			const fetchedUser = await getUserByUsername(username);
+			const normalizedUsername = username.startsWith("@") ? username.slice(1) : username;
+			const fetchedUser = await getUserByUsername(normalizedUsername);
 			if (!fetchedUser) {
 				setError("User not found");
 			} else {
