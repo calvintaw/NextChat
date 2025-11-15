@@ -1439,10 +1439,10 @@ export async function updateReadmeByUsername(readme: string) {
         SET readme = ${readme}
         WHERE id = ${user.id}
       `;
-			return { success: true, message: "README.md updated successfully." };
+			return { success: true, message: "Bio updated successfully." };
 		} catch (error) {
 			console.error("updateReadmeByUsername ERROR:", error);
-			return { success: false, message: "Failed to update README.md Please try again." };
+			return { success: false, message: "Failed to update Bio Please try again." };
 		}
 	});
 }

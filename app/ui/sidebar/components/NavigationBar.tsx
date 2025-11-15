@@ -65,9 +65,9 @@ const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: R
 				className="
 			bg-background
 			flex items-start flex-col max-sm:gap-1.5 gap-1 h-full w-fit py-2 sticky top-0 navigation-bar
-			min-w-[52px]
+			min-w-13
 			max-lg:border-r
-			dark:border-surface border-surface/10
+			dark:border-surface border-surface
 
 			"
 			>

@@ -106,7 +106,7 @@ const DashboardPage = ({ initialUser, isOwnPage = true }: { initialUser: User; i
 		user.readme?.trim() ||
 			`# Hey there! I'm ${user.username} 👋
 
-Looks like I haven't written my README yet. 
+Looks like I haven't written my Bio yet. 
 
 ✨ Here’s what I might share:
 - A little about me
@@ -294,7 +294,7 @@ z-[12000]							"
 							</>
 						)}
 						<Button className="md:hidden btn-inverted !border-border" onClick={() => setIsReadMeMode(true)}>
-							Open README.md
+							Open Bio
 						</Button>
 					</div>
 				</div>
@@ -306,7 +306,7 @@ z-[12000]							"
 					style
 				)}
 			>
-				<p className="text-muted text-sm mb-0 px-4">{user.username} / README.md</p>
+				<p className="text-muted text-sm mb-0 px-4">{user.username} / bio</p>
 				<hr className="hr-separator mt-2 mb-4 border-contrast" />
 
 				{!isEditingReadme && (
@@ -344,11 +344,14 @@ z-[12000]							"
 											}, 0);
 										}}
 									>
-										Edit README.md
+										Edit Bio
 									</Button>
 									{isReadMeMode && (
-										<Button className="btn-primary" onClick={() => setIsReadMeMode(false)}>
-											Close README.md
+										<Button
+											className="btn-primary bg-transparent text-text hover:!bg-surface hover:!opacity-100 opacity-65"
+											onClick={() => setIsReadMeMode(false)}
+										>
+											Close Bio
 										</Button>
 									)}
 								</div>

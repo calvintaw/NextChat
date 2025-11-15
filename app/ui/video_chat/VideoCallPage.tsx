@@ -1,15 +1,32 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { HiOutlineMicrophone } from "react-icons/hi2";
-import { TbMicrophoneOff } from "react-icons/tb";
-import { PiCamera, PiCameraSlash } from "react-icons/pi";
-import { MdScreenShare, MdCallEnd } from "react-icons/md";
-import { IconWithSVG } from "../general/Buttons";
+import { useEffect, useRef, useState } from "react";
 import { socket } from "@/app/lib/socket";
+import { User } from "next-auth";
+import { HiOutlineMicrophone } from "react-icons/hi";
+import { MdCallEnd, MdScreenShare } from "react-icons/md";
+import { PiCamera, PiCameraSlash } from "react-icons/pi";
+import { TbMicrophoneOff } from "react-icons/tb";
+import { IconWithSVG } from "../general/Buttons";
+import { FaPhone } from "react-icons/fa6";
+import { Tooltip } from "react-tooltip";
 
-export default function VideoCallPage({ roomId }: { roomId: string }) {
-	// =============================
+type VideoCallSearchParams = {
+	micOn: boolean;
+	camOn: boolean;
+};
+
+export default function VideoCallPage({
+	currentUser,
+	searchParams,
+	roomId,
+}: {
+	roomId: string;
+	currentUser: User;
+	searchParams: VideoCallSearchParams;
+}) {
+	// ============================
+
 	//   VIDEO + RTC STATE
 	// =============================
 	// Video element refs
@@ -24,8 +41,8 @@ export default function VideoCallPage({ roomId }: { roomId: string }) {
 	const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
 
 	// Control states
-	const [micOn, setMicOn] = useState(true);
-	const [camOn, setCamOn] = useState(true);
+	const [micOn, setMicOn] = useState(searchParams.micOn);
+	const [camOn, setCamOn] = useState(searchParams.camOn);
 	const [inCall, setInCall] = useState(false);
 
 	useEffect(() => {
@@ -65,7 +82,7 @@ export default function VideoCallPage({ roomId }: { roomId: string }) {
 			socket.off("answer-video");
 			socket.off("ice-candidate");
 		};
-	}, []);
+	}, [roomId]);
 
 	// =============================
 	//   INIT LOCAL MEDIA
@@ -169,9 +186,9 @@ export default function VideoCallPage({ roomId }: { roomId: string }) {
 		setLocalStream(null);
 		setRemoteStream(null);
 		setInCall(false);
-		setMicOn(true);
-		setCamOn(true);
-		setInCall(false);
+
+		setMicOn(searchParams.micOn);
+		setCamOn(searchParams.camOn);
 		if (localVideoRef.current) localVideoRef.current.srcObject = null;
 		if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
 
@@ -211,8 +228,16 @@ export default function VideoCallPage({ roomId }: { roomId: string }) {
 	// ============================================================
 	return (
 		<div className="relative flex-1 h-[100vh] min-lg:h-[calc(100vh-32px)] flex flex-col bg-background text-text select-none">
+			<Tooltip
+				id={`videochat-toolbar-icons-tooltip`}
+				place="top"
+				className="small-tooltip"
+				border="var(--tooltip-border)"
+				offset={5}
+			/>
+
 			{/* Remote Video */}
-			<div className="flex-1 p-4">
+			<div className="flex-1 p-4 max-[420px]:p-2">
 				<div className="w-full h-full rounded-xl bg-foreground/30 dark:bg-foreground/20 border border-contrast flex items-center justify-center overflow-hidden relative">
 					<div className="text-text opacity-50 text-sm absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
 						Remote Video
@@ -225,7 +250,7 @@ export default function VideoCallPage({ roomId }: { roomId: string }) {
 			</div>
 
 			{/* Local Mini Preview */}
-			<div className="absolute bottom-28 right-4 sm:right-6 w-40 h-28 rounded-lg overflow-hidden shadow-xl border border-border/40 bg-black/40 backdrop-blur">
+			<div className="absolute bottom-28 right-6 w-40 h-28 rounded-lg overflow-hidden shadow-xl border border-border/40 bg-black/40 backdrop-blur">
 				<video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-cover" />{" "}
 				<div
 					className="text-[11px] opacity-50 text-white
@@ -241,40 +266,50 @@ export default function VideoCallPage({ roomId }: { roomId: string }) {
 			<div className="w-full py-3 flex items-center justify-center gap-4 border-t border-contrast bg-contrast/75 backdrop-blur-md">
 				{/* START / LEAVE CALL */}
 				{!inCall ? (
-					<IconWithSVG onClick={startCall} className="hover:bg-foreground/25 bg-green-500 text-white">
+					<button
+						onClick={startCall}
+						className="btn h-12 hover:bg-foreground/25 bg-green-600 text-white flex btn-with-icon gap-2 items-center"
+					>
+						<FaPhone className="text-lg" />
 						Start Call
-					</IconWithSVG>
+					</button>
 				) : (
 					<IconWithSVG onClick={leaveCall} className="icon bg-red-500 hover:bg-red-600 text-white transition">
-						<MdCallEnd size={22} />
+						<MdCallEnd className="text-2xl" />
 					</IconWithSVG>
 				)}
 
 				{/* MIC */}
 				<IconWithSVG
+					data-tooltip-id="videochat-toolbar-icons-tooltip"
+					data-tooltip-content={micOn ? "Mute microphone" : "Unmute microphone"}
 					onClick={toggleMic}
 					className="hover:bg-foreground/25 bg-accent dark:bg-surface dark:hover:bg-accent"
 					disabled={!inCall}
 				>
-					{micOn ? <HiOutlineMicrophone size={22} /> : <TbMicrophoneOff size={22} />}
+					{micOn ? <HiOutlineMicrophone className="text-2xl" /> : <TbMicrophoneOff className="text-2xl" />}
 				</IconWithSVG>
 
 				{/* CAMERA */}
 				<IconWithSVG
+					data-tooltip-id="videochat-toolbar-icons-tooltip"
+					data-tooltip-content={camOn ? "Turn off camera" : "Turn on camera"}
 					onClick={toggleCam}
 					className="hover:bg-foreground/25 bg-accent dark:bg-surface dark:hover:bg-accent"
 					disabled={!inCall}
 				>
-					{camOn ? <PiCamera size={22} /> : <PiCameraSlash size={22} />}
+					{camOn ? <PiCamera className="text-2xl" /> : <PiCameraSlash className="text-2xl" />}
 				</IconWithSVG>
 
 				{/* SCREEN SHARE */}
 				<IconWithSVG
+					data-tooltip-id="videochat-toolbar-icons-tooltip"
+					data-tooltip-content="Start/stop screen share"
 					onClick={shareScreen}
 					className="hover:bg-foreground/25 bg-accent dark:bg-surface dark:hover:bg-accent"
 					disabled={!inCall}
 				>
-					<MdScreenShare size={22} />
+					<MdScreenShare className="text-2xl" />
 				</IconWithSVG>
 			</div>
 		</div>
@@ -332,22 +367,22 @@ export default function VideoCallPage({ roomId }: { roomId: string }) {
 // 			<div className="w-full py-3 flex items-center justify-center gap-4 border-t border-contrast bg-contrast/75 backdrop-blur-md">
 // 				{/* MIC */}
 // 				<IconWithSVG className="hover:bg-foreground/25 bg-accent dark:bg-surface dark:hover:bg-accent">
-// 					<HiOutlineMicrophone size={22} />
+// 					<HiOutlineMicrophone className="text-2xl" />
 // 				</IconWithSVG>
 
 // 				{/* CAMERA */}
 // 				<IconWithSVG className="hover:bg-foreground/25 bg-accent dark:bg-surface dark:hover:bg-accent">
-// 					<PiCamera size={22} />
+// 					<PiCamera className="text-2xl" />
 // 				</IconWithSVG>
 
 // 				{/* SCREEN SHARE */}
 // 				<IconWithSVG className="hover:bg-foreground/25 bg-accent dark:bg-surface dark:hover:bg-accent">
-// 					<MdScreenShare size={22} />
+// 					<MdScreenShare className="text-2xl" />
 // 				</IconWithSVG>
 
 // 				{/* LEAVE */}
 // 				<IconWithSVG className="icon bg-red-500 hover:bg-red-600 text-white transition">
-// 					<MdCallEnd size={22} />
+// 					<MdCallEnd className="text-2xl" />
 // 				</IconWithSVG>
 // 			</div>
 // 		</div>

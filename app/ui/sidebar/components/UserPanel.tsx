@@ -34,7 +34,7 @@ const UserPanel = ({ user }: Props) => {
 
 	return (
 		<div
-			className="@container !absolute !bottom-4.5 !left-2 !right-2.5 z-40
+			className="@container !absolute !bottom-4 !left-2 !right-2.5 z-40
 
 		max-lg:[#sidebar.active_&]:!min-w-78
 		max-lg:[#sidebar.active_&]:!max-w-81

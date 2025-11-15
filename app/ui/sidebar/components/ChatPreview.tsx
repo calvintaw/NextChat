@@ -151,6 +151,7 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 	const pathname = usePathname();
 	const router = useRouterWithProgress();
 
+	//@ts-ignore
 	async function handleRemoveFriend(e) {
 		e.preventDefault();
 		if (!selectedChat) return;

@@ -154,7 +154,6 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, isBlocked }: C
 			if (input.trim() === "") setInput("");
 			if (replyToMsg) setReplyToMsg(null);
 		}
-		
 	};
 
 	// use effect side effect for focusing input when ctrl + /
@@ -173,7 +172,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, isBlocked }: C
 	return (
 		<div className={clsx("relative", (isBlocked || (isSystem && isBlocked)) && "cursor-not-allowed")}>
 			<div
-				className={clsx("p-4  mb-3 ", (isBlocked || (isSystem && isBlocked)) && "pointer-events-none")}
+				className={clsx("p-4 ", (isBlocked || (isSystem && isBlocked)) && "pointer-events-none")}
 				data-tooltip-id={"typing-indicator"}
 			>
 				<TypingIndicator displayName={activePersons} />
