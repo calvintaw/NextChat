@@ -12,6 +12,7 @@ export const PathBanner = () => {
 		"/": "🖥️ Main Dashboard",
 		"/news": "📰 Top News",
 		"/dashboard": "👤 Profile",
+		"/video_chat": "🎥 Video Chat",
 	};
 
 	const getBannerTitle = (pathname: string): string => {

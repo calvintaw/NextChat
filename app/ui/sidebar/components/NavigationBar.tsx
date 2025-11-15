@@ -78,6 +78,7 @@ const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: R
 
 						return (
 							<Link
+								//@ts-ignore
 								target={icon.external ? "_blank" : "_self"}
 								href={icon.href as Route}
 								role="navigation"
@@ -100,6 +101,8 @@ const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: R
 										className={clsx(
 											"not-dark:group-hover:text-background text-[24px] max-sm:text-[20px]",
 											pathname === icon.href && "not-dark:!text-white",
+
+											//@ts-ignore
 											icon.external && "text-yellow-400"
 										)}
 									/>
