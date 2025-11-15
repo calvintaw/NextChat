@@ -20,11 +20,8 @@ import { ServerImageUploadBtn } from "../chat/components/UploadButtons";
 import clsx from "clsx";
 import { MdMotionPhotosOff } from "react-icons/md";
 import useToggle from "../../lib/hooks/useToggle";
-import { ImSpinner9 } from "react-icons/im";
 import { supabase } from "@/app/lib/supabase";
 import imageCompression from "browser-image-compression";
-import { nanoid } from "nanoid";
-import { useRouter } from "next/navigation";
 import { BiLoaderAlt } from "react-icons/bi";
 import { useRouterWithProgress } from "@/app/lib/hooks/useRouterWithProgressBar";
 

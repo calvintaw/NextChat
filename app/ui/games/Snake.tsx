@@ -12,6 +12,12 @@ import { useLocalStorage } from "@/app/lib/hooks/useStorage";
 import { updateSnakeScore, getSnakeLeaderboard } from "@/app/lib/actions";
 import { FaArrowLeft } from "react-icons/fa6";
 import Link from "next/link";
+import { FiSidebar } from "react-icons/fi";
+import { IconWithSVG } from "../general/Buttons";
+import { Tooltip } from "react-tooltip";
+import useToggle from "@/app/lib/hooks/useToggle";
+import clsx from "clsx";
+import { useWindowSize } from "@/app/lib/hooks/useWindowSize";
 
 const gridSize = 10;
 const canvasWidth = 400;
@@ -227,112 +233,137 @@ export default function SnakeHome({ user }: { user: User }) {
 
 	return (
 		<>
-			<div className="flex flex-col items-center gap-4 relative flex-1 justify-center">
-				{!disableInstructions && (
-					<div className="hidden  snake-instructions   w-full h-fit absolute top-0 justify-between left-0 right-0 py-1 px-2 items-center text-sm font-semibold bg-accent/25  text-muted">
-						<p className="text-center">Use the arrow keys or WASD to move the snake around</p>
-						<button
-							onClick={() => setDisableInstructions(true)}
-							className="size-5.5 text-center bg-background hover:bg-surface hover:border border-contrast !p-0 text-xs"
-						>
-							X
-						</button>
-					</div>
-				)}
-
-				<Link href="/?tab=games" className="no-underline absolute left-2 top-2">
-					<button className=" btn-small text-sm btn-with-icon items-center gap-1 !w-fit px-2 pr-2.5">
-						<FaArrowLeft />
-						Go Back
-					</button>
-				</Link>
-
-				{/* --- Game Canvas --- */}
-				{/* --- Score Display --- */}
-				<p className="text-lg font-semibold text-gray-700">
-					Score: <span className="text-green-600">{score}</span>
-				</p>
-
-				<div className="relative">
-					<canvas
-						ref={canvasRef}
-						width={canvasWidth}
-						height={canvasHeight}
-						className="border-4 border-primary rounded-md bg-contrast"
-					></canvas>
-
-					{/* --- Overlay for idle, paused, and over states --- */}
-					{gameState !== "running" && (
-						<div
-							onClick={() => {
-								if (gameState === "idle" || "paused") startGame();
-							}}
-							className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white rounded-md space-y-3"
-						>
-							{gameState === "over" && (
-								<>
-									<FaSkull className="text-4xl text-red-400 animate-pulse" />
-									<p className="text-xl font-bold">Game Over</p>
-									<p className="text-sm">Score: {score}</p>
-								</>
-							)}
-
-							{gameState === "paused" && (
-								<>
-									<FaPause className="text-4xl cursor-pointer text-yellow-300" />
-									<p className="text-lg">Paused</p>
-								</>
-							)}
-
-							{gameState === "idle" && (
-								<>
-									<FaPlay className="text-4xl cursor-pointer text-green-400" />
-									<p className="text-lg">Press Start to Play</p>
-									{/* <p>Controls: Up, Down, Left, Right</p> */}
-								</>
-							)}
+			<Tooltip
+				id={`snake-sidebar-icons-tooltip`}
+				place="left-start"
+				className="small-tooltip"
+				border="var(--tooltip-border)"
+				offset={0}
+			/>
+			<div className="relative flex w-full">
+				<div className="flex flex-col items-center gap-4 relative flex-1 justify-center">
+					{!disableInstructions && (
+						<div className="hidden  snake-instructions   w-full h-fit absolute top-0 justify-between left-0 right-0 py-1 px-2 items-center text-sm font-semibold bg-accent/25  text-muted">
+							<p className="text-center">Use the arrow keys or WASD to move the snake around</p>
+							<button
+								onClick={() => setDisableInstructions(true)}
+								className="size-5.5 text-center bg-background hover:bg-surface hover:border border-contrast !p-0 text-xs"
+							>
+								X
+							</button>
 						</div>
 					)}
-				</div>
 
-				{/* --- Controls with icons --- */}
-				<div className="flex gap-3 mt-2">
-					<button className="btn btn-secondary flex items-center gap-2" onClick={startGame}>
-						<FaPlay /> Start
-					</button>
-					<button
-						className="btn btn-secondary flex items-center gap-2"
-						onClick={() => {
-							if (gameState === "running") pauseGame();
-							else if (gameState === "paused") unPauseGame();
-						}}
-						disabled={gameState === "idle" || gameState === "over"}
-					>
-						{gameState === "running" ? (
-							<>
-								<FaPause /> Pause
-							</>
-						) : gameState === "paused" ? (
-							<>
-								<FaPlayCircle /> Unpause
-							</>
-						) : (
-							<>
-								<FaPause /> Pause
-							</>
+					<Link href="/?tab=games" className="no-underline absolute left-2 top-2">
+						<button className=" btn-small text-sm btn-with-icon items-center gap-1 !w-fit px-2 pr-2.5">
+							<FaArrowLeft />
+							Go Back
+						</button>
+					</Link>
+
+					{/* --- Game Canvas --- */}
+					{/* --- Score Display --- */}
+					<p className="text-lg max-sm:text-base font-semibold text-gray-700">
+						Score: <span className="text-green-600">{score}</span>
+					</p>
+
+					<div className="relative max-sm:!size-[306px]">
+						<canvas
+							ref={canvasRef}
+							width={canvasWidth}
+							height={canvasHeight}
+							className="border-4 border-primary rounded-md bg-contrast max-sm:!size-[306px]"
+						></canvas>
+
+						{/* --- Overlay for idle, paused, and over states --- */}
+						{gameState !== "running" && (
+							<div
+								onClick={() => {
+									if (gameState === "idle" || "paused") startGame();
+								}}
+								className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white rounded-md space-y-3"
+							>
+								{gameState === "over" && (
+									<>
+										<FaSkull className="text-4xl text-red-400 animate-pulse" />
+										<p className="text-xl font-bold">Game Over</p>
+										<p className="text-sm">Score: {score}</p>
+									</>
+								)}
+
+								{gameState === "paused" && (
+									<>
+										<FaPause className="text-4xl cursor-pointer text-yellow-300" />
+										<p className="text-lg">Paused</p>
+									</>
+								)}
+
+								{gameState === "idle" && (
+									<>
+										<FaPlay className="text-4xl cursor-pointer text-green-400" />
+										<p className="text-lg">Press Start to Play</p>
+										{/* <p>Controls: Up, Down, Left, Right</p> */}
+									</>
+								)}
+							</div>
 						)}
-					</button>
+					</div>
 
-					<button className="btn btn-secondary flex items-center gap-2" onClick={restartGame}>
-						<FaRedo /> Restart
-					</button>
-					<button className="btn btn-error flex items-center gap-2" onClick={clearCanvas}>
-						<FaTrash /> Clear
-					</button>
+					{/* --- Controls with icons --- */}
+					<div className="flex gap-3 max-sm:gap-1.5 mt-2">
+						<button
+							className="max-sm:!size-12 max-sm:justify-center max-sm:!p-0 btn btn-secondary flex items-center gap-2"
+							onClick={startGame}
+						>
+							<FaPlay />
+							<span className="max-sm:hidden">Start</span>
+						</button>
+
+						<button
+							className="max-sm:!size-12 max-sm:justify-center max-sm:!p-0 btn btn-secondary flex items-center gap-2"
+							onClick={() => {
+								if (gameState === "running") pauseGame();
+								else if (gameState === "paused") unPauseGame();
+							}}
+							disabled={gameState === "idle" || gameState === "over"}
+						>
+							{gameState === "running" ? (
+								<>
+									<FaPause />
+									<span className="max-sm:hidden">Pause</span>
+								</>
+							) : gameState === "paused" ? (
+								<>
+									<FaPlayCircle />
+									<span className="max-sm:hidden">Unpause</span>
+								</>
+							) : (
+								<>
+									<FaPause />
+									<span className="max-sm:hidden">Pause</span>
+								</>
+							)}
+						</button>
+
+						<button
+							className="max-sm:!size-12 max-sm:justify-center max-sm:!p-0 btn btn-secondary flex items-center gap-2"
+							onClick={restartGame}
+						>
+							<FaRedo />
+							<span className="max-sm:hidden">Restart</span>
+						</button>
+
+						<button
+							className="max-sm:!size-12 max-sm:justify-center max-sm:!p-0 btn btn-error flex items-center gap-2"
+							onClick={clearCanvas}
+						>
+							<FaTrash />
+							<span className="max-sm:hidden">Clear</span>
+						</button>
+					</div>
 				</div>
-			</div>
 
-			{/* <aside className="w-75 border-l border-contrast p-2">
+				{/* <aside className="w-75 border-l border-contrast p-2">
 				<h1 className="text-lg mb-2 text-center font-bold">LeaderBoards</h1>
 
 				<div className="w-full h-10 bg-gray-800 rounded-md"></div>
@@ -344,84 +375,85 @@ export default function SnakeHome({ user }: { user: User }) {
 				at the bottom - => you
 				<div className="w-full h-10 bg-gray-800 rounded-md"></div>
 			</aside> */}
-			<aside className="w-75 border-l border-contrast p-2 pt-1">
-				<h1 className="text-lg text-center font-bold mb-2">LeaderBoards</h1>
-				<hr className="hr-separator my-1 border-contrast" />
-
-				{/* Top 10 slots */}
-				{Array.from({ length: 5 }).map((_, i) => {
-					const entry = leaderboard[i];
-					return entry ? (
-						<div
-							key={entry.username}
-							className="w-full h-12 bg-gradient-to-r from-gray-800 to-gray-900 rounded-lg mb-2 flex items-center px-4 justify-between shadow-md hover:scale-105 transition-transform"
-						>
-							<span className="font-semibold text-gray-200">#{entry.rank}</span>
-							<span className="text-gray-300 font-medium">@{entry.username}</span>
-							<span className="font-bold text-green-400">{entry.best_score}</span>
-						</div>
-					) : (
-						<div
-							key={`empty-${i}`}
-							className="w-full h-12 bg-gray-700 rounded-lg mb-2 flex items-center px-4 justify-between text-gray-400 italic opacity-70"
-						>
-							<span className="font-semibold">#{i + 1}</span>
-							<span>Empty slot</span>
-							<span>-</span>
-						</div>
-					);
-				})}
-
-				{/* Divider */}
-				<p className="text-center text-sm text-gray-500 mt-4 mb-1">— You —</p>
-
-				{/* Current player row */}
-				{me ? (
-					<div className="w-full h-12 bg-green-900 rounded-lg flex items-center px-4 justify-between border border-green-500 shadow-lg">
-						<span className="font-semibold text-gray-100">#{me.rank}</span>
-						<span className="text-gray-200 font-medium">@{me.username}</span>
-						<span className="font-bold text-green-400">{me.best_score}</span>
-					</div>
-				) : (
-					<div className="w-full h-12 bg-gray-700 rounded-lg flex items-center px-4 justify-center text-gray-400 italic">
-						No score yet
-					</div>
-				)}
-			</aside>
+				<LeaderBoards leaderboard={leaderboard} me={me}></LeaderBoards>
+			</div>
 		</>
 	);
 }
 
-// <aside className="w-75 border-l border-contrast p-2 pt-1">
-// 	<h1 className="text-lg text-center font-bold">LeaderBoards</h1>
+const LeaderBoards = ({ leaderboard, me }: any) => {
+	const [showLeaderBoard, toggleLeaderBoard] = useToggle(true);
+	const size = useWindowSize();
 
-// 	<hr className="hr-separator my-1 border-contrast" />
+	useEffect(() => {
+		if (size.width < 801 && showLeaderBoard) toggleLeaderBoard(false);
+		if (size.width >= 801 && !showLeaderBoard) toggleLeaderBoard(true);
+	}, [size]);
 
-// 	{/* Top 10 */}
-// 	{leaderboard.slice(0, 10).map((entry, i) => (
-// 		<div
-// 			key={entry.username}
-// 			className="w-full h-10 bg-gray-800 rounded-md mb-1 flex items-center px-3 justify-between"
-// 		>
-// 			<span className="font-semibold text-gray-100">#{entry.rank}</span>
-// 			<span className="text-gray-300 text-sm">{entry.username}</span>
-// 			<span className="font-bold text-green-400">{entry.best_score}</span>
-// 		</div>
-// 	))}
+	return (
+		<aside
+			className={clsx(
+				showLeaderBoard ? "w-75 border-l border-contrast p-2" : "w-fit",
+				showLeaderBoard &&
+					"max-[801px]:absolute max-[801px]:top-0 max-[801px]:left-0 max-[801px]:right-0 max-[801px]:bottom-0 bg-contrast max-[801px]:w-full"
+			)}
+		>
+			<div className="flex items-center">
+				{showLeaderBoard && <h1 className="text-lg flex-1 text-center">LeaderBoards</h1>}
+				<IconWithSVG
+					onClick={toggleLeaderBoard}
+					className="icon-small bg-transparent hover:bg-secondary max-sm:absolute max-sm:top-2 max-sm:right-2 hover:cursor-ew-resize"
+					data-tooltip-id="snake-sidebar-icons-tooltip"
+					data-tooltip-content={showLeaderBoard ? "Close Leaderboards" : "Open Leaderboards"}
+				>
+					<FiSidebar />
+				</IconWithSVG>
+			</div>
+			{showLeaderBoard && (
+				<div>
+					<hr className="hr-separator my-1 border-contrast" />
 
-// 	{/* Divider */}
-// 	<p className="text-center text-sm text-gray-500 mt-4 mb-1">— You —</p>
+					{/* Top 10 slots */}
+					{Array.from({ length: 5 }).map((_, i) => {
+						const entry = leaderboard[i];
+						return entry ? (
+							<div
+								key={entry.username}
+								className="w-full h-12 bg-gradient-to-r from-gray-800 to-gray-900 rounded-lg mb-2 flex items-center px-4 justify-between shadow-md scale-100 hover:scale-90 transition-transform"
+							>
+								<span className="font-semibold text-gray-200">#{entry.rank}</span>
+								<span className="text-gray-300 font-medium">@{entry.username}</span>
+								<span className="font-bold text-green-400">{entry.best_score}</span>
+							</div>
+						) : (
+							<div
+								key={`empty-${i}`}
+								className="w-full h-12 bg-gray-700 rounded-lg mb-2 flex items-center px-4 justify-between text-gray-400 italic opacity-70"
+							>
+								<span className="font-semibold">#{i + 1}</span>
+								<span>Empty slot</span>
+								<span>-</span>
+							</div>
+						);
+					})}
 
-// 	{/* YOU row */}
-// 	{me ? (
-// 		<div className="w-full h-10 bg-gray-700 rounded-md flex items-center px-3 justify-between border border-green-500">
-// 			<span className="font-semibold text-gray-100">#{me.rank}</span>
-// 			<span className="text-gray-300 text-sm">{me.username}</span>
-// 			<span className="font-bold text-green-400">{me.best_score}</span>
-// 		</div>
-// 	) : (
-// 		<div className="w-full h-10 bg-gray-700 rounded-md flex items-center px-3 justify-center text-gray-400">
-// 			No score yet
-// 		</div>
-// 	)}
-// </aside>
+					{/* Divider */}
+					<p className="text-center text-sm text-gray-500 mt-4 mb-1">— You —</p>
+
+					{/* Current player row */}
+					{me ? (
+						<div className="w-full h-12 bg-green-900 rounded-lg flex items-center px-4 justify-between border border-green-500 shadow-lg">
+							<span className="font-semibold text-gray-100">#{me.rank}</span>
+							<span className="text-gray-200 font-medium">@{me.username}</span>
+							<span className="font-bold text-green-400">{me.best_score}</span>
+						</div>
+					) : (
+						<div className="w-full h-12 bg-gray-700 rounded-lg flex items-center px-4 justify-center text-gray-400 italic">
+							No score yet
+						</div>
+					)}
+				</div>
+			)}
+		</aside>
+	);
+};
