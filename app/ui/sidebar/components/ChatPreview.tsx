@@ -204,44 +204,43 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 
 								{!selectedChat.room_id.startsWith("system-room") && (
 									<>
-									<DropdownMenu.Separator className="DropdownMenu__Separator" />
+										<DropdownMenu.Separator className="DropdownMenu__Separator" />
 
-								<DropdownMenu.Item
-									className="DropdownMenuItem"
-									onClick={async (e) => {
-										e.preventDefault();
-										const result = await removeFriendshipRequest(selectedChat, "friend");
+										<DropdownMenu.Item
+											className="DropdownMenuItem"
+											onClick={async (e) => {
+												e.preventDefault();
+												const result = await removeFriendshipRequest(selectedChat, "friend");
 
-										if (result.success) {
-											router.refresh();
-											// socket.emit("refresh-contacts-page", user.id, selectedChat.id);
-											toast({
-												title: "",
-												mode: "positive",
-												subtitle: `Friend request with ${selectedChat.username} removed successfully.`,
-											});
-										} else {
-											toast({
-												title: "",
-												mode: "negative",
-												subtitle: result.message || "Failed to remove friend request. Please try again.",
-											});
-										}
-									}}
-								>
-									Remove Friend
+												if (result.success) {
+													router.refresh();
+													// socket.emit("refresh-contacts-page", user.id, selectedChat.id);
+													toast({
+														title: "",
+														mode: "positive",
+														subtitle: `Friend request with ${selectedChat.username} removed successfully.`,
+													});
+												} else {
+													toast({
+														title: "",
+														mode: "negative",
+														subtitle: result.message || "Failed to remove friend request. Please try again.",
+													});
+												}
+											}}
+										>
+											Remove Friend
+										</DropdownMenu.Item>
 
-								</DropdownMenu.Item>
-
-								<DropdownMenu.Item
-									onClick={(e) => {
-										e.preventDefault();
-										blockFriendship(user.id, selectedChat.id);
-									}}
-									className="DropdownMenuItem text-error"
-								>
-									Block
-								</DropdownMenu.Item>
+										<DropdownMenu.Item
+											onClick={(e) => {
+												e.preventDefault();
+												blockFriendship(user.id, selectedChat.id);
+											}}
+											className="DropdownMenuItem text-error"
+										>
+											Block
+										</DropdownMenu.Item>
 									</>
 								)}
 							</>
@@ -282,8 +281,8 @@ export const ChatPreview = ({
 		>
 			<div
 				className={clsx(
-					"rounded-lg py-2 px-2.5 -mb-0.5 flex items-center gap-2.5 group max-lg:[#sidebar.active_&]:mb-1.5",
-					isSelected ? "bg-accent/50 hover:bg-accent/20" : "hover:bg-accent/25 bg-accent/2"
+					"rounded-lg py-2 px-2.5 -mb-1 flex items-center gap-2.5 group max-lg:[#sidebar.active_&]:mb-1.5",
+					isSelected ? "bg-accent/50 hover:bg-accent/20" : "hover:bg-accent/25 bg-accent/5"
 				)}
 			>
 				<Avatar

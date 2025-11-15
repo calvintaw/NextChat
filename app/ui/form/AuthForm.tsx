@@ -28,7 +28,7 @@ export const AuthFormWrapper = ({ className, children }: { className?: string; c
 };
 
 export default function AuthForm() {
-	const [errorMessage, formAction, isPending] = useActionState(authenticate, "");
+	const [errorMessage, formAction, isPending] = useActionState(authenticate, undefined);
 
 	return (
 		<AuthFormWrapper>

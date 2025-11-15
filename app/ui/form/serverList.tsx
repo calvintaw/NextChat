@@ -177,7 +177,7 @@ const Card = ({ server, user }: any) => {
 					</div>
 
 					{/* Server Description */}
-					<p className="text-muted text-sm mt-2 line-clamp-3">{server.description || "No description available."}</p>
+					<p className="text-muted text-sm mt-2 max-w-[120ch]">{server.description || "No description available."}</p>
 				</div>
 
 				{/* Server Stats and Join Button */}

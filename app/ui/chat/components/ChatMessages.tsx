@@ -18,7 +18,7 @@ dayjs.extend(isYesterday);
 dayjs.extend(weekday);
 
 const ChatMessages = ({ messages }: { messages: MessageType[] }) => {
-	const { isBlocked, isSystem } = useChatProvider();
+	const { isBlocked, isSystem, isLoadingOldMsg} = useChatProvider();
 
 	return (
 		<div
@@ -44,7 +44,7 @@ const ChatMessages = ({ messages }: { messages: MessageType[] }) => {
 
 			{!isBlocked && (
 				<>
-					{messages.length === 0 ? (
+					{messages.length === 0 && !isLoadingOldMsg ? (
 						// <MessageSkeleton count={5} />
 						<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none pt-6">
 							<div className="bg-accent/30 text-text px-4 py-2 rounded-lg flex items-center gap-2 max-w-[90vw] mx-3">

@@ -20,7 +20,8 @@ import { useChatProvider } from "../ChatBoxWrapper";
 import { GrHistory } from "react-icons/gr";
 import { IconWithSVG } from "../../general/Buttons";
 import { ServerList } from "./ChatHeaderServerList";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { MdBlock, MdPersonRemove } from "react-icons/md";
 
 export function DirectMessageCard({
 	roomId,
@@ -54,24 +55,24 @@ export function DirectMessageCard({
 		setClipboard(string);
 	};
 
-	// useEffect(() => {
-	// 	if (roomId.startsWith("system-room")) return;
+	useEffect(() => {
+		if (roomId.startsWith("system-room")) return;
 
-	// 	const fetchCommonServers = async () => {
-	// 		setIsPending(true);
-	// 		try {
-	// 			const servers = await getServersInCommon(currentUserId, user.id);
-	// 			setCommonServers(servers);
-	// 		} catch (err) {
-	// 			console.error(err);
-	// 			setCommonServers([]);
-	// 		} finally {
-	// 			setIsPending(false);
-	// 		}
-	// 	};
+		const fetchCommonServers = async () => {
+			setIsPending(true);
+			try {
+				const servers = await getServersInCommon(currentUserId, user.id);
+				setCommonServers(servers);
+			} catch (err) {
+				console.error(err);
+				setCommonServers([]);
+			} finally {
+				setIsPending(false);
+			}
+		};
 
-	// 	fetchCommonServers();
-	// }, [user.id]);
+		fetchCommonServers();
+	}, [user.id]);
 
 	return (
 		<>
@@ -83,7 +84,7 @@ export function DirectMessageCard({
 				offset={0}
 			/>
 
-			<div className="flex items-center justify-between mb-4 sticky border top-0 z-20 bg-contrast border-b border-contrast px-4 py-1.5 border-t-0 border-l-0 border-r-0">
+			<div className="flex items-center justify-between mb-4 sticky border-b border-contrast  top-0 z-20 bg-contrast px-4 py-1.5 ">
 				<div className="flex items-center gap-1.5">
 					<Avatar
 						id={user.id}
@@ -96,12 +97,45 @@ export function DirectMessageCard({
 					<h2 className="text-sm">{user.username}</h2>
 				</div>
 
-				<div className="flex gap-1.5">
+				<div className="flex gap-2 items-center">
+					{!roomId.startsWith("system-room") && (
+						<>
+							<button
+								className={clsx(
+									"btn btn-small !w-fit p-1 px-1.5 btn-with-icon items-center flex gap-1.5",
+									isBlocked ? "btn-inverted" : "btn-secondary"
+								)}
+								onClick={() => {
+									if (isBlocked) {
+										unblockFriendship(currentUserId, user.id);
+									} else {
+										blockFriendship(currentUserId, user.id);
+									}
+								}}
+							>
+								<MdBlock />
+								{isBlocked ? "Unblock" : "Block"}
+							</button>
+							<button
+								className="btn btn-small !w-fit p-1 px-1.5 btn-with-icon items-center flex gap-1.5 btn-secondary"
+								onClick={async () => {
+									const result = await removeFriendshipRequest({ username: user.username, id: user.id }, "friend");
+									if (result.success) {
+										toast({ title: result.message, mode: "positive", subtitle: "" });
+									}
+								}}
+							>
+								<MdPersonRemove />
+								Unfriend
+							</button>
+						</>
+					)}
+
 					<IconWithSVG
 						onClick={() => {
 							clearMsgHistory(roomId, pathname);
 						}}
-						className="!size-6.5"
+						className="!size-7"
 						data-tooltip-id="header-icons-tooltip"
 						data-tooltip-content={"Clear history"}
 					>
@@ -109,6 +143,7 @@ export function DirectMessageCard({
 					</IconWithSVG>
 				</div>
 			</div>
+
 			<div className="bg-contrast text-white px-4 pb-2 rounded-lg max-w-full">
 				<div className="flex items-center justify-between mb-4">
 					<div className="flex items-center gap-3">
@@ -140,37 +175,10 @@ export function DirectMessageCard({
 					</div>
 				</div>
 				<div className="text-gray-400 text-sm mb-4">
-					This is the beginning of your direct message history with{" "}
+					This is the beginning of your DM history with{" "}
 					{roomId.startsWith("system-room") && <span className="text-text font-medium">Our AI Chatbot</span>}
 					{!roomId.startsWith("system-room") && <span className="text-text font-medium">{user.username}</span>}.
 				</div>
-				{!roomId.startsWith("system-room") && (
-					<div className="flex items-center gap-2">
-						<button
-							className={clsx("btn", isBlocked ? "btn-inverted" : "btn-secondary")}
-							onClick={() => {
-								if (isBlocked) {
-									unblockFriendship(currentUserId, user.id);
-								} else {
-									blockFriendship(currentUserId, user.id);
-								}
-							}}
-						>
-							{isBlocked ? "Unblock" : "Block"}
-						</button>
-						<button
-							className="btn btn-secondary"
-							onClick={async () => {
-								const result = await removeFriendshipRequest({ username: user.username, id: user.id }, "friend");
-								if (result.success) {
-									toast({ title: result.message, mode: "positive", subtitle: "" });
-								}
-							}}
-						>
-							Unfriend
-						</button>
-					</div>
-				)}
 
 				{!roomId.startsWith("system-room") &&
 					(isPending ? (
@@ -180,8 +188,8 @@ export function DirectMessageCard({
 					))}
 				{roomId.startsWith("system-room") && (
 					<>
-						<p className="text-base text-primary">
-							Hi! I can answer your questions using DeepSeek — now powered via Hugging Face
+						<p className="text-sm text-primary bg-background px-3 py-1.5 rounded-md">
+							Hi! I can answer your questions using DeepSeek — now powered via Hugging Face.
 						</p>
 					</>
 				)}

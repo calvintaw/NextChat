@@ -54,7 +54,7 @@ export function ServerCardHeader({ server, user }: { server: Room; user: User })
 					</IconWithSVG>
 				</div>
 			</div>
-			<div className="bg-contrast text-white px-4 pb-2 rounded-lg max-w-md w-full flex flex-col gap-3">
+			<div className="bg-contrast text-white px-4 pb-2 rounded-lg w-full flex flex-col gap-3">
 				<div className="flex items-center gap-3">
 					{/* Server Icon */}
 					<Avatar
@@ -95,7 +95,7 @@ export function ServerCardHeader({ server, user }: { server: Room; user: User })
 				</div>
 
 				{/* Server Description */}
-				<p className="text-sm text-gray-400">{localServer.description || "No description available"}</p>
+				<p className="text-sm text-gray-400 w-full">{localServer.description || "No description available"}</p>
 
 				{/* Server Stats */}
 				<div className="flex items-center gap-4 text-gray-400 text-sm">

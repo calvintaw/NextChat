@@ -184,7 +184,6 @@ export async function clearMsgHistory(
 }
 
 export async function getChats(currentUserId: string): Promise<ChatType[]> {
-
 	return await sql`
 			SELECT 
 				r.name as "room_name",
@@ -724,7 +723,7 @@ export async function registerUser(formData: FormData): Promise<FormState> {
 			const [user1_id, user2_id] = [id, systemUserId].sort((a, b) => a.localeCompare(b));
 			const roomId = `system-room-${id}`;
 
-					await sql`
+			await sql`
 						INSERT INTO friends (user1_id, user2_id, request_sender_id, status)
 						VALUES (
 							${user1_id},  -- deterministic system UUID
@@ -733,8 +732,8 @@ export async function registerUser(formData: FormData): Promise<FormState> {
 							'accepted'
 						);
 					`;
-					// Create system room
-					await sql`
+			// Create system room
+			await sql`
 			  INSERT INTO rooms (id, owner_id, description, type)
 			  VALUES (
 			    ${roomId},
@@ -745,8 +744,8 @@ export async function registerUser(formData: FormData): Promise<FormState> {
 			  ON CONFLICT (id) DO NOTHING;
 			`;
 
-					// Add members: system, new user
-					await sql`
+			// Add members: system, new user
+			await sql`
 			  INSERT INTO room_members (room_id, user_id, role)
 			  VALUES
 			    (${roomId}, ${systemUserId}, 'admin'),
@@ -775,7 +774,7 @@ export async function registerUser(formData: FormData): Promise<FormState> {
 		redirect: false,
 	});
 
-	(await cookies()).set("theme", "dark", { path: "/", maxAge: 60 * 60 * 24 * 30 })
+	(await cookies()).set("theme", "dark", { path: "/", maxAge: 60 * 60 * 24 * 30 });
 
 	return {
 		errors: {},
@@ -783,7 +782,7 @@ export async function registerUser(formData: FormData): Promise<FormState> {
 	};
 }
 
-export async function authenticate(prevState: string | undefined, formData: FormData) {
+export async function authenticate(prevState: { error: string } | undefined, formData: FormData) {
 	try {
 		const indentifier = formData.get("identifier");
 		const EmailSchema = z.string().trim().email();
@@ -796,14 +795,14 @@ export async function authenticate(prevState: string | undefined, formData: Form
 			username: !emailResult.success ? indentifier : null,
 		};
 
-		await signIn("credentials", { ...data, redirectTo: "/dashboard" });
+		await signIn("credentials", { ...data, redirectTo: "/?tab=all" });
 	} catch (error) {
 		if (error instanceof AuthError) {
 			switch (error.type) {
 				case "CredentialsSignin":
-					return "Invalid credentials.";
+					return { error: "Invalid credentials." };
 				default:
-					return "Something went wrong.";
+					return { error: "Something went wrong." };
 			}
 		}
 		throw error;
@@ -921,7 +920,8 @@ export async function createDM(
 			console.log(`Creating DM between ${currentUser.username} and ${targetUser.username}...`);
 
 			// Generate a new room ID
-			const room_id = getDMRoom(currentUser.id, targetUser.id);
+			const room_id =
+				targetUser.username === "system" ? `system-room-${currentUser.id}` : getDMRoom(currentUser.id, targetUser.id);
 
 			await sql.begin(async (sql) => {
 				// Insert into rooms

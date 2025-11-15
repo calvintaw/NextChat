@@ -156,6 +156,12 @@ export default function CreateServerFormDialog({ className, user }: { className:
 
 	const [disableMotion, toggleDisableMotion] = useToggle(true);
 
+  const [mounted, setMounted] = useState(false);
+
+	useEffect(() => setMounted(true), []);
+
+	if (!mounted) return null;
+
 	return (
 		<Dialog.Root open={open} onOpenChange={setOpen}>
 			<Dialog.Trigger asChild>

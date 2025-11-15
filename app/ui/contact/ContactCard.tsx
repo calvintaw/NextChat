@@ -138,6 +138,27 @@ const ContactCard = ({
 					return prev; // do nothing if already exists
 				}
 
+
+				if (contact.username==="system"){
+					return [
+						{
+							id: contact.id,
+							image: contact.image,
+							username: contact.username,
+							displayName: contact.displayName,
+							email: contact.email,
+							online: false,
+							room_id,
+							room_image: "",
+							room_name: "",
+							room_type: "dm",
+						},
+						...prev
+					];
+				}
+
+
+
 				// Otherwise, add the new contact
 				return [
 					...prev,

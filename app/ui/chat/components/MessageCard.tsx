@@ -408,7 +408,9 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 				</div>
 			</div>
 
-			<MessageDropdownMenu retrySendingMessage={retrySendingMessage} msg={msg}></MessageDropdownMenu>
+			{!(roomId.startsWith("system-room") && msg.sender_id !== user.id) && (
+				<MessageDropdownMenu retrySendingMessage={retrySendingMessage} msg={msg}></MessageDropdownMenu>
+			)}
 		</div>
 	);
 };

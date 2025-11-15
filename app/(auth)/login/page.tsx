@@ -57,17 +57,29 @@ export default function LoginPage() {
 }
 
 function LoginForm() {
-	const [error, formAction, isPending] = useActionState(authenticate, "");
-	const [errorMessage, setErrorMessage] = useState("");
-	const formRef = useRef<HTMLFormElement | null>(null);
+	const [result, formAction, isPending] = useActionState(authenticate, undefined);
+	const [localError, setLocalError] = useState("");
 
 	useEffect(() => {
-		setErrorMessage(error ?? "");
-	}, [error]);
+		if (result?.error) {
+			setLocalError(result.error);
+			const timer = setTimeout(() => setLocalError(""), 8000);
+			return () => clearTimeout(timer);
+		}
+	}, [result]);
+
+	const [input, setInput] = useState("");
+	const formRef = useRef<HTMLFormElement | null>(null);
+
+	const actionStatus = isPending
+		? "pending"
+		: localError
+		? "idle" // login failed, do NOT signal finished
+		: "finished"; // login succeeded
 
 	return (
 		<AuthFormWrapper className="bg-background max-w-[440px]">
-			<form ref={formRef} onSubmit={() => setErrorMessage("")} action={formAction} className="form ">
+			<form ref={formRef} action={formAction} className="form ">
 				<div role="heading" className="flex items-center gap-2">
 					<IoLogoPolymer className="text-5xl"></IoLogoPolymer>
 					<h2 className="text-3xl font-semibold">Welcome back!</h2>
@@ -82,17 +94,24 @@ function LoginForm() {
 						icon={<RiMailLine />}
 						placeholder="Enter your email or username"
 						required
-						onChange={() => errorMessage && setErrorMessage("")}
+						value={input}
+						onChange={(e) => {
+							setInput(e.target.value);
+							setLocalError("");
+						}}
 					/>
 					<PasswordField
-						fnToCallOnChange={() => errorMessage && setErrorMessage("")}
+						fnToCallOnChange={() => {
+							setLocalError("");
+						}}
+						actionStatus={actionStatus}
 						hideRules
 						disabled={isPending}
 						name="password"
 					></PasswordField>
 				</div>
 
-				{errorMessage && <span className="text-sm text-red-500">{errorMessage}</span>}
+				{localError && <span className="text-sm text-red-500">{localError}</span>}
 
 				<TermsAndServices />
 

@@ -24,7 +24,6 @@ dayjs.extend(isYesterday);
 dayjs.extend(weekday);
 
 type ChatboxProps = { recipient: User | Room; user: User; roomId: string; type: "dm" | "server" };
-const getRoomMessagesKey = (roomId: string) => `chat_messages_${roomId}`;
 
 export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	const [messages, setMessages] = useState<MessageType[]>([]);
@@ -160,57 +159,97 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		};
 	}, [roomId, isBlocked, isSystem, user.id]);
 
-	// initial setup for blocking/system status
-	useEffect(() => {
-		// ... (unchanged)
-		if (type === "dm" && recipient) {
-			const check = async () => {
-				const blocked = await checkIfBlocked(user, recipient as User);
-				setIsBlocked(blocked);
-				setInitialLoading(false);
-			};
+	// // initial setup for blocking/system status
+	// useEffect(() => {
+	// 	// ... (unchanged)
+	// 	if (type === "dm" && recipient) {
+	// 		const check = async () => {
+	// 			const blocked = await checkIfBlocked(user, recipient as User);
+	// 			setIsBlocked(blocked);
+	// 			setInitialLoading(false);
+	// 		};
 
-			check();
-		} else {
-			setIsBlocked(false);
-		}
+	// 		check();
+	// 	} else {
+	// 		setIsBlocked(false);
+	// 	}
 
-		if (roomId.startsWith("system-room")) {
-			setIsSystem(true);
-			setInitialLoading(false);
-		}
-	}, [type, recipient, user.id]);
+	// 	if (roomId.startsWith("system-room")) {
+	// 		setIsSystem(true);
+	// 		setInitialLoading(false);
+	// 	}
+	// }, [type, recipient, user.id]);
 
 	// fetching msgs at startup and add listeners for typing event (ONLY FETCHING REMAINS)
-	useEffect(() => {
-		if (isBlocked || (isSystem && isBlocked)) {
-			setInitialLoading(false);
-			setHasMore(false);
-			return;
-		}
+	// useEffect(() => {
+	// 	if (isBlocked || (isSystem && isBlocked)) {
+	// 		setInitialLoading(false);
+	// 		setHasMore(false);
+	// 		return;
+	// 	}
 
-		const fetchMessages = async () => {
+	// 	const fetchMessages = async () => {
+	// 		try {
+	// 			const recent = await getRecentMessages(roomId, { limit });
+	// 			if (recent.length !== 0) {
+	// 				offsetRef.current = recent.length;
+	// 				lastBatchLength.current = recent.length;
+	// 				oldestMsgCreatedAt.current = recent[recent.length - 1].createdAt;
+	// 				setMessages(sortMessagesAsc(filterNewMessages(recent)));
+	// 			}
+
+	// 			if (recent.length < limit) setHasMore(false);
+	// 		} catch (err) {
+	// 			console.error("Failed to fetch recent messages:", err);
+	// 			// Added toast to show error to user
+	// 			toast({ title: "Error!", mode: "negative", subtitle: "Failed to load messages. Please refresh the page." });
+	// 		} finally {
+	// 			setInitialLoading(false); // Ensure loading stops even on failure
+	// 		}
+	// 	};
+
+	// 	fetchMessages();
+	// }, [isBlocked, isSystem, roomId]);
+
+	useEffect(() => {
+		const initialize = async () => {
+			messageIdsRef.current.clear();
+
+			let blocked = false;
+			if (type === "dm" && recipient) blocked = await checkIfBlocked(user, recipient as User);
+			setIsBlocked(blocked);
+
+			const system = roomId.startsWith("system-room");
+			setIsSystem(system);
+
+			if (blocked) {
+				setHasMore(false);
+				setInitialLoading(false);
+				return;
+			}
+
 			try {
 				const recent = await getRecentMessages(roomId, { limit });
-				if (recent.length !== 0) {
+				console.log("RECENT: ", recent);
+
+				if (recent.length > 0) {
 					offsetRef.current = recent.length;
 					lastBatchLength.current = recent.length;
 					oldestMsgCreatedAt.current = recent[recent.length - 1].createdAt;
 					setMessages(sortMessagesAsc(filterNewMessages(recent)));
-				} else {
-					setHasMore(false);
 				}
+				setHasMore(recent.length === limit);
 			} catch (err) {
 				console.error("Failed to fetch recent messages:", err);
-				// Added toast to show error to user
 				toast({ title: "Error!", mode: "negative", subtitle: "Failed to load messages. Please refresh the page." });
+				setHasMore(false);
 			} finally {
-				setInitialLoading(false); // Ensure loading stops even on failure
+				setInitialLoading(false);
 			}
 		};
 
-		fetchMessages();
-	}, [isBlocked, isSystem, roomId]);
+		initialize();
+	}, [type, recipient, roomId, user.id]);
 
 	const deleteMessage = async (id: string, type: MessageContentType = "text", content: string) => {
 		if (isBlocked || (isSystem && isBlocked)) return;
@@ -261,7 +300,11 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		// prepend messages
 		const uniqueOlder = filterNewMessages(olderMessages);
 
-		setMessages((prev) => [...sortMessagesAsc(uniqueOlder), ...prev]);
+		setMessages((prev) => {
+			console.log("OLDER MESSAGES: ", sortMessagesAsc(uniqueOlder), "previous messages: ", prev);
+			return [...sortMessagesAsc(uniqueOlder), ...prev];
+		});
+
 		setIsLoadingOldMsg(false);
 	};
 
@@ -293,6 +336,10 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		}
 	}, [initialLoading, messages]);
 
+	useEffect(() => {
+		console.log("MESSAGE USEFFECT: ", messages, " LENGTH: ", messages.length);
+	}, [messages]);
+
 	return (
 		<>
 			<div
@@ -301,6 +348,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 			>
 				<ChatProvider
 					config={{
+						isLoadingOldMsg,
 						setMessages,
 						messages,
 						roomId,
@@ -328,7 +376,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 						)}
 						{type === "server" && recipient && <ServerCardHeader user={user} server={recipient as Room} />}
 
-						<hr className="hr-separator bg-contrast"></hr>
+						<hr className="hr-separator bg-contrast mt-1"></hr>
 
 						{isLoadingOldMsg && (
 							<div className="flex items-center justify-center w-full py-2">

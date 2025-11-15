@@ -69,6 +69,7 @@ const RULES = [
 type PasswordFieldProps = InputFieldProps & {
 	setIsAllowed?: React.Dispatch<React.SetStateAction<boolean>>;
 	fnToCallOnChange?: () => void;
+	actionStatus?: "idle" | "pending" | "finished";
 };
 
 export function PasswordField({
@@ -78,6 +79,7 @@ export function PasswordField({
 	errors,
 	className,
 	parentClassName = "",
+	actionStatus,
 	hideRules = false,
 	setIsAllowed,
 	fnToCallOnChange = () => {},
@@ -86,6 +88,14 @@ export function PasswordField({
 	const [value, setValue] = useState("");
 	const [score, setScore] = useState(0);
 	const [zxcvbnScore, setZxcvbnScore] = useState<number | null>(null);
+
+	useEffect(() => {
+		if (!actionStatus) return;
+
+		if (actionStatus === "finished") {
+			setValue("");
+		}
+	}, [actionStatus]);
 
 	useEffect(() => {
 		if (hideRules) return;

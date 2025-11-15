@@ -158,6 +158,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, isBlocked }: C
 			if (input.trim() === "") setInput("");
 			if (replyToMsg) setReplyToMsg(null);
 		}
+		
 	};
 
 	// use effect side effect for focusing input when ctrl + /
