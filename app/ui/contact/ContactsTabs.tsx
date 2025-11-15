@@ -152,6 +152,20 @@ const ContactTabs = ({ user, initialFriendRequests }: ContactTabsProps) => {
 							incoming: [...prev.incoming, recipient],
 						}));
 					}
+				} else if (data.status === "accepted") {
+					const data = payload.new;
+					const recipient_id = data.user1_id === user.id ? data.user2_id : data.user1_id;
+
+					// early return bc there's already local UI Update if user accepted an incoming friend request
+					if (data.request_sender_id !== user.id) return;
+					const recipient = await getUser(recipient_id);
+					if (!recipient) return;
+					const { createdAt, bio, password, readme, ...rest } = recipient;
+					if (rest.username === "system") {
+						setContacts((prev) => [{ ...rest, online: rest.username === "system" ? true : "loading" }, ...prev]);
+					} else {
+						setContacts((prev) => [...prev, { ...rest, online: rest.username === "system" ? true : "loading" }]);
+					}
 				}
 			} else if (payload.eventType === "DELETE") {
 				const data = payload.old;
