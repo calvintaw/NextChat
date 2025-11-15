@@ -1,4 +1,3 @@
-
 import { Room } from "@/app/lib/definitions";
 import clsx from "clsx";
 import Link from "next/link";
@@ -53,37 +52,41 @@ export const ServerList = ({ servers }: { servers: Room[] }) => {
 	const displayedServers = showAll ? servers : servers.slice(0, visibleCount);
 
 	return (
-		<div ref={containerRef} className="flex flex-wrap gap-1 flex-1 items-center">
-			{displayedServers.map((server) => (
-				<Link
-					key={server.id}
-					href={server.type === "dm" ? `/chat/${server.id}` : `/chat/server/${server.id}`}
-					className={clsx(
-						"flex items-center gap-1 p-1 pr-1.5 rounded-sm no-underline cursor-pointer transition-colors duration-150",
-						"bg-background/50 hover:bg-background/70 dark:bg-accent/50 dark:hover:bg-accent/70"
-					)}
-				>
-					<Avatar
-						disableTooltip
-						src={server.profile ?? ""}
-						displayName={server.name}
-						size="size-6"
-						radius="rounded-sm"
-						fontSize="text-sm"
-						statusIndicator={false}
-					/>
-					<span className="font-medium text-sm max-w-[15ch] text-text truncate">{server.name}</span>
-				</Link>
-			))}
-			{servers.length > visibleCount && (
-				<button
-					className="ml-2 btn btn-small h-8 rounded-full bg-background hover:bg-accent btn-secondary !w-fit btn-with-icon flex items-center gap-0.5 px-2 pl-1 text-sm"
-					onClick={() => setShowAll((prev) => !prev)}
-				>
-					{showAll ? <MdExpandLess className="text-lg" /> : <MdExpandMore className="text-lg" />}
-					{showAll ? "Show Less" : "Show More"}
-				</button>
-			)}
+		<div className="p-1.5 rounded-md bg-background">
+			<p className="text-xs font-medium text-muted">Servers in common: </p>{" "}
+			<hr className="hr-separator mb-2 mt-0.5 bg-contrast" />
+			<div ref={containerRef} className="flex flex-wrap gap-1 flex-1 items-center">
+				{displayedServers.map((server) => (
+					<Link
+						key={server.id}
+						href={server.type === "dm" ? `/chat/${server.id}` : `/chat/server/${server.id}`}
+						className={clsx(
+							"flex items-center gap-1.5 p-1 pr-1.5 rounded-sm no-underline cursor-pointer transition-colors duration-150",
+							"bg-background/50 hover:bg-background/70 dark:bg-accent/50 dark:hover:bg-accent/70"
+						)}
+					>
+						<Avatar
+							disableTooltip
+							src={server.profile ?? ""}
+							displayName={server.name}
+							size="size-6"
+							radius="rounded-sm"
+							fontSize="text-sm"
+							statusIndicator={false}
+						/>
+						<span className="text-xs max-w-[15ch] text-text truncate">{server.name}</span>
+					</Link>
+				))}
+				{servers.length > visibleCount && (
+					<button
+						className="ml-2 btn btn-small h-8 rounded-full bg-background hover:bg-accent btn-secondary !w-fit btn-with-icon flex items-center gap-0.5 px-2 pl-1 text-sm"
+						onClick={() => setShowAll((prev) => !prev)}
+					>
+						{showAll ? <MdExpandLess className="text-lg" /> : <MdExpandMore className="text-lg" />}
+						{showAll ? "Show Less" : "Show More"}
+					</button>
+				)}
+			</div>
 		</div>
 	);
 };

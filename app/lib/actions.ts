@@ -596,6 +596,15 @@ export async function joinServer(room_id: string) {
 	});
 }
 
+export async function leaveServer(room_id: string) {
+	return withCurrentUser(async (user: User) => {
+		await sql`
+      DELETE FROM room_members
+      WHERE room_id = ${room_id} AND user_id = ${user.id};
+    `;
+	});
+}
+
 export async function createServer(formData: FormData): Promise<{ errors: {}; message: string; success: boolean }> {
 	console.log("formData: ", formData);
 	const parsedForm = createServerSchema.safeParse({

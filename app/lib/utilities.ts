@@ -30,7 +30,6 @@ export const normalizeMarkdown = (str: string) =>
 		.join("\n") // join lines back
 		.trim(); // trim whole string
 
-
 export function getLocalTimeString(date?: string | Date, options?: Intl.DateTimeFormatOptions): string {
 	if (!date) {
 		console.log("DATE IS NOT TRUE ");
@@ -105,7 +104,6 @@ export function isUser(input: any): input is User {
 		input && typeof input === "object" && typeof input.username === "string" && typeof input.displayName === "string"
 	);
 }
-
 
 // export function sendWithRetry(event: string, msg: any, retries = 3, delay = 2000) {
 // 	return new Promise((resolve, reject) => {

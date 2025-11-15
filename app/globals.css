@@ -317,7 +317,7 @@ html {
 	}
 
 	.small-tooltip {
-		@apply !scale-80 
+		@apply !scale-80
 		!transition 
 		!duration-250 
 		!ease-[cubic-bezier(0.16,1,0.3,1)] 
@@ -329,7 +329,7 @@ html {
 		!max-w-60 
 		!text-text 
 		!rounded-md 
-		!text-sm 
+		!text-base
 		!font-semibold 
 		!shadow-md 
 		!shadow-black/25 

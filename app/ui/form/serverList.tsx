@@ -13,6 +13,7 @@ import src from "react-textarea-autosize";
 type FilterType = "all" | "public" | "private";
 import { HiServerStack } from "react-icons/hi2";
 import { useServersProvider } from "@/app/lib/contexts/ServersContext";
+import { FaArrowRight } from "react-icons/fa";
 
 export const ServerList = ({ user, servers }: { user: User; servers: Room[] }) => {
 	const [search, setSearch] = useState("");
@@ -96,7 +97,7 @@ export const ServerList = ({ user, servers }: { user: User; servers: Room[] }) =
 	);
 };
 
-const Card = ({ server, user }: any) => {
+const Card = ({ server, user }: { server: Room; user: User }) => {
 	const [loaded, setLoaded] = useState(false);
 	const imgRef = useRef<HTMLImageElement>(null);
 
@@ -123,14 +124,14 @@ const Card = ({ server, user }: any) => {
 							"
 		>
 			{/* Server Banner */}
-			<div className="relative h-25 w-full mb-2.5">
+			<div className="relative h-30 w-full mb-2.5">
 				{server.banner ? (
 					<>
 						{!loaded && <div className="absolute bg-accent top-0 left-0 w-full h-full animate-pulse" />}
 						<img
 							src={server.banner}
 							alt={`${server.name} banner`}
-							className={clsx(!loaded ? "opacity-0" : "opacity-100")}
+							className={clsx(!loaded ? "opacity-0" : "opacity-100", "w-full h-full object-cover")}
 							loading="lazy"
 							onLoad={() => setLoaded(true)}
 							onError={() => setLoaded(false)}
@@ -139,23 +140,22 @@ const Card = ({ server, user }: any) => {
 				) : (
 					<div className={clsx("absolute w-full h-full", getBannerColor(server.name))}></div>
 				)}
-				{/* Server Icon/Avatar */}
-				<div className="absolute left-2.5 -bottom-6 z-[1] border-4 rounded-[18px] overflow-hidden border-surface">
-					<Avatar
-						statusIndicator={false}
-						fontSize="text-xl"
-						radius="rounded-lg"
-						size="size-12"
-						src={server.profile ?? ""}
-						displayName={server.name}
-					></Avatar>
-				</div>
-			</div>
+				<div className="absolute left-2.5 -bottom-7 z-[1] flex items-center gap-2">
+					{/* Server Icon/Avatar */}
+					<div className=" border-4 rounded-[18px] overflow-hidden border-surface">
+						<Avatar
+							statusIndicator={false}
+							fontSize="text-xl"
+							radius="rounded-lg"
+							disableTooltip
+							size="size-12"
+							src={server.profile ?? ""}
+							displayName={server.name}
+						></Avatar>
+					</div>
 
-			<div className="flex-1 p-4 pb-3 flex flex-col justify-between relative">
-				<div>
 					{/* Server Name and Verification */}
-					<div className="flex items-center gap-1 -ml-1">
+					<div className="flex items-center gap-1 -ml-1 mt-6.5">
 						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
 							<path
 								fill="var(--color-success)"
@@ -175,7 +175,11 @@ const Card = ({ server, user }: any) => {
 							{server.name || "No name"}
 						</h2>
 					</div>
+				</div>
+			</div>
 
+			<div className="flex-1 p-4 pb-3 flex flex-col justify-between relative">
+				<div>
 					{/* Server Description */}
 					<p className="text-muted text-sm mt-2 max-w-[120ch]">{server.description || "No description available."}</p>
 				</div>
@@ -194,10 +198,18 @@ const Card = ({ server, user }: any) => {
 						href={server.type === "dm" ? `/chat/${server.id}` : `/chat/server/${server.id}`}
 					>
 						<button
-							disabled={hasJoined}
-							className="btn btn-third disabled:pointer-events-none  disabled:ring-2 ring-inset disabled:bg-green-600 disabled:text-white disabled:ring-green-600"
+							disabled={hasJoined || server.type === "private"}
+							className={clsx(
+								"btn btn-third btn-with-icon flex items-center gap-1.5 disabled:pointer-events-none  disabled:ring-2 ring-inset disabled:bg-green-600 disabled:text-white disabled:ring-green-600"
+							)}
 						>
-							{hasJoined ? "Joined" : "Join"}
+							{hasJoined ? (
+								<>
+									Go <FaArrowRight />
+								</>
+							) : (
+								"Join"
+							)}
 						</button>
 					</Link>
 				</div>

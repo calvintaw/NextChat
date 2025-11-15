@@ -18,6 +18,8 @@ import imageCompression from "browser-image-compression";
 import { ServerBannerUploadBtn, ServerImageUploadBtn } from "./UploadButtons";
 import { BiLoaderAlt } from "react-icons/bi";
 import { useRouterWithProgress } from "@/app/lib/hooks/useRouterWithProgressBar";
+import { IoMdSettings } from "react-icons/io";
+import { Tooltip } from "react-tooltip";
 
 type EditServerState = {
 	errors: Record<string, string[]>;
@@ -148,11 +150,12 @@ export function ServerEditForm({
 		}
 
 		try {
-			const options = {
-				maxSizeMB: 1, // allow larger file for banners
-				maxWidthOrHeight: 1024, // higher resolution for banner quality
-				useWebWorker: true, // improves performance for resizing
-				fileType: "image/jpeg", // jpg is standard, can also allow png
+			const bannerOptions = {
+				maxSizeMB: 0.15,
+				maxWidthOrHeight: 800,
+				useWebWorker: true,
+				fileType: "image/jpg",
+				initialQuality: 0.75,
 			};
 
 			const compressedFile = await imageCompression(selectedBannerFile, options);
@@ -195,24 +198,36 @@ export function ServerEditForm({
 
 	return (
 		<div className="flex items-center gap-1 text-gray-400 text-sm">
-			<IconWithSVG
+			{/* <IconWithSVG
 				onClick={() => {
 					const isConfirmed = window.confirm("Are you sure you want to delete this server?");
 					if (isConfirmed) deleteServer(server.id);
 				}}
 				className="!size-6.5"
-			>
-				<RiDeleteBin5Line className="text-xl" />
-			</IconWithSVG>
+			></IconWithSVG> */}
+			{/* <Tooltip
+				id={`header-icons-tooltip-settings`}
+				place="left-start"
+				className="small-tooltip"
+				border="var(--tooltip-border)"
+				offset={0}
+				
+			/> */}
 
-			<Dialog.Root
-				open={isOpen}
-				onOpenChange={openCloseDialog}
-			>
+			<Dialog.Root open={isOpen} onOpenChange={openCloseDialog}>
 				<Dialog.Trigger asChild>
-					<IconWithSVG className="!size-6.5">
-						<FiEdit className="text-lg" />
+					<IconWithSVG
+						className="!size-7.5"
+						data-tooltip-id="header-icons-tooltip"
+						data-tooltip-content={"Server settings"}
+					>
+						<IoMdSettings className="text-lg" />
 					</IconWithSVG>
+
+					{/* <button className={"btn btn-small !w-fit p-1 px-1.5 btn-with-icon items-center flex gap-1.5 btn-secondary"}>
+						<IoMdSettings className="text-lg" />
+						Settings
+					</button> */}
 				</Dialog.Trigger>
 
 				<Dialog.Portal>
@@ -303,33 +318,52 @@ z-[12000]					"
 							)}
 
 							{/* Action Buttons */}
-							<div className="flex justify-end gap-2 mt-2">
-								<Dialog.Close asChild>
-									<button className="btn btn-secondary">Cancel</button>
-								</Dialog.Close>
-								<Button
-									disabled={data.state === "pending"}
-									className="btn-purple btn-with-icon justify-center items-center gap-2"
-									type={data.state === "error" || data.state === "idle" ? "submit" : "button"}
-									onClick={(e) => {
-										if (data.state === "success" || data.state === "no-changes") {
-											e.preventDefault();
-											openCloseDialog(false);
-										}
-										// if state is "error", just let the form submit normally
+							<div className="flex justify-between gap-2 mt-2">
+								<button
+									type="button"
+									onClick={() => {
+										const isConfirmed = window.confirm(
+											"Are you sure you want to delete this server? This will kick out everyone. "
+										);
+										if (isConfirmed) deleteServer(server.id);
 									}}
+									className={
+										"btn bg-red-400 hover:bg-red-500 opacity-50 dark:bg-red-500 hover:opacity-100 !w-fit btn-with-icon items-center flex gap-1.5 btn-secondary"
+									}
 								>
-									{data.state === "pending"
-										? "Saving..."
-										: data.state === "success"
-										? "Close"
-										: data.state === "error"
-										? "Try again"
-										: data.state === "no-changes"
-										? "OK"
-										: "Save Changes"}
-									{data.state === "pending" && <BiLoaderAlt className="animate-spin text-lg" />}
-								</Button>
+									<RiDeleteBin5Line className="text-xl" />
+									{/* <FiEdit className="text-lg" /> */}
+									Delete Server
+								</button>
+
+								<div className="flex gap-2">
+									<Dialog.Close asChild>
+										<button className="btn btn-secondary">Cancel</button>
+									</Dialog.Close>
+									<Button
+										disabled={data.state === "pending"}
+										className="btn-purple btn-with-icon justify-center items-center gap-2"
+										type={data.state === "error" || data.state === "idle" ? "submit" : "button"}
+										onClick={(e) => {
+											if (data.state === "success" || data.state === "no-changes") {
+												e.preventDefault();
+												openCloseDialog(false);
+											}
+											// if state is "error", just let the form submit normally
+										}}
+									>
+										{data.state === "pending"
+											? "Saving..."
+											: data.state === "success"
+											? "Close"
+											: data.state === "error"
+											? "Try again"
+											: data.state === "no-changes"
+											? "OK"
+											: "Save Changes"}
+										{data.state === "pending" && <BiLoaderAlt className="animate-spin text-lg" />}
+									</Button>
+								</div>
 							</div>
 						</form>
 					</Dialog.Content>

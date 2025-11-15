@@ -9,24 +9,42 @@ import { Avatar } from "../../general/Avatar";
 import { ServerEditForm } from "./Server_edit_form";
 import { GrHistory } from "react-icons/gr";
 import { IconWithSVG } from "../../general/Buttons";
-import { clearMsgHistory } from "@/app/lib/actions";
+import { clearMsgHistory, leaveServer } from "@/app/lib/actions";
 import { usePathname, useRouter } from "next/navigation";
 
 export function ServerCardHeader({ server, user }: { server: Room; user: User }) {
 	const [clipboard, setClipboard] = useState("");
 	const [localServer, setLocalServer] = useState(() => server);
 	const pathname = usePathname();
+	const router = useRouter();
+	const [leavePending, setLeavePending] = useState(false);
 
-	const handleCopy = (string: string) => {
-		window.navigator.clipboard.writeText(string);
-		setClipboard(string);
+	const handleCopy = async (text: string) => {
+		try {
+			await navigator.clipboard.writeText(text);
+			setClipboard(text);
+			setTimeout(() => setClipboard(""), 5000);
+		} catch (err) {
+			console.error("Failed to copy!", err);
+		}
 	};
+
+	const inviteLink = `@/invite/${server.id}`;
 
 	return (
 		<>
-			<div className="flex items-center justify-between mb-4 sticky border top-0 z-20 bg-contrast border-b border-contrast px-4 py-1.5 border-t-0 border-l-0 border-r-0">
+			<Tooltip
+				id={`header-icons-tooltip`}
+				place="left-start"
+				className="small-tooltip"
+				border="var(--tooltip-border)"
+				offset={0}
+			/>
+
+			<div className="flex items-center justify-between mb-4 sticky border top-0 z-20 bg-contrast border-b border-contrast px-4 pr-2 max-lg:pr-1 py-1.5 border-t-0 border-l-0 border-r-0">
 				<div className="flex items-center gap-1.5">
 					<Avatar
+						disableTooltip
 						id={localServer.id}
 						size={"size-5.5"}
 						fontSize={"text-[11px]"}
@@ -37,27 +55,38 @@ export function ServerCardHeader({ server, user }: { server: Room; user: User })
 					<h2 className="text-sm">{localServer.name}</h2>
 				</div>
 
-				<div className="flex gap-1.5">
-					{localServer.owner_id === user.id && (
-						<ServerEditForm setLocalServer={setLocalServer} server={server} user={user} />
-					)}
-
+				<div className="flex gap-1.5 items-center">
 					<IconWithSVG
 						onClick={() => {
-							clearMsgHistory(server.id, pathname);
+							const isConfirmed = window.confirm("Are you sure you want to delete all messages?");
+							if (isConfirmed) clearMsgHistory(server.id, pathname);
 						}}
-						className="!size-6.5"
+						className="!size-7.5"
 						data-tooltip-id="header-icons-tooltip"
 						data-tooltip-content={"Clear history"}
 					>
-						<GrHistory className="text-lg" />
+						<RiDeleteBin5Line className="text-lg" />
 					</IconWithSVG>
+
+					<IconWithSVG
+						className="!size-7.5"
+						data-tooltip-id="header-icons-tooltip"
+						data-tooltip-content={clipboard === inviteLink ? "Copied!" : "Copy Invite Link"}
+						onClick={() => handleCopy(inviteLink)}
+					>
+						<MdLink className="text-xl" />
+					</IconWithSVG>
+
+					{localServer.owner_id === user.id && (
+						<ServerEditForm setLocalServer={setLocalServer} server={server} user={user} />
+					)}
 				</div>
 			</div>
 			<div className="bg-contrast text-white px-4 pb-2 rounded-lg w-full flex flex-col gap-3">
 				<div className="flex items-center gap-3">
 					{/* Server Icon */}
 					<Avatar
+						disableTooltip
 						size="size-14"
 						displayName={localServer.name}
 						src={localServer.profile ?? ""}
@@ -109,15 +138,49 @@ export function ServerCardHeader({ server, user }: { server: Room; user: User })
 					</div>
 
 					{localServer.owner_id !== user.id && (
-						<button className="btn-secondary btn-wit-icon flex items-center gap-1 text-red-400 max-[420px]:hidden">
-							<TbLogout className="text-xl"></TbLogout> Leave Server
+						<button
+							onClick={async () => {
+								setLeavePending(true);
+								await leaveServer(server.id);
+								router.replace("/");
+								setLeavePending(false);
+							}}
+							className="btn-secondary btn-wit-icon flex items-center gap-1 text-red-400 max-[420px]:hidden"
+						>
+							{!leavePending && (
+								<>
+									<TbLogout className="text-xl"></TbLogout> Leave Server
+								</>
+							)}
+							{leavePending && (
+								<>
+									<BiLoaderAlt className="animate-spin text-lg" /> Leaving ...
+								</>
+							)}
 						</button>
 					)}
 				</div>
 
 				{localServer.owner_id !== user.id && (
-					<button className="btn-secondary btn-wit-icon flex items-center gap-1 text-red-400 min-[420px]:hidden">
-						<TbLogout className="text-xl"></TbLogout> Leave Server
+					<button
+						onClick={async () => {
+							setLeavePending(true);
+							await leaveServer(server.id);
+							router.replace("/");
+							setLeavePending(false);
+						}}
+						className="btn-secondary btn-wit-icon flex items-center gap-1 text-red-400 min-[420px]:hidden"
+					>
+						{!leavePending && (
+							<>
+								<TbLogout className="text-xl"></TbLogout> Leave Server
+							</>
+						)}
+						{leavePending && (
+							<>
+								<BiLoaderAlt className="animate-spin text-lg" /> Leaving ...
+							</>
+						)}
 					</button>
 				)}
 			</div>
@@ -127,6 +190,9 @@ export function ServerCardHeader({ server, user }: { server: Room; user: User })
 
 import { TbLogout } from "react-icons/tb";
 import { supabase } from "@/app/lib/supabase";
+import { RiDeleteBin5Line } from "react-icons/ri";
+import { MdLink } from "react-icons/md";
+import { BiLoaderAlt } from "react-icons/bi";
 
 function OnlineCount({ server, currentUser }: { server: Room; currentUser: User }) {
 	const [onlineUsersCount, setOnlineUsersCount] = useState(0);

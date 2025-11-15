@@ -22,6 +22,7 @@ import { IconWithSVG } from "../../general/Buttons";
 import { ServerList } from "./ChatHeaderServerList";
 import { usePathname } from "next/navigation";
 import { MdBlock, MdPersonRemove } from "react-icons/md";
+import { RiDeleteBin5Line } from "react-icons/ri";
 
 export function DirectMessageCard({
 	roomId,
@@ -84,7 +85,7 @@ export function DirectMessageCard({
 				offset={0}
 			/>
 
-			<div className="flex items-center justify-between mb-4 sticky border-b border-contrast  top-0 z-20 bg-contrast px-4 py-1.5 ">
+			<div className="flex items-center justify-between mb-4 sticky border-b border-contrast  top-0 z-20 bg-contrast px-4 pr-2 max-lg:pr-1 py-1.5 ">
 				<div className="flex items-center gap-1.5">
 					<Avatar
 						id={user.id}
@@ -135,11 +136,11 @@ export function DirectMessageCard({
 						onClick={() => {
 							clearMsgHistory(roomId, pathname);
 						}}
-						className="!size-7"
+						className="!size-7.5"
 						data-tooltip-id="header-icons-tooltip"
 						data-tooltip-content={"Clear history"}
 					>
-						<GrHistory className="text-lg" />
+						<RiDeleteBin5Line className="text-lg" />
 					</IconWithSVG>
 				</div>
 			</div>

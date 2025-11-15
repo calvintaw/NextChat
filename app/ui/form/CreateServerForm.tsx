@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { IoMdClose, IoMdGlobe, IoMdPeople } from "react-icons/io";
 import { FiPlus } from "react-icons/fi";
-import { createServer } from "@/app/lib/actions";
+import { createServer, joinServer } from "@/app/lib/actions";
 import * as Tabs from "@radix-ui/react-tabs";
 import InputField from "./InputField";
 import { IconWithSVG } from "../general/Buttons";
@@ -36,7 +36,8 @@ type FormState = {
 
 export default function CreateServerFormDialog({ className, user }: { className: string; user: User }) {
 	const [open, setOpen] = useState(false);
-	const formRef = useRef<HTMLFormElement | null>(null);
+	const create_formRef = useRef<HTMLFormElement | null>(null);
+	const join_formRef = useRef<HTMLFormElement | null>(null);
 
 	const [{ errors, message, success }, setResult] = useState<FormState>({
 		errors: {},
@@ -44,20 +45,21 @@ export default function CreateServerFormDialog({ className, user }: { className:
 		success: false,
 	});
 
-	const [isPending, setIsPending] = useState(false);
+	const [isPendingCreate, setIsPendingCreate] = useState(false);
+	const [isPendingJoin, setIsPendingJoin] = useState(false);
 	const router = useRouterWithProgress();
 
 	const [uploaded, setUploaded] = useState<string>("");
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
 	const [publicImgUrl, setPublicImgUrl] = useState("");
-	const handleSubmit = async () => {
-		setIsPending(true);
-		const form = formRef.current;
+	const createFormHandleSubmit = async () => {
+		setIsPendingCreate(true);
+		const form = create_formRef.current;
 		const formData = new FormData(form!);
 		const url = await uploadAndGetURL(formData.get("server_name"));
 		if (!url) {
 			alert("Upload required! (Fill out the form correctly)");
-			setIsPending(false);
+			setIsPendingCreate(false);
 			return;
 		}
 		formData.set("server_image", url);
@@ -66,9 +68,42 @@ export default function CreateServerFormDialog({ className, user }: { className:
 			router.refresh();
 		}
 		setResult(data);
-		setIsPending(false);
+		setIsPendingCreate(false);
 		setOpen(false);
 		form?.reset();
+	};
+
+	const joinFormHandleSubmit = async (e) => {
+		e.preventDefault();
+
+		setIsPendingJoin(true);
+
+		const form = join_formRef.current;
+		const formData = new FormData(form!);
+		const inviteLink = String(formData.get("invite_link"));
+		if (!inviteLink) {
+			alert("Invite link required! (Fill out the form correctly)");
+			setIsPendingJoin(false);
+			return;
+		}
+
+		const regex = /^@\/invite\/([^/]+)$/;
+		const match = inviteLink.match(regex);
+		const id = match ? match[1] : null;
+
+		if (!id) {
+			alert("Invalid invite link! (Fill out the form correctly)");
+			setIsPendingJoin(false);
+			return;
+		}
+
+		await joinServer(id);
+		setIsPendingJoin(false);
+		setOpen(false);
+		form?.reset();
+		
+
+		console.log("JOINED SERVER SUCCESS");
 	};
 
 	async function uploadAndGetURL(name: FormDataEntryValue | null) {
@@ -156,7 +191,7 @@ export default function CreateServerFormDialog({ className, user }: { className:
 
 	const [disableMotion, toggleDisableMotion] = useToggle(true);
 
-  const [mounted, setMounted] = useState(false);
+	const [mounted, setMounted] = useState(false);
 
 	useEffect(() => setMounted(true), []);
 
@@ -322,53 +357,63 @@ export default function CreateServerFormDialog({ className, user }: { className:
 							)}
 							value="join"
 						>
-							<div className="mb-6 flex-col flex gap-3">
-								<Dialog.Title className="create-server-dialog__title">Join a Server</Dialog.Title>
-								<Dialog.Description className="create-server-dialog__description">
-									Enter a invite link below to join an existing server
-								</Dialog.Description>
-							</div>
+							<form ref={join_formRef} onSubmit={joinFormHandleSubmit}>
+								<div className="mb-6 flex-col flex gap-3">
+									<Dialog.Title className="create-server-dialog__title">Join a Server</Dialog.Title>
+									<Dialog.Description className="create-server-dialog__description">
+										Enter a invite link below to join an existing server
+									</Dialog.Description>
+								</div>
 
-							<InputField
-								name="server-name"
-								labelClassName="!text-muted"
-								label={
-									<>
-										<span>Invite Link</span>
-										<span className="text-xl ml-0.5 -mt-0.5 text-error/75">*</span>
-									</>
-								}
-								placeholder=""
-							></InputField>
+								<div className="px-1">
+									<InputField
+										name="invite_link"
+										labelClassName="!text-muted"
+										label={
+											<>
+												<span>Invite Link</span>
+												<span className="text-xl ml-0.5 -mt-0.5 text-error/75">*</span>
+											</>
+										}
+										placeholder="e.g. @/invite/abcdef123456"
+									></InputField>
+								</div>
 
-							<Dialog.Close asChild>
-								<Link
-									href={"/discover"}
-									className="no-underline btn btn-secondary w-full text-base py-3 px-3 text-left btn-with-icon border border-foreground/10 gap-2.5 my-5"
-								>
-									<div className="flex items-center justify-center rounded-full bg-primary shrink-0 p-1.5">
-										<RiCompass3Fill className="text-3xl text-white" />
-									</div>
-									<div className="flex flex-col">
-										<p className="text-[15px] font-semibold">Don't have an invite?</p>
-										<p className="text-[13px] text-muted">Check out Other communities in Server Discovery.</p>
-									</div>
-									<MdArrowForwardIos className="ml-auto shrink-0" />
-								</Link>
-							</Dialog.Close>
+								<Dialog.Close asChild>
+									<Link
+										href={"/discover"}
+										className="no-underline btn btn-secondary w-full text-base py-3 px-3 text-left btn-with-icon border border-foreground/10 gap-2.5 my-5"
+									>
+										<div className="flex items-center justify-center rounded-full bg-primary shrink-0 p-1.5">
+											<RiCompass3Fill className="text-3xl text-white" />
+										</div>
+										<div className="flex flex-col">
+											<p className="text-[15px] font-semibold">Don't have an invite?</p>
+											<p className="text-[13px] text-muted">Check out other communities in Server Discovery.</p>
+										</div>
+										<MdArrowForwardIos className="ml-auto shrink-0" />
+									</Link>
+								</Dialog.Close>
 
-							<div className="flex justify-end gap-3 mt-4">
-								<Tabs.List>
-									<Tabs.Trigger value="default" asChild>
-										<button type="button" className="btn btn-secondary">
-											Back
-										</button>
-									</Tabs.Trigger>
-								</Tabs.List>
-								<button type="submit" className="btn btn-primary">
-									Join Server
-								</button>
-							</div>
+								<div className="flex justify-end gap-3 mt-4">
+									<Tabs.List>
+										<Tabs.Trigger value="default" asChild>
+											<button type="button" className="btn btn-secondary">
+												Back
+											</button>
+										</Tabs.Trigger>
+									</Tabs.List>
+									<button
+										disabled={isPendingJoin}
+										type="submit"
+										// onClick={joinFormHandleSubmit}
+										className="btn btn-primary btn-with-icon disabled:pointer-events-none"
+									>
+										{isPendingJoin ? "Joining" : "Join Server"}
+										{isPendingJoin && <BiLoaderAlt className="animate-spin text-lg"></BiLoaderAlt>}
+									</button>
+								</div>
+							</form>
 						</Tabs.Content>
 
 						{/* create-club  OR create-club */}
@@ -392,23 +437,31 @@ export default function CreateServerFormDialog({ className, user }: { className:
 								</Dialog.Description>
 							</div>
 
-							<form aria-disabled={isPending} ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-2">
+							<form
+								aria-disabled={isPendingCreate}
+								ref={create_formRef}
+								onSubmit={createFormHandleSubmit}
+								className="flex flex-col gap-2"
+							>
 								<ServerImageUploadBtn
 									uploaded={uploaded}
 									setUploaded={setUploaded}
 									publicImgUrl={publicImgUrl}
 									setSelectedFile={setSelectedFile}
 								></ServerImageUploadBtn>
-								<InputField
-									disabled={isPending}
-									defaultValue={`${user?.displayName}'s server`}
-									label="Server Name"
-									name="server_name"
-									success={success ? message : ""}
-									errors={errors?.server_name}
-								></InputField>
 
-								<input disabled={isPending} type="hidden" name="visibility" value={serverType} readOnly />
+								<div className="px-1">
+									<InputField
+										disabled={isPendingCreate}
+										defaultValue={`${user?.displayName}'s server`}
+										label="Server Name"
+										name="server_name"
+										success={success ? message : ""}
+										errors={errors?.server_name}
+									></InputField>
+								</div>
+
+								<input disabled={isPendingCreate} type="hidden" name="visibility" value={serverType} readOnly />
 
 								<span className="my-0.5 text-xs text-muted">
 									By creating a server, you agree to{" "}
@@ -425,13 +478,13 @@ export default function CreateServerFormDialog({ className, user }: { className:
 										</Tabs.Trigger>
 									</Tabs.List>
 									<button
-										disabled={isPending}
+										disabled={isPendingCreate}
 										type="submit"
-										onClick={handleSubmit}
+										onClick={createFormHandleSubmit}
 										className="btn btn-primary btn-with-icon disabled:pointer-events-none"
 									>
-										{isPending ? "Creating" : "Create Server"}
-										{isPending && <BiLoaderAlt className="animate-spin text-lg"></BiLoaderAlt>}
+										{isPendingCreate ? "Creating" : "Create Server"}
+										{isPendingCreate && <BiLoaderAlt className="animate-spin text-lg"></BiLoaderAlt>}
 									</button>
 								</div>
 							</form>
