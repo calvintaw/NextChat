@@ -116,8 +116,7 @@ const ContactCard = ({
 	contact: ContactType;
 }) => {
 	const { friends: chats, setFriends: setChats } = useFriendsProvider();
-	const room_id =
-		contact.username === "system" ? `system-room-${contact.id}:${user.id}` : getDMRoom(user.id, contact.id);
+	const room_id = contact.username === "system" ? `system-room-${user.id}` : getDMRoom(user.id, contact.id);
 
 	const handleClick = async () => {
 		// Check if DM already exists in state

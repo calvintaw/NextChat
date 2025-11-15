@@ -202,7 +202,9 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 									Delete DM
 								</DropdownMenu.Item>
 
-								<DropdownMenu.Separator className="DropdownMenu__Separator" />
+								{!selectedChat.room_id.startsWith("system-room") && (
+									<>
+									<DropdownMenu.Separator className="DropdownMenu__Separator" />
 
 								<DropdownMenu.Item
 									className="DropdownMenuItem"
@@ -240,6 +242,8 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 								>
 									Block
 								</DropdownMenu.Item>
+									</>
+								)}
 							</>
 						)}
 					</DropdownMenu.Content>
