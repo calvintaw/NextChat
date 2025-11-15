@@ -151,6 +151,27 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 	const pathname = usePathname();
 	const router = useRouterWithProgress();
 
+	async function handleRemoveFriend(e) {
+		e.preventDefault();
+		if (!selectedChat) return;
+		const result = await removeFriendshipRequest(selectedChat, "friend");
+
+		if (result.success) {
+			router.refresh();
+			toast({
+				title: "",
+				mode: "positive",
+				subtitle: `Friend request with ${selectedChat.username} removed successfully.`,
+			});
+		} else {
+			toast({
+				title: "",
+				mode: "negative",
+				subtitle: result.message || "Failed to remove friend request. Please try again.",
+			});
+		}
+	}
+
 	return (
 		<>
 			<DropdownMenu.Root
@@ -206,29 +227,7 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 									<>
 										<DropdownMenu.Separator className="DropdownMenu__Separator" />
 
-										<DropdownMenu.Item
-											className="DropdownMenuItem"
-											onClick={async (e) => {
-												e.preventDefault();
-												const result = await removeFriendshipRequest(selectedChat, "friend");
-
-												if (result.success) {
-													router.refresh();
-													// socket.emit("refresh-contacts-page", user.id, selectedChat.id);
-													toast({
-														title: "",
-														mode: "positive",
-														subtitle: `Friend request with ${selectedChat.username} removed successfully.`,
-													});
-												} else {
-													toast({
-														title: "",
-														mode: "negative",
-														subtitle: result.message || "Failed to remove friend request. Please try again.",
-													});
-												}
-											}}
-										>
+										<DropdownMenu.Item className="DropdownMenuItem" onClick={handleRemoveFriend}>
 											Remove Friend
 										</DropdownMenu.Item>
 
@@ -385,6 +384,7 @@ import { IoSearch } from "react-icons/io5";
 import InputField from "../../form/InputField";
 import { IconWithSVG } from "../../general/Buttons";
 import { BiLoaderAlt } from "react-icons/bi";
+import router from "next/router";
 
 // const CreateDMButton = () => {
 // 	const [isPending, setIsPending]
@@ -480,7 +480,7 @@ export const CreateDMButton = ({ currentUser }: { currentUser: User }) => {
 		// e.preventDefault();
 		// const formData = new FormData(e.currentTarget);
 		// const username = formData.get("q")?.toString().trim();
-		
+
 		if (username === currentUser.username) {
 			setError("Invalid DM");
 			return;

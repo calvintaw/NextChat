@@ -256,7 +256,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 		const originalMsg = [...messages];
 
-		// local update (Optimistic UI update is still good practice)
+		// local update
 		setMessages((prev) => prev.filter((tx) => tx.id != id));
 
 		const result = await deleteMsg(id, roomId, type, content);
@@ -264,7 +264,6 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 			setMessages(originalMsg);
 			toast({ title: "Error!", mode: "negative", subtitle: result.message });
 		}
-		// NOTE: socket.emit("delete message", id, roomId); is REMOVED
 		// The deletion in the DB inside deleteMsg() triggers the Supabase
 		// "postgres_changes" DELETE event automatically for other clients.
 

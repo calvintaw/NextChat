@@ -55,7 +55,6 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, isBlocked }: C
 	};
 
 	const { trigger: triggerTypingAnimation, cancel: cancelTypingAnimation } = useDebounce({
-		// REPLACED: socket.emit calls with Supabase send functions
 		startCallback: sendTypingStart,
 		endCallback: sendTypingStop,
 		delay: 2000,
@@ -147,9 +146,6 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, isBlocked }: C
 			if (isBlocked || (isSystem && isBlocked) || isPending) return;
 			if (textRef.current.value.trim() === "") return;
 			if (!canSendMessage()) return;
-
-			// REMOVED: socket.emit("join", roomId);
-			// Joining is now handled on mount of ChatBox.tsx via Supabase channel subscription.
 
 			sendMessage(textRef.current?.value);
 			textRef.current.value = "";

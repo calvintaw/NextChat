@@ -1014,7 +1014,6 @@ export async function requestFriendship(
 			});
 
 			console.log(`Success! Your friend requests to ${username} was sent.`);
-			// socket.emit("refresh-contacts-page", currentUser.id, targetUser.id);
 
 			return {
 				success: true,
@@ -1075,7 +1074,6 @@ export async function removeFriendshipRequest(
 			});
 
 			console.log(`Success! Removed friend request to ${targetUser.username}.`);
-			// socket.emit("refresh-contacts-page", currentUser.id, targetUser.id);
 
 			return { success: true, message: `Removed friend request to ${targetUser.username}.` };
 		} catch (error) {
@@ -1130,7 +1128,6 @@ export async function acceptFriendshipRequest(
 			});
 
 			console.log(`Success! Accepted friend request from ${targetUser.username}.`);
-			// socket.emit("refresh-contacts-page", currentUser.id, targetUser.id);
 
 			return {
 				success: true,

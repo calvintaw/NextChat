@@ -22,26 +22,6 @@ type Props = {
 };
 
 export const ContactPreviewContainer = ({ setContacts, user, contacts }: Props) => {
-	// useEffect(() => {
-	// 	function handleStatusChange(userId: string, online: boolean) {
-	// 		setContacts((prev) => {
-	// 			const index = prev.findIndex((person) => person.id === userId);
-
-	// 			if (index === -1) return prev;
-	// 			const newContacts = [...prev];
-	// 			newContacts[index].online = online;
-	// 			return newContacts;
-	// 		});
-	// 	}
-
-	// 	socket.on("online", handleStatusChange);
-	// 	socket.on("offline", handleStatusChange);
-
-	// 	return () => {
-	// 		socket.off("online", handleStatusChange);
-	// 		socket.off("offline", handleStatusChange);
-	// 	};
-	// }, []);
 
 	const toast = useToast();
 	const [error, setError] = useState("");
@@ -56,7 +36,6 @@ export const ContactPreviewContainer = ({ setContacts, user, contacts }: Props) 
 				setError(result.message);
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
-				// socket.emit("refresh-contacts-page", user.id, friend.id);
 
 				// local update
 				setContacts((prev) => prev.filter((req) => req.id !== friend.id));

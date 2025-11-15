@@ -2,13 +2,11 @@
 import {
 	requestFriendship,
 	getContacts,
-	getFriendRequests,
 	acceptFriendshipRequest,
 	removeFriendshipRequest,
 	getUser,
 } from "@/app/lib/actions";
 import { ContactType } from "@/app/lib/definitions";
-import { socket } from "@/app/lib/socket";
 import * as Tabs from "@radix-ui/react-tabs";
 import { useActionState, useState, useRef, useEffect } from "react";
 import { FaUserFriends } from "react-icons/fa";
@@ -57,7 +55,11 @@ type AllContactsTabProps = {
 
 const ContactTabs = ({ user, initialFriendRequests }: ContactTabsProps) => {
 	const toast = useToast();
-
+	const [initialLoad, setInitialLoad] = useState(true);
+	const [friendRequests, setFriendRequests] = useState<friendRequestsType>(initialFriendRequests);
+	const { contacts, setContacts } = useFriendsProvider();
+	const addFriendInputRef = useRef<HTMLInputElement | null>(null);
+	const friendsCount = contacts.length;
 	const [request, formAction, isPending] = useActionState(
 		async (prevState: { success: boolean; message: string }, formData: FormData) => {
 			let username = (formData.get("username") as string | null)?.trim() ?? "";
@@ -70,7 +72,6 @@ const ContactTabs = ({ user, initialFriendRequests }: ContactTabsProps) => {
 
 			const result = await requestFriendship(prevState, formData);
 			if (result.success && result.targetUser) {
-				// socket.emit("refresh-contacts-page", user.id, result.targetUser.id);
 				// local update
 				setFriendRequests((prev) => ({
 					incoming: [...prev.incoming],
@@ -89,32 +90,6 @@ const ContactTabs = ({ user, initialFriendRequests }: ContactTabsProps) => {
 		},
 		{ success: false, message: "" }
 	);
-
-	const [initialLoad, setInitialLoad] = useState(true);
-
-	const [friendRequests, setFriendRequests] = useState<friendRequestsType>(initialFriendRequests);
-	// const [contacts, setContacts] = useState(initialContacts);
-
-	const { contacts, setContacts } = useFriendsProvider();
-	const addFriendInputRef = useRef<HTMLInputElement | null>(null);
-	const friendsCount = contacts.length;
-
-	// useEffect(() => {
-	// 	socket.emit("join", user.id);
-	// 	async function refrechContactsPage() {
-	// 		const [newContacts, newRequests] = await Promise.all([getContacts(user.id), getFriendRequests(user.id)]);
-	// 		setContacts(newContacts);
-	// 		setFriendRequests(newRequests);
-	// 	}
-
-	// 	// the code can be refactored to be more efficient, for example, sending the new info via socket instead of fetching from db or fetching from db but only the required ones
-	// 	// TODO task (maybe)
-	// 	socket.on(`refresh-contacts-page`, refrechContactsPage);
-	// 	return () => {
-	// 		socket.off(`refresh-contacts-page`, refrechContactsPage);
-	// 		socket.disconnect();
-	// 	};
-	// }, []);
 
 	useEffect(() => {
 		const fetchContacts = async () => {
@@ -450,7 +425,6 @@ const RequestTab = ({ user, friendRequests, setFriendRequests, setContacts }: Re
 				setError(result.message);
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
-				// socket.emit("refresh-contacts-page", user.id, friend.id);
 				const { createdAt, ...contact } = friend;
 
 				// local update
@@ -483,7 +457,6 @@ const RequestTab = ({ user, friendRequests, setFriendRequests, setContacts }: Re
 				setError(result.message);
 				toast({ title: "Error!", mode: "negative", subtitle: result.message });
 			} else {
-				// socket.emit("refresh-contacts-page", user.id, friend.id);
 				// local update
 				setFriendRequests((prev) => ({
 					...prev,

@@ -71,10 +71,6 @@ export function MessageDropdownMenu({ msg, retrySendingMessage }: Props) {
 			setMessages(originalMsg);
 			toast({ title: "Error!", mode: "negative", subtitle: result.message });
 		}
-		// else {
-		// 	if (didChange) socket.emit("add_reaction_msg", msg.id, user.id, roomId, emoji);
-		// 	if (!didChange) socket.emit("remove_reaction_msg", msg.id, user.id, roomId, emoji);
-		// }
 	};
 
 	const handleCopy = async (text: string) => {
