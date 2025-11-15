@@ -10,12 +10,12 @@ const Page = async () => {
 	const currentUser = session.user;
 	// const [contacts, requests] = await Promise.all([getContacts(currentUser.id), getFriendRequests(currentUser.id)]);
 
-	const requests = await getFriendRequests(currentUser.id);
+	// const requests = await getFriendRequests(currentUser.id);
 	return (
 		<section className="flex gap-2 flex-col flex-1">
 			<ContactTabs
 				user={currentUser}
-				initialFriendRequests={requests}
+				initialFriendRequests={{ incoming: [], sent: [] }}
 
 				// initialContacts={contacts}
 			></ContactTabs>{" "}

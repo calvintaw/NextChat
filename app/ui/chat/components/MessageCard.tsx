@@ -205,7 +205,7 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 						{!isFirstGroup && !msg.replyTo && (
 							<>
 								<div
-									className="max-sm:hidden w-11 h-auto font-mono text-center whitespace-nowrap text-nowrap flex items-center justify-center text-[11px] text-muted -z-50 group-hover:z-0"
+									className="max-sm:hidden w-9 h-auto font-mono text-center whitespace-nowrap text-nowrap flex items-center justify-center pl-0.5 text-[10px] text-muted -z-50 group-hover:z-0"
 									title={msg_date}
 								>
 									{msg_date}

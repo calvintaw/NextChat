@@ -31,9 +31,11 @@ export default function ProgressBar() {
 				return;
 			}
 
+			if (target?.closest("[data-no-progress]")) return;
+			
 			const path = e.composedPath?.() as HTMLElement[];
-			if (path.some((el) => el instanceof HTMLElement && el.closest("[data-id='no-progress-bar']"))) {
-				return; 
+			if (path.some((el) => el instanceof HTMLElement && el.dataset?.id === "no-progress-bar")) {
+				return;
 			}
 
 			const anchor = target?.closest("a");

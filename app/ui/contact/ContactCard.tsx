@@ -211,7 +211,7 @@ const ContactCard = ({
 							);
 						}}
 						data-tooltip-id={`tooltip-${contact.id}`}
-						data-tooltip-content="Remove Friend"
+						data-tooltip-content={contact.username === "system" ? "Remove ChatBot" : "Remove Friend"}
 						className="icon-contact-panel group/icon"
 					>
 						<RxCross2 className="group-hover/icon:text-error" />

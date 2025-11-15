@@ -1,16 +1,32 @@
-import React, { useState } from "react";
+import React, { RefObject, useState } from "react";
 import { AddReactionBtn } from "./AddReactionBtn";
 import clsx from "clsx";
 
-type ChatToolbarProps = {
+export interface ChatToolbarProps {
 	setEmoji: (emoji: string) => void;
 	isPending: boolean;
 	isFocused: boolean;
 	isSystem: boolean;
 	isBlocked: boolean;
-};
+	textRef: RefObject<HTMLTextAreaElement|null>;
+	setInput: React.Dispatch<React.SetStateAction<string>>;
+	setReplyToMsg: (msg: MessageType | null) => void;
+	sendMessage: (msg: string, type?: MessageContentType) => void;
+	replyToMsg: MessageType | null;
+}
 
-export const ChatToolbar = ({ setEmoji, isPending, isFocused, isSystem, isBlocked }: ChatToolbarProps) => {
+export const ChatToolbar = ({
+	setEmoji,
+	isPending,
+	isFocused,
+	isSystem,
+	isBlocked,
+	textRef,
+	setInput,
+	setReplyToMsg,
+	sendMessage,
+	replyToMsg,
+}: ChatToolbarProps) => {
 	const [open, setOpen] = useState(false);
 
 	return (
@@ -91,6 +107,14 @@ export const ChatToolbar = ({ setEmoji, isPending, isFocused, isSystem, isBlocke
 						: "opacity-100",
 					isPending && "dark:!bg-background/75 !opacity-100 !bg-black/25 border-0"
 				)}
+				onClick={() => {
+					if (textRef.current && textRef.current.value.trim() !== "" && !isBlocked && !isSystem) {
+						sendMessage(textRef.current.value); // re-use your existing function
+						textRef.current.value = "";
+						setInput("");
+						if (replyToMsg) setReplyToMsg(null);
+					}
+				}}
 			>
 				{!isPending && <IoArrowUp className="text-xs text-background"></IoArrowUp>}{" "}
 				{isPending && <GoSquareFill className="text-xs text-foreground"></GoSquareFill>}
@@ -103,3 +127,4 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { IconWithSVG } from "../../general/Buttons";
 import { GoSquareFill } from "react-icons/go";
 import { IoArrowUp } from "react-icons/io5";
+import { MessageType, MessageContentType } from "@/app/lib/definitions";

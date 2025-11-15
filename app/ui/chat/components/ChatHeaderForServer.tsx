@@ -95,7 +95,7 @@ export function ServerCardHeader({ server, user }: { server: Room; user: User })
 				</div>
 
 				{/* Server Description */}
-				<p className="text-sm text-gray-400 truncate">{localServer.description || "No description available"}</p>
+				<p className="text-sm text-gray-400">{localServer.description || "No description available"}</p>
 
 				{/* Server Stats */}
 				<div className="flex items-center gap-4 text-gray-400 text-sm">

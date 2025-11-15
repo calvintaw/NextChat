@@ -326,9 +326,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 								user={recipient as User}
 							/>
 						)}
-						{type === "server" && recipient && (
-							<ServerCardHeader user={user} server={recipient as Room} />
-						)}
+						{type === "server" && recipient && <ServerCardHeader user={user} server={recipient as Room} />}
 
 						<hr className="hr-separator bg-contrast"></hr>
 

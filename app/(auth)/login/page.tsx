@@ -57,18 +57,17 @@ export default function LoginPage() {
 }
 
 function LoginForm() {
-	const [errorMessage, formAction, isPending] = useActionState(authenticate, "");
+	const [error, formAction, isPending] = useActionState(authenticate, "");
+	const [errorMessage, setErrorMessage] = useState("");
 	const formRef = useRef<HTMLFormElement | null>(null);
 
 	useEffect(() => {
-		if (errorMessage && formRef.current) {
-			formRef.current.reset();
-		}
-	}, [errorMessage]);
+		setErrorMessage(error ?? "");
+	}, [error]);
 
 	return (
 		<AuthFormWrapper className="bg-background max-w-[440px]">
-			<form ref={formRef} action={formAction} className="form ">
+			<form ref={formRef} onSubmit={() => setErrorMessage("")} action={formAction} className="form ">
 				<div role="heading" className="flex items-center gap-2">
 					<IoLogoPolymer className="text-5xl"></IoLogoPolymer>
 					<h2 className="text-3xl font-semibold">Welcome back!</h2>
@@ -83,9 +82,14 @@ function LoginForm() {
 						icon={<RiMailLine />}
 						placeholder="Enter your email or username"
 						required
+						onChange={() => errorMessage && setErrorMessage("")}
 					/>
-
-					<PasswordField hideRules disabled={isPending} name="password"></PasswordField>
+					<PasswordField
+						fnToCallOnChange={() => errorMessage && setErrorMessage("")}
+						hideRules
+						disabled={isPending}
+						name="password"
+					></PasswordField>
 				</div>
 
 				{errorMessage && <span className="text-sm text-red-500">{errorMessage}</span>}

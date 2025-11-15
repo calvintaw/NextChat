@@ -369,12 +369,16 @@ const AddContactTab = ({ formAction, addFriendInputRef, request, isPending }: Ad
 				</button>
 			</form>
 
+			<p className="my-2 text-sm text-muted">
+				Tip: <span>use @system to get access to the AI ChatBot Room</span>
+			</p>
+
 			<hr className="hr-separator" />
-			<span className="text-muted text-sm">Recommended ~</span>
+			{/* <span className="text-muted text-sm">Recommended ~</span>
 
 			<hr className="hr-separator my-2 bg-transparent" />
 
-			<p className="text-muted">- Recommended Friends functionality coming soon...</p>
+			<p className="text-muted">- Recommended Friends functionality coming soon...</p> */}
 		</div>
 	);
 };

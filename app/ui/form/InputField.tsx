@@ -68,6 +68,7 @@ const RULES = [
 
 type PasswordFieldProps = InputFieldProps & {
 	setIsAllowed?: React.Dispatch<React.SetStateAction<boolean>>;
+	fnToCallOnChange?: () => void;
 };
 
 export function PasswordField({
@@ -79,6 +80,7 @@ export function PasswordField({
 	parentClassName = "",
 	hideRules = false,
 	setIsAllowed,
+	fnToCallOnChange = () => {},
 }: PasswordFieldProps) {
 	const [showPass, setShowPass] = useState(false);
 	const [value, setValue] = useState("");
@@ -137,7 +139,10 @@ export function PasswordField({
 						id={name}
 						name={name}
 						value={value}
-						onChange={(e) => setValue(e.target.value)}
+						onChange={(e) => {
+							setValue(e.target.value);
+							fnToCallOnChange();
+						}}
 						type={showPass ? "text" : "password"}
 						placeholder={placeholder}
 						className={className}
@@ -186,8 +191,6 @@ export function PasswordField({
 									</span>
 								</p>
 							</div>
-
-				
 						</>
 					)}
 

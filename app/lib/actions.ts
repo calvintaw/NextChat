@@ -47,12 +47,8 @@ async function withCurrentUser(callback: Function) {
 }
 
 export async function getUser(user_id: string): Promise<User | null> {
-	if (user_id.includes("system-room")) {
-		const result = await sql<User[]>`
-		SELECT id, username, display_name as "displayName", email, created_at as "createdAt", image FROM users WHERE username = ${"system"}
-	`;
-
-		return result[0] ?? null;
+	if (user_id === SYSTEM_USER.id) {
+		return SYSTEM_USER;
 	}
 
 	const result = await sql<User[]>`
@@ -188,6 +184,7 @@ export async function clearMsgHistory(
 }
 
 export async function getChats(currentUserId: string): Promise<ChatType[]> {
+
 	return await sql`
 			SELECT 
 				r.name as "room_name",
@@ -311,7 +308,6 @@ export async function insertMessageInDB(msg: LocalMessageType): Promise<{ succes
 			await sql`
 				INSERT INTO messages (room_id, sender_id, content, type)
 				VALUES (${msg.room_id}, ${SYSTEM_USER.id}, ${answer}, 'text')
-				RETURNING id, created_at
 			`;
 		}
 
@@ -531,7 +527,7 @@ export async function editServer(formData: FormData, server: Room, currentUserId
 		};
 	}
 
-	const { name = null, description = null, type = null, profile = null, banner = null} = result.data ?? {};
+	const { name = null, description = null, type = null, profile = null, banner = null } = result.data ?? {};
 
 	try {
 		const results: Room[] = await sql`
@@ -726,41 +722,42 @@ export async function registerUser(formData: FormData): Promise<FormState> {
 
 			const systemUserId = process.env.SYSTEM_USER_ID!;
 			const [user1_id, user2_id] = [id, systemUserId].sort((a, b) => a.localeCompare(b));
-			const roomId = `system-room-${systemUserId}:${id}`;
+			const roomId = `system-room-${id}`;
 
-			await sql`
-				INSERT INTO friends (user1_id, user2_id, request_sender_id, status)
-				VALUES (
-					${user1_id},  -- deterministic system UUID
-					${user2_id}::UUID,                            
-					${id}::UUID,                             
-					'accepted'
-				);
+					await sql`
+						INSERT INTO friends (user1_id, user2_id, request_sender_id, status)
+						VALUES (
+							${user1_id},  -- deterministic system UUID
+							${user2_id}::UUID,
+							${id}::UUID,
+							'accepted'
+						);
+					`;
+					// Create system room
+					await sql`
+			  INSERT INTO rooms (id, owner_id, description, type)
+			  VALUES (
+			    ${roomId},
+			    ${systemUserId},
+			    'Chat between system and user.',
+			    'dm'
+			  )
+			  ON CONFLICT (id) DO NOTHING;
 			`;
-			// Create system room
-			await sql`
-    INSERT INTO rooms (id, owner_id, description, type)
-    VALUES (
-      ${roomId},
-      ${systemUserId},
-      'Chat between system and user.',
-      'dm'
-    )
-    ON CONFLICT (id) DO NOTHING;
-  `;
 
-			// Add members: system, new user
-			await sql`
-    INSERT INTO room_members (room_id, user_id, role)
-    VALUES
-      (${roomId}, ${systemUserId}, 'admin'),
-      (${roomId}, ${id}, 'user')
-    ON CONFLICT (user_id, room_id) DO NOTHING;
-  `;
+					// Add members: system, new user
+					await sql`
+			  INSERT INTO room_members (room_id, user_id, role)
+			  VALUES
+			    (${roomId}, ${systemUserId}, 'admin'),
+			    (${roomId}, ${id}, 'user')
+			  ON CONFLICT (user_id, room_id) DO NOTHING;
+			`;
 
 			await sql<LoginFormUser[]>`
 				INSERT INTO user_status (user_id, online)
 				VALUES (${id}, true)
+				ON CONFLICT DO NOTHING
 			`;
 		});
 	} catch (error) {
@@ -778,12 +775,7 @@ export async function registerUser(formData: FormData): Promise<FormState> {
 		redirect: false,
 	});
 
-	await (
-		await cookies()
-	).set("theme", "dark", {
-		path: "/",
-		maxAge: 60 * 60 * 24 * 30, // 30 days
-	});
+	(await cookies()).set("theme", "dark", { path: "/", maxAge: 60 * 60 * 24 * 30 })
 
 	return {
 		errors: {},
@@ -952,6 +944,7 @@ export async function createDM(
 		} catch (error) {
 			console.error("Error creating DM:", error);
 
+			//@ts-ignore
 			if (error.code === "23505") {
 				return {
 					success: false,
@@ -985,9 +978,9 @@ export async function requestFriendship(
 				};
 			}
 
-			if (username === "system") {
-				return acceptFriendshipRequest(currentUser, SYSTEM_USER);
-			}
+			// if (username === "system") {
+			// 	return acceptFriendshipRequest(currentUser, SYSTEM_USER);
+			// }
 
 			const [targetUser] = await sql`SELECT 
 			id,

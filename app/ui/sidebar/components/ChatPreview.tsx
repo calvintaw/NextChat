@@ -228,6 +228,7 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 									}}
 								>
 									Remove Friend
+
 								</DropdownMenu.Item>
 
 								<DropdownMenu.Item
@@ -302,6 +303,7 @@ export const ChatPreview = ({
 								e.stopPropagation();
 								selectChat();
 							}}
+							data-no-progress
 							data-id="no-progress-bar"
 							data-tooltip-id="chat-panel-item-tooltip"
 							data-tooltip-content={"More"}

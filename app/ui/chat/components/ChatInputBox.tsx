@@ -81,7 +81,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, isBlocked }: C
 
 	const sendMessage = async (input: string, type: MessageContentType = "text") => {
 		const tempId = uuidv4();
-		setIsPending(true);
+		if (isSystem) setIsPending(true);
 		if (roomId.startsWith("system-room")) setActivePersons((prev: string[]) => [...prev, "system"]);
 
 		const temp_msg = {
@@ -112,15 +112,25 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, isBlocked }: C
 		});
 
 		// Database insertion triggers the Supabase Realtime listener in ChatBox.tsx
-		const result = await insertMessageInDB(temp_msg);
-		if (!result.success && result.message) {
-			toast({ title: result.message, subtitle: "", mode: "negative" });
-			setMessages((prev) => prev.map((msg) => (msg.id === tempId ? { ...msg, synced: false } : msg)));
-		} else if (result.success) {
-			// Mark as synced, assuming insertMessageInDB was successful
-			setMessages((prev) => prev.map((msg) => (msg.id === tempId ? { ...msg, synced: true } : msg)));
+		if (isSystem) {
+			const result = await insertMessageInDB(temp_msg);
+			if (!result.success && result.message) {
+				toast({ title: result.message, subtitle: "", mode: "negative" });
+				setMessages((prev) => prev.map((msg) => (msg.id === tempId ? { ...msg, synced: false } : msg)));
+			} else if (result.success) {
+				setMessages((prev) => prev.map((msg) => (msg.id === tempId ? { ...msg, synced: true } : msg)));
+			}
+		} else {
+			insertMessageInDB(temp_msg).then((result) => {
+				if (result.success) {
+					setMessages((prev) => prev.map((msg) => (msg.id === temp_msg.id ? { ...msg, synced: true } : msg)));
+				} else {
+					setMessages((prev) => prev.map((msg) => (msg.id === temp_msg.id ? { ...msg, synced: false } : msg)));
+				}
+			});
 		}
-		setIsPending(false);
+
+		if (isSystem) setIsPending(false);
 		setActivePersons((prev: string[]) => prev.filter((name) => name != "system"));
 	};
 
@@ -214,6 +224,11 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, isBlocked }: C
 						)}
 					/>
 					<ChatToolbar
+						textRef={textRef}
+						sendMessage={sendMessage}
+						setReplyToMsg={setReplyToMsg}
+						replyToMsg={replyToMsg}
+						setInput={setInput}
 						isPending={isPending}
 						isFocused={isFocused}
 						isSystem={isSystem}
