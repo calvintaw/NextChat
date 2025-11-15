@@ -1099,12 +1099,20 @@ export async function acceptFriendshipRequest(
 				: [currentUser.id, targetUser.id].sort((a, b) => a.localeCompare(b));
 
 			await sql.begin(async (tx) => {
-				await tx`
-        UPDATE friends
-        SET status = 'accepted'
-        WHERE user1_id = ${user1_id} 
-					AND user2_id = ${user2_id}
-      `;
+
+				if (isSystem) {
+					await tx`
+					INSERT INTO friends (user1_id, user2_id, request_sender_id,  status)
+					VALUES (${user1_id}, ${user2_id}, ${currentUser.id}, 'accepted')
+				`;
+				} else {
+					await tx`
+					UPDATE friends
+					SET status = 'accepted'
+					WHERE user1_id = ${user1_id} 
+						AND user2_id = ${user2_id}
+				`;
+				}
 
 				await tx`
         INSERT INTO rooms (id, type)
