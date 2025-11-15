@@ -605,6 +605,16 @@ export async function leaveServer(room_id: string) {
 	});
 }
 
+export async function isMember(userId: string, roomId: string) {
+	const result = await sql<{ exists: number }[]>`
+    SELECT 1 AS exists
+    FROM room_members
+    WHERE user_id = ${userId} AND room_id = ${roomId}
+    LIMIT 1;
+  `;
+	return result.length > 0;
+}
+
 export async function createServer(formData: FormData): Promise<{ errors: {}; message: string; success: boolean }> {
 	console.log("formData: ", formData);
 	const parsedForm = createServerSchema.safeParse({

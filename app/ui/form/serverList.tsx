@@ -14,6 +14,7 @@ type FilterType = "all" | "public" | "private";
 import { HiServerStack } from "react-icons/hi2";
 import { useServersProvider } from "@/app/lib/contexts/ServersContext";
 import { FaArrowRight } from "react-icons/fa";
+import { MdPeopleAlt } from "react-icons/md";
 
 export const ServerList = ({ user, servers }: { user: User; servers: Room[] }) => {
 	const [search, setSearch] = useState("");
@@ -140,7 +141,7 @@ const Card = ({ server, user }: { server: Room; user: User }) => {
 				) : (
 					<div className={clsx("absolute w-full h-full", getBannerColor(server.name))}></div>
 				)}
-				<div className="absolute left-2.5 -bottom-7 z-[1] flex items-center gap-2">
+				<div className="absolute left-2.5 -bottom-7 z-[1] flex items-center gap-2 right-0">
 					{/* Server Icon/Avatar */}
 					<div className=" border-4 rounded-[18px] overflow-hidden border-surface">
 						<Avatar
@@ -155,7 +156,7 @@ const Card = ({ server, user }: { server: Room; user: User }) => {
 					</div>
 
 					{/* Server Name and Verification */}
-					<div className="flex items-center gap-1 -ml-1 mt-6.5">
+					<div className="flex items-center gap-1 -ml-1 mt-7 flex-1">
 						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
 							<path
 								fill="var(--color-success)"
@@ -171,7 +172,7 @@ const Card = ({ server, user }: { server: Room; user: User }) => {
 							</g>
 						</svg>
 
-						<h2 title={server.name} className="text-lg font-bold line-clamp-1">
+						<h2 title={server.name} className="text-lg font-bold w-full max-w-[16ch] truncate">
 							{server.name || "No name"}
 						</h2>
 					</div>
@@ -188,27 +189,41 @@ const Card = ({ server, user }: { server: Room; user: User }) => {
 				<div className="flex items-center justify-between text-muted text-xs mt-4">
 					<div className="flex items-center gap-4">
 						<div className="flex items-center gap-1">
-							<div className="size-2 bg-gray-400 rounded-full" />
-							<p>{formatNumber(server?.total_members)} Members</p>
+							{/* <div className="size-2 bg-gray-400 rounded-full" /> */}
+							<MdPeopleAlt className="text-lg" />
+							<p>
+								{formatNumber(server?.total_members)}{" "}
+								{server?.total_members && server.total_members > 1 ? "Members" : "Member"}
+							</p>
 						</div>
 					</div>
 
 					<Link
-						onClick={() => joinServer(server.id)}
+						onClick={() => server.type === "public" && joinServer(server.id)}
+						className={clsx("no-underline", server.type === "private" && !hasJoined && "!cursor-not-allowed")}
 						href={server.type === "dm" ? `/chat/${server.id}` : `/chat/server/${server.id}`}
 					>
 						<button
 							disabled={hasJoined || server.type === "private"}
 							className={clsx(
-								"btn btn-third btn-with-icon flex items-center gap-1.5 disabled:pointer-events-none  disabled:ring-2 ring-inset disabled:bg-green-600 disabled:text-white disabled:ring-green-600"
+								"btn btn-third btn-with-icon flex items-center gap-1.5 disabled:pointer-events-none disabled:ring-2 ring-inset disabled:bg-foreground disabled:text-background disabled:ring-background"
 							)}
+							title={
+								server.type === "private" && !hasJoined
+									? "Private server – invite required"
+									: hasJoined
+									? "Enter server"
+									: "Join server"
+							}
 						>
 							{hasJoined ? (
 								<>
-									Go <FaArrowRight />
+									Enter <FaArrowRight />
 								</>
-							) : (
+							) : server.type === "public" ? (
 								"Join"
+							) : (
+								"Invite Required"
 							)}
 						</button>
 					</Link>

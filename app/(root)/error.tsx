@@ -22,6 +22,7 @@ export default function ErrorPage({
 
 	// Extract text inside square brackets (only present in my custom throw new error statements)
 	// Split error.message into main text and bracketed digest
+	const disableReload = error.message?.includes("[disableReload]");
 	const { mainMessage, digest } = (() => {
 		const match = error.message.match(/^(.*?)\s*\[([^\]]+)\]/);
 		if (match) {
@@ -61,7 +62,11 @@ export default function ErrorPage({
 					<MdArrowBack className="text-xl " />
 					<span>Back to Home</span>
 				</Link>
-				<Button className="btn-inverted h-9" onClick={() => reset()}>
+				<Button
+					disabled={disableReload}
+					className={clsx("btn-inverted h-9", disableReload && "opacity-50 cursor-not-allowed")}
+					onClick={() => reset()}
+				>
 					Reload
 				</Button>
 			</div>

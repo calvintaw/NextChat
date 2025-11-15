@@ -101,7 +101,6 @@ export default function CreateServerFormDialog({ className, user }: { className:
 		setIsPendingJoin(false);
 		setOpen(false);
 		form?.reset();
-		
 
 		console.log("JOINED SERVER SUCCESS");
 	};
@@ -452,8 +451,8 @@ export default function CreateServerFormDialog({ className, user }: { className:
 
 								<div className="px-1">
 									<InputField
+										placeholder="Recommended max: 16 characters"
 										disabled={isPendingCreate}
-										defaultValue={`${user?.displayName}'s server`}
 										label="Server Name"
 										name="server_name"
 										success={success ? message : ""}
