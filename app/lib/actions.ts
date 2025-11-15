@@ -509,6 +509,7 @@ export async function editServer(formData: FormData, server: Room, currentUserId
 		description: z.string().trim().max(120).optional(),
 		type: z.enum(["public", "private"]).optional(),
 		profile: z.string().url("Profile image must be a valid URL").or(z.literal("")).optional(),
+		banner: z.string().url("Banner image must be a valid URL").or(z.literal("")).optional(),
 	});
 
 	const rawData = {
@@ -516,6 +517,7 @@ export async function editServer(formData: FormData, server: Room, currentUserId
 		description: formData.get("description")?.toString(),
 		type: formData.get("type")?.toString(),
 		profile: formData.get("server_image")?.toString(),
+		banner: formData.get("server_banner")?.toString(),
 	};
 
 	const result = parsedFormSchema.safeParse(rawData);
@@ -529,7 +531,7 @@ export async function editServer(formData: FormData, server: Room, currentUserId
 		};
 	}
 
-	const { name = null, description = null, type = null, profile = null } = result.data ?? {};
+	const { name = null, description = null, type = null, profile = null, banner = null} = result.data ?? {};
 
 	try {
 		const results: Room[] = await sql`
@@ -538,9 +540,10 @@ export async function editServer(formData: FormData, server: Room, currentUserId
 				name = ${name ?? server.name!},
 				description = ${description ?? server.description!},
 				type = ${type ?? server.type!},
-				profile = ${profile ?? server.profile!}
+				profile = ${profile ?? server.profile},
+				banner = ${banner ?? server.banner}
       WHERE id = ${server.id} AND owner_id = ${currentUserId}
-      RETURNING id, owner_id, name, description, type, profile, created_at
+      RETURNING id, owner_id, name, description, type, profile, banner, created_at
     `;
 
 		result_server = results[0] ?? null;

@@ -12,7 +12,6 @@ import { get as getCache, set as setCache } from "idb-keyval";
 import Loading from "@/app/(root)/chat/[room_id]/loading";
 import useOnScreen from "@/app/lib/hooks/useOnScreen";
 import { useToast } from "@/app/lib/hooks/useToast";
-import { isServerRoom } from "@/app/lib/utilities";
 import ChatProvider from "./ChatBoxWrapper";
 import { DirectMessageCard } from "./components/ChatHeaderForDM";
 import { ServerCardHeader } from "./components/ChatHeaderForServer";
@@ -306,6 +305,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 						messages,
 						roomId,
 						user,
+						recipient,
 						containerRef,
 						isBlocked,
 						isSystem,
@@ -326,7 +326,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 								user={recipient as User}
 							/>
 						)}
-						{type === "server" && isServerRoom(roomId) && recipient && (
+						{type === "server" && recipient && (
 							<ServerCardHeader user={user} server={recipient as Room} />
 						)}
 

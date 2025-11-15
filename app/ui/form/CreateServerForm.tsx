@@ -345,7 +345,7 @@ export default function CreateServerFormDialog({ className, user }: { className:
 									</div>
 									<div className="flex flex-col">
 										<p className="text-[15px] font-semibold">Don't have an invite?</p>
-										<p className="text-[13px] text-muted">Check out Discoverable communities in Server Discovery.</p>
+										<p className="text-[13px] text-muted">Check out Other communities in Server Discovery.</p>
 									</div>
 									<MdArrowForwardIos className="ml-auto shrink-0" />
 								</Link>

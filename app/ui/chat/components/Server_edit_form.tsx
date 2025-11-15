@@ -8,14 +8,14 @@ import clsx from "clsx";
 import { nanoid } from "nanoid";
 import { User } from "@/app/lib/definitions";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FiEdit } from "react-icons/fi";
 import { ImSpinner9 } from "react-icons/im";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import InputField from "../../form/InputField";
 import { IconWithSVG, Button } from "../../general/Buttons";
 import imageCompression from "browser-image-compression";
-import { ServerImageUploadBtn } from "./UploadButtons";
+import { ServerBannerUploadBtn, ServerImageUploadBtn } from "./UploadButtons";
 import { BiLoaderAlt } from "react-icons/bi";
 import { useRouterWithProgress } from "@/app/lib/hooks/useRouterWithProgressBar";
 
@@ -24,6 +24,7 @@ type EditServerState = {
 	message: string;
 	success: boolean;
 	server: Room | null;
+	state: "idle" | "pending" | "success" | "error" | "no-changes";
 };
 
 export function ServerEditForm({
@@ -36,33 +37,64 @@ export function ServerEditForm({
 	setLocalServer: React.Dispatch<React.SetStateAction<Room>>;
 }) {
 	const [uploaded, setUploaded] = useState<string>(server.profile ?? "");
+	const [IsBannerUploaded, setIsBannerUploaded] = useState<string>(server.banner ?? "");
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
+	const [selectedBannerFile, setSelectedBannerFile] = useState<File | null>(null);
 	const [publicImgUrl] = useState<string>(server.profile ?? "");
-	useEffect(() => {
-		if (selectedFile) {
-			console.log(selectedFile);
-		}
-	}, [selectedFile]);
-	const [{ errors, message, success }, setData] = useState<EditServerState>({
+	const [publicBannerImgUrl] = useState<string>(server.banner ?? "");
+	const dialogRef = useRef<HTMLElement | null>(null);
+	const [isOpen, setIsOpen] = useState(false);
+
+	const [{ errors, message, success, ...data }, setData] = useState<EditServerState>({
 		errors: {},
 		message: "",
 		success: false,
 		server: null,
+		state: "idle",
 	});
-	const [isPending, setIsPending] = useState(false);
 	const router = useRouterWithProgress();
 
 	async function handleSubmit(e: React.FormEvent) {
 		e.preventDefault();
-		setIsPending(true);
+		setData((prev) => ({ ...prev, state: "pending" }));
+
 		const formData = new FormData(e.target as HTMLFormElement);
-		const url = await uploadAndGetURL();
-		console.log("server_image: CHATBOX: ", url);
-		formData.set("server_image", url);
+		const name = formData.get("name")?.toString().trim() || "";
+		const description = formData.get("description")?.toString().trim() || "";
+		const type = formData.get("type")?.toString() || "";
+
+		// Check if nothing changed
+		const noChanges =
+			name === server.name &&
+			description === (server.description || "") &&
+			type === server.type &&
+			!selectedFile &&
+			!selectedBannerFile;
+
+		if (noChanges) {
+			setData({
+				errors: {},
+				message: "No changes made.",
+				success: false,
+				server: null,
+				state: "no-changes",
+			});
+			return; // Stop submission
+		}
+
+		setData((prev) => ({ ...prev, state: "pending" }));
+		const profileUrl = await uploadAndGetURL();
+		formData.set("server_image", profileUrl);
+
+		const bannerUrl = await uploadAndGetURL_Banner();
+		formData.set("server_banner", bannerUrl);
+
 		const result = await editServer(formData, server, user.id);
-		setData(result);
-		if (result.server) setLocalServer((prev) => ({ ...prev, ...result.server }));
-		setIsPending(false);
+		setData({ ...result, state: result.success ? "success" : "error" });
+
+		if (result.server) {
+			setLocalServer((prev) => ({ ...prev, ...result.server }));
+		}
 		router.refresh();
 	}
 
@@ -105,6 +137,62 @@ export function ServerEditForm({
 		}
 	}
 
+	async function uploadAndGetURL_Banner(): Promise<string> {
+		console.log("uploadAndGetURL called");
+		console.log("selectedFile:", selectedBannerFile);
+		console.log("publicImgUrl:", publicBannerImgUrl);
+
+		if (selectedBannerFile === null) {
+			console.log("No selected file, returning publicImgUrl:", publicBannerImgUrl);
+			return publicBannerImgUrl;
+		}
+
+		try {
+			const options = {
+				maxSizeMB: 1, // allow larger file for banners
+				maxWidthOrHeight: 1024, // higher resolution for banner quality
+				useWebWorker: true, // improves performance for resizing
+				fileType: "image/jpeg", // jpg is standard, can also allow png
+			};
+
+			const compressedFile = await imageCompression(selectedBannerFile, options);
+			const filename = `profile.jpg`;
+			const filePath = `${server.name}/banner:${filename}`;
+			const { data, error } = await supabase.storage.from("uploads").upload(filePath, compressedFile, { upsert: true });
+			if (error) throw error;
+
+			const { data: publicData } = supabase.storage.from("uploads").getPublicUrl(data?.path || "");
+
+			if (publicData?.publicUrl) {
+				return publicData.publicUrl;
+			}
+
+			console.log("No public URL, resetting uploaded");
+			setUploaded("");
+			return "";
+		} catch (err) {
+			console.error("Upload error caught:", err);
+			return "";
+		}
+	}
+
+	function openCloseDialog(open: boolean) {
+		setIsOpen(open);
+		if (!open) {
+			setData({
+				errors: {},
+				message: "",
+				success: false,
+				server: null,
+				state: "idle",
+			});
+			setUploaded(server.profile ?? "");
+			setIsBannerUploaded(server.banner ?? "");
+			setSelectedFile(null);
+			setSelectedBannerFile(null);
+		}
+	}
+
 	return (
 		<div className="flex items-center gap-1 text-gray-400 text-sm">
 			<IconWithSVG
@@ -112,22 +200,25 @@ export function ServerEditForm({
 					const isConfirmed = window.confirm("Are you sure you want to delete this server?");
 					if (isConfirmed) deleteServer(server.id);
 				}}
-				className="icon-small"
+				className="!size-6.5"
 			>
-				<RiDeleteBin5Line />
+				<RiDeleteBin5Line className="text-xl" />
 			</IconWithSVG>
 
-			<Dialog.Root>
+			<Dialog.Root
+				open={isOpen}
+				onOpenChange={openCloseDialog}
+			>
 				<Dialog.Trigger asChild>
-					<IconWithSVG className="icon-small">
-						<FiEdit />
+					<IconWithSVG className="!size-6.5">
+						<FiEdit className="text-lg" />
 					</IconWithSVG>
 				</Dialog.Trigger>
 
 				<Dialog.Portal>
 					<Dialog.Overlay className="fixed inset-0 bg-black/70 z-[11000]" />
 					<Dialog.Content
-						className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface rounded-xl p-6 w-full max-w-md shadow-lg border border-border
+						className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface rounded-xl p-6 py-4 w-full max-w-md shadow-lg border border-border
 z-[12000]					"
 					>
 						<Dialog.Title className="text-xl font-semibold text-text mb-4">Edit Server</Dialog.Title>
@@ -142,27 +233,38 @@ z-[12000]					"
 								publicImgUrl={publicImgUrl}
 							/>
 
+							<ServerBannerUploadBtn
+								uploaded={IsBannerUploaded}
+								setUploaded={setIsBannerUploaded}
+								setSelectedFile={setSelectedBannerFile}
+								publicImgUrl={publicBannerImgUrl}
+							/>
+
 							{/* Server Name */}
 							<InputField
+								labelClassName="font-semibold text-sm text-text"
 								label="Server Name"
 								name="name"
 								defaultValue={server.name}
 								placeholder="Enter server name"
 								errors={errors?.name}
+								autoComplete="off"
 							/>
 
 							{/* Server Description */}
 							<InputField
+								labelClassName="font-semibold text-sm text-text"
 								label="Server Description"
 								name="description"
 								defaultValue={server.description || ""}
 								placeholder="Enter a short description (optional)"
 								errors={errors?.description}
+								autoComplete="off"
 							/>
 
 							{/* Server Type / Visibility */}
 							<div className="flex flex-col gap-1">
-								<span className="text-muted text-sm">Server Type</span>
+								<span className=" font-semibold text-sm text-text">Server Type</span>
 								<select
 									name="type"
 									defaultValue={server.type}
@@ -176,10 +278,13 @@ z-[12000]					"
                   !min-h-11
                   !outline-none
                   !rounded-lg
-                  !border
-                  !border-border
-                  !bg-background
-                  !text-text
+                
+
+									!border
+								!border-border/65
+								!bg-background
+									dark:!bg-background/45
+								!text-text
                   !placeholder-muted
                   !transition
                   !text-base
@@ -193,20 +298,37 @@ z-[12000]					"
 								{errors?.type && <span className="text-error text-xs">{errors.type}</span>}
 							</div>
 
-							{message && <span className={clsx("text-sm", success ? "text-success" : "text-error")}>{message}</span>}
+							{message && (
+								<span className={clsx("text-sm -mt-1 -mb-2", success ? "text-success" : "text-error")}>{message}</span>
+							)}
 
 							{/* Action Buttons */}
 							<div className="flex justify-end gap-2 mt-2">
 								<Dialog.Close asChild>
-									<Button className="btn-secondary">Cancel</Button>
+									<button className="btn btn-secondary">Cancel</button>
 								</Dialog.Close>
 								<Button
-									disabled={isPending}
+									disabled={data.state === "pending"}
 									className="btn-purple btn-with-icon justify-center items-center gap-2"
-									type="submit"
+									type={data.state === "error" || data.state === "idle" ? "submit" : "button"}
+									onClick={(e) => {
+										if (data.state === "success" || data.state === "no-changes") {
+											e.preventDefault();
+											openCloseDialog(false);
+										}
+										// if state is "error", just let the form submit normally
+									}}
 								>
-									{isPending ? "Saving..." : "Save Changes"}
-									{isPending && <BiLoaderAlt className="animate-spin text-lg" />}
+									{data.state === "pending"
+										? "Saving..."
+										: data.state === "success"
+										? "Close"
+										: data.state === "error"
+										? "Try again"
+										: data.state === "no-changes"
+										? "OK"
+										: "Save Changes"}
+									{data.state === "pending" && <BiLoaderAlt className="animate-spin text-lg" />}
 								</Button>
 							</div>
 						</form>

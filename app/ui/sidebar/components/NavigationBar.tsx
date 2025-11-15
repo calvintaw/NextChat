@@ -16,6 +16,7 @@ import { Route } from "next";
 import useEventListener from "@/app/lib/hooks/useEventListener";
 import { FaStar } from "react-icons/fa";
 import { HiDotsHorizontal } from "react-icons/hi";
+import { useServersProvider } from "@/app/lib/contexts/ServersContext";
 type ActionIcon = React.FC<{ user: User; className?: string }>;
 
 const NavigationSections = [
@@ -29,7 +30,7 @@ const NavigationSections = [
 		name: "Add New",
 		href: null,
 		icon: CreateServerFormDialog,
-		description: "Add a server",
+		description: "Add/Join a server",
 	},
 	{
 		name: "Discover",
@@ -47,8 +48,11 @@ const NavigationSections = [
 ];
 
 const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: Room[] }) => {
-
+	const { setJoinedServers } = useServersProvider()
 	
+	useEffect(() => {
+		setJoinedServers(joined_servers)
+	}, [])
 
 	const pathname = usePathname();
 	const nav_icon_styles =

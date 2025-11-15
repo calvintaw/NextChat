@@ -1,4 +1,4 @@
-import { NewsArticle } from "./definitions";
+import { NewsArticle, Room, User } from "./definitions";
 import { socket } from "./socket";
 
 export function getDMRoom(a: string, b?: string) {
@@ -30,9 +30,6 @@ export const normalizeMarkdown = (str: string) =>
 		.join("\n") // join lines back
 		.trim(); // trim whole string
 
-export function isServerRoom(roomId: string) {
-	return !roomId.startsWith("@me:");
-}
 
 export function getLocalTimeString(date?: string | Date, options?: Intl.DateTimeFormatOptions): string {
 	if (!date) {
@@ -99,30 +96,41 @@ export function getBannerColor(char: string) {
 	return "bg-secondary";
 }
 
-export function sendWithRetry(event: string, msg: any, retries = 3, delay = 2000) {
-	return new Promise((resolve, reject) => {
-		let attempts = 0;
-
-		const attempt = () => {
-			attempts++;
-			// console.log(`Sending attempt ${attempts} for event "${event}"`);
-
-			socket.timeout(5000).emit(event, msg, (err: any, response?: any) => {
-				if (err) {
-					// console.warn(`No ack from server for "${event}" (attempt ${attempts})`);
-
-					if (attempts < retries) {
-						setTimeout(attempt, delay); // retry after delay
-					} else {
-						reject(new Error(`Failed after ${retries} attempts`));
-					}
-				} else {
-					// console.log(`Ack received for "${event}":`, response);
-					resolve(response);
-				}
-			});
-		};
-
-		attempt();
-	});
+export function isRoom(input: any): input is Room {
+	return input && typeof input === "object" && typeof input.owner_id === "string" && typeof input.type === "string";
 }
+
+export function isUser(input: any): input is User {
+	return (
+		input && typeof input === "object" && typeof input.username === "string" && typeof input.displayName === "string"
+	);
+}
+
+
+// export function sendWithRetry(event: string, msg: any, retries = 3, delay = 2000) {
+// 	return new Promise((resolve, reject) => {
+// 		let attempts = 0;
+
+// 		const attempt = () => {
+// 			attempts++;
+// 			// console.log(`Sending attempt ${attempts} for event "${event}"`);
+
+// 			socket.timeout(5000).emit(event, msg, (err: any, response?: any) => {
+// 				if (err) {
+// 					// console.warn(`No ack from server for "${event}" (attempt ${attempts})`);
+
+// 					if (attempts < retries) {
+// 						setTimeout(attempt, delay); // retry after delay
+// 					} else {
+// 						reject(new Error(`Failed after ${retries} attempts`));
+// 					}
+// 				} else {
+// 					// console.log(`Ack received for "${event}":`, response);
+// 					resolve(response);
+// 				}
+// 			});
+// 		};
+
+// 		attempt();
+// 	});
+// }

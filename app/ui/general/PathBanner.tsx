@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { usePathProvider } from "@/app/lib/PathContext";
+import { usePathProvider } from "@/app/lib/contexts/PathContext";
 
 export const PathBanner = () => {
 	const pathname = usePathname();
@@ -43,7 +43,6 @@ export const PathBanner = () => {
 			window.removeEventListener("click", handleClick);
 		};
 	}, []);
-
 
 	return (
 		<div

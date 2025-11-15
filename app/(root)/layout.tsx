@@ -7,12 +7,13 @@ import { PathBanner } from "../ui/general/PathBanner";
 import { cookies } from "next/headers";
 import { Suspense } from "react";
 import Loading from "./chat/[room_id]/loading";
-import FriendsProvider from "../lib/friendsContext";
+import FriendsProvider from "../lib/contexts/friendsContext";
 import "@/app/lib/passwordRules.js";
 import Toaster from "../ui/Toast";
-import PathProvider from "../lib/PathContext";
+import PathProvider from "../lib/contexts/PathContext";
 import ProgressBar from "@/app/ui/ProgressBar";
 import SupabasePresenceWrapper from "../ui/SupabasePresenceWrapper";
+import ServersProvider from "../lib/contexts/ServersContext";
 
 const roboto = localFont({
 	src: [
@@ -64,6 +65,8 @@ export default async function RootLayout({
 				<PathProvider>
 					<PathBanner />
 					<main className="flex flex-1 min-h-0 min-w-0 w-full h-full overflow-hidden">
+						<ServersProvider>
+
 						<FriendsProvider>
 							<SupabasePresenceWrapper />
 							<Sidebar />
@@ -71,6 +74,7 @@ export default async function RootLayout({
 								<Suspense fallback={<Loading className="!w-full !h-full" />}>{children}</Suspense>
 							</div>
 						</FriendsProvider>
+						</ServersProvider>
 					</main>
 					<Toaster />
 				</PathProvider>

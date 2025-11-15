@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { supabase } from "@/app/lib/supabase";
-import { useFriendsProvider } from "@/app/lib/friendsContext";
+import { useFriendsProvider } from "@/app/lib/contexts/friendsContext";
 
 type Props = {
 	userId: string;

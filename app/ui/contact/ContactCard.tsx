@@ -10,7 +10,7 @@ import { Tooltip } from "react-tooltip";
 import { Avatar } from "../general/Avatar";
 import { IconWithSVG } from "../general/Buttons";
 import { getDMRoom } from "@/app/lib/utilities";
-import { useFriendsProvider } from "@/app/lib/friendsContext";
+import { useFriendsProvider } from "@/app/lib/contexts/friendsContext";
 import { useToast } from "@/app/lib/hooks/useToast";
 import clsx from "clsx";
 

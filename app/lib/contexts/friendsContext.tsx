@@ -1,6 +1,6 @@
 "use client";
 import React, { createContext, useState, useContext, ReactNode } from "react";
-import { ChatType, ContactType } from "./definitions";
+import { ChatType, ContactType } from "../definitions";
 
 interface FriendsContextType {
 	friends: ChatType[];

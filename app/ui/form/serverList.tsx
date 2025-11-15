@@ -12,6 +12,7 @@ import InputField from "./InputField";
 import src from "react-textarea-autosize";
 type FilterType = "all" | "public" | "private";
 import { HiServerStack } from "react-icons/hi2";
+import { useServersProvider } from "@/app/lib/contexts/ServersContext";
 
 export const ServerList = ({ user, servers }: { user: User; servers: Room[] }) => {
 	const [search, setSearch] = useState("");
@@ -67,12 +68,11 @@ export const ServerList = ({ user, servers }: { user: User; servers: Room[] }) =
 				</form>
 			</div>
 
+			<hr className="hr-separator my-2 border-contrast" />
+
 			{filteredServers.length !== 0 && (
 				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
 					{filteredServers.map((server) => {
-						// TODO: add these to db schema
-						server.online_members = 1000;
-
 						return <Card key={server.id} server={server} user={user}></Card>;
 					})}
 				</div>
@@ -113,9 +113,13 @@ const Card = ({ server, user }: any) => {
 			}
 		}
 	}, [src]);
+
+	const { joinedServers } = useServersProvider();
+	const hasJoined = joinedServers.some((room) => room.id === server.id);
+
 	return (
 		<div
-			className="bg-background p-0 rounded-xl overflow-hidden min-w-70 shadow-md flex flex-col border-2 border-border group hover:border-foreground/40 not-dark:hover:border-foreground/80 cursor-pointer 
+			className="bg-background p-0 rounded-xl overflow-hidden min-w-70 shadow-md flex flex-col border-2 border-border group hover:border-foreground/40 not-dark:hover:border-foreground/80  
 							"
 		>
 			{/* Server Banner */}
@@ -180,10 +184,6 @@ const Card = ({ server, user }: any) => {
 				<div className="flex items-center justify-between text-muted text-xs mt-4">
 					<div className="flex items-center gap-4">
 						<div className="flex items-center gap-1">
-							<div className="size-2 bg-emerald-500 rounded-full" />
-							<p>{formatNumber(server?.online_members)} Online</p>
-						</div>
-						<div className="flex items-center gap-1">
 							<div className="size-2 bg-gray-400 rounded-full" />
 							<p>{formatNumber(server?.total_members)} Members</p>
 						</div>
@@ -194,10 +194,10 @@ const Card = ({ server, user }: any) => {
 						href={server.type === "dm" ? `/chat/${server.id}` : `/chat/server/${server.id}`}
 					>
 						<button
-							disabled={server.owner_id === user.id}
+							disabled={hasJoined}
 							className="btn btn-third disabled:pointer-events-none  disabled:ring-2 ring-inset disabled:bg-green-600 disabled:text-white disabled:ring-green-600"
 						>
-							{server.owner_id === user.id ? "Joined" : "Join"}
+							{hasJoined ? "Joined" : "Join"}
 						</button>
 					</Link>
 				</div>

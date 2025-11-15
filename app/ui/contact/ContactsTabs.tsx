@@ -390,7 +390,7 @@ import { Route } from "next";
 import { supabase } from "@/app/lib/supabase";
 import { getDMRoom } from "@/app/lib/utilities";
 import SupabasePresence from "../SupabasePresence";
-import { useFriendsProvider } from "@/app/lib/friendsContext";
+import { useFriendsProvider } from "@/app/lib/contexts/friendsContext";
 
 const RequestTab = ({ user, friendRequests, setFriendRequests, setContacts }: RequestTabProps) => {
 	const [error, setError] = useState("");

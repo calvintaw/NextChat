@@ -2,7 +2,7 @@
 
 import { Room } from "@/app/lib/definitions";
 import { User } from "@/app/lib/definitions";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaCheck } from "react-icons/fa6";
 import { Tooltip } from "react-tooltip";
 import { Avatar } from "../../general/Avatar";
@@ -38,6 +38,10 @@ export function ServerCardHeader({ server, user }: { server: Room; user: User })
 				</div>
 
 				<div className="flex gap-1.5">
+					{localServer.owner_id === user.id && (
+						<ServerEditForm setLocalServer={setLocalServer} server={server} user={user} />
+					)}
+
 					<IconWithSVG
 						onClick={() => {
 							clearMsgHistory(server.id, pathname);
@@ -61,7 +65,7 @@ export function ServerCardHeader({ server, user }: { server: Room; user: User })
 					/>
 					<div className="flex-1 flex flex-col">
 						{/* Server Name */}
-						<h2 className="text-xl font-semibold">{localServer.name ?? "No name"}</h2>
+						<h2 className="text-xl font-sem€ibold">{localServer.name ?? "No name"}</h2>
 
 						{/* Copy server name */}
 						<div
@@ -97,18 +101,66 @@ export function ServerCardHeader({ server, user }: { server: Room; user: User })
 				<div className="flex items-center gap-4 text-gray-400 text-sm">
 					<div className="flex items-center gap-1">
 						<div className="size-2 bg-emerald-500 rounded-full" />
-						<p>{localServer.online_members?.toLocaleString() ?? 0} Online</p>
+						<OnlineCount currentUser={user} server={localServer}></OnlineCount>
 					</div>
 					<div className="flex items-center gap-1">
 						<div className="size-2 bg-gray-400 rounded-full" />
 						<p>{localServer.total_members?.toLocaleString() ?? 0} Members</p>
 					</div>
+
+					{localServer.owner_id !== user.id && (
+						<button className="btn-secondary btn-wit-icon flex items-center gap-1 text-red-400 max-[420px]:hidden">
+							<TbLogout className="text-xl"></TbLogout> Leave Server
+						</button>
+					)}
 				</div>
 
-				{localServer.owner_id === user.id && (
-					<ServerEditForm setLocalServer={setLocalServer} server={server} user={user} />
+				{localServer.owner_id !== user.id && (
+					<button className="btn-secondary btn-wit-icon flex items-center gap-1 text-red-400 min-[420px]:hidden">
+						<TbLogout className="text-xl"></TbLogout> Leave Server
+					</button>
 				)}
 			</div>
 		</>
 	);
+}
+
+import { TbLogout } from "react-icons/tb";
+import { supabase } from "@/app/lib/supabase";
+
+function OnlineCount({ server, currentUser }: { server: Room; currentUser: User }) {
+	const [onlineUsersCount, setOnlineUsersCount] = useState(0);
+
+	useEffect(() => {
+		const channel = supabase.channel(`Room:${server.id}:online_users`, {
+			config: { presence: { key: currentUser.id } },
+		});
+
+		// Sync is the truth: calculate online count
+		const handleSync = () => {
+			const state = channel.presenceState();
+			setOnlineUsersCount(Object.keys(state).length);
+		};
+
+		// Join/leave should NOT touch contacts — only recalc via sync
+		const handleJoin = handleSync;
+		const handleLeave = handleSync;
+
+		channel.on("presence", { event: "sync" }, handleSync);
+		channel.on("presence", { event: "join" }, handleJoin);
+		channel.on("presence", { event: "leave" }, handleLeave);
+
+		channel.subscribe(async (status) => {
+			if (status === "SUBSCRIBED") {
+				await channel.track({});
+			}
+		});
+
+		return () => {
+			channel.untrack();
+			channel.unsubscribe();
+		};
+	}, [currentUser, server]);
+
+	return <p>{onlineUsersCount.toLocaleString()} Online</p>;
 }

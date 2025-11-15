@@ -1,5 +1,5 @@
 "use client";
-import { getLocalTimeString, sendWithRetry } from "@/app/lib/utilities";
+import { getLocalTimeString, isRoom } from "@/app/lib/utilities";
 import clsx from "clsx";
 import React, { useEffect, useRef, useState } from "react";
 import { Avatar } from "../../general/Avatar";
@@ -13,7 +13,6 @@ import { RxCross2 } from "react-icons/rx";
 import { IconWithSVG } from "../../general/Buttons";
 import Link from "next/link";
 import { AiOutlineReload } from "react-icons/ai";
-import { socket } from "@/app/lib/socket";
 
 type MessageCardType = {
 	msg: MessageType;
@@ -23,7 +22,7 @@ type MessageCardType = {
 const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 	const msg_date = getLocalTimeString(msg.createdAt, { hour: "numeric", minute: "numeric", hour12: true });
 	const editInputRef = useRef<HTMLInputElement | null>(null);
-	const { msgToEdit, messages, setMessages, setMsgToEdit, roomId, replyToMsg, user } = useChatProvider();
+	const { msgToEdit, messages, setMessages, setMsgToEdit, roomId, replyToMsg, user, recipient } = useChatProvider();
 	const toast = useToast();
 
 	const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -154,11 +153,11 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 		>
 			{replyBlock}
 
-			<div className="flex items-start gap-4 max-w-[95%]">
+			<div className="flex items-start gap-2 max-w-[95%]">
 				{(isFirstGroup || msg.replyTo) && (
 					<div className="min-w-11 flex justify-center max-sm:hidden">
 						<Avatar
-							size="size-10"
+							size="size-8.5"
 							id={msg.sender_id}
 							src={msg.sender_image}
 							statusIndicator={false}
@@ -176,7 +175,7 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 								id={msg.sender_id}
 								src={msg.sender_image}
 								statusIndicator={false}
-								fontSize="text-sm"
+								fontSize="text-xs"
 								displayName={msg.sender_display_name}
 								parentClassName="cursor-pointer min-sm:hidden"
 							></Avatar>
@@ -187,6 +186,16 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 							>
 								{msg.sender_display_name}
 							</Link>
+							{isRoom(recipient) && recipient.owner_id === msg.sender_id && (
+								<span
+									className="-ml-0.5 py-0.5 px-1.5 text-xs rounded-lg text-yellow-400 bg-primary/50 not-dark:bg-foreground
+								
+								flex items-center gap-0.5
+								"
+								>
+									<FaCrown className="text-xs"></FaCrown>owner
+								</span>
+							)}
 
 							<span className="text-xs">{msg_date}</span>
 						</div>
@@ -530,3 +539,4 @@ const CornerSVG = () => {
 		</svg>
 	);
 };
+import { FaCrown } from "react-icons/fa";

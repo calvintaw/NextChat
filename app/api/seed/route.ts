@@ -33,7 +33,8 @@ async function seedRooms() {
 			name VARCHAR(32) UNIQUE,
 			description VARCHAR(120),
 			type TEXT NOT NULL CHECK (type IN ('public', 'private', 'dm')),
-			profile TEXT DEFAULT NULL,
+			banner TEXT,
+			profile TEXT,
 			created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
 			FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
 		);
@@ -268,6 +269,10 @@ async function enableRLSAndPolicies() {
 
 export async function GET() {
 	try {
+		await sql`
+ALTER TABLE rooms
+ADD COLUMN banner TEXT;
+		`;
 		return Response.json({ message: "Database policies set successfully" });
 	} catch (error) {
 		console.error("Policy setup failed:", error);

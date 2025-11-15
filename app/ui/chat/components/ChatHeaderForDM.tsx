@@ -13,7 +13,7 @@ import { useState, useEffect } from "react";
 import { FaCheck } from "react-icons/fa6";
 import { Tooltip } from "react-tooltip";
 import { Avatar } from "../../general/Avatar";
-import { usePathProvider } from "@/app/lib/PathContext";
+import { usePathProvider } from "@/app/lib/contexts/PathContext";
 import clsx from "clsx";
 import { useToast } from "@/app/lib/hooks/useToast";
 import { useChatProvider } from "../ChatBoxWrapper";

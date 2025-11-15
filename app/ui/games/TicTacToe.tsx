@@ -1,5 +1,5 @@
 "use client";
-import { usePathProvider } from "@/app/lib/PathContext";
+import { usePathProvider } from "@/app/lib/contexts/PathContext";
 import type { User } from "@/app/lib/definitions";
 import React, { useEffect, useState } from "react";
 import { FaRobot, FaUserFriends } from "react-icons/fa";

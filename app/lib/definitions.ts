@@ -160,8 +160,8 @@ export type Room = {
 	created_at: string;
 	online_members?: number;
 	total_members?: number;
-	banner?: string;
-	profile?: string;
+	banner: string | null;
+	profile: string | null;
 };
 
 export type NewsApiParams = {
