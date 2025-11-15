@@ -22,12 +22,8 @@ import bcrypt from "bcryptjs";
 import z from "zod";
 import { getDMRoom } from "./utilities";
 import { newsData } from "./news";
-import { socket } from "./socket";
-import console, { error } from "console";
 import { cookies } from "next/headers";
-import { io } from "socket.io-client";
 import { supabase } from "./supabase";
-import { type } from "os";
 
 const SYSTEM_USER: User = {
 	id: process.env.SYSTEM_USER_ID!,
@@ -448,7 +444,7 @@ export async function editProfile(user: User, formData: FormData) {
 				};
 			}
 		} catch (err) {
-			console.log("error in edit profile: ", error);
+			console.log("error in edit profile: ", err);
 			return {
 				errors: {},
 				message: "Something went wrong while checking username.",
@@ -1090,16 +1086,16 @@ export async function removeFriendshipRequest(
 }
 
 export async function acceptFriendshipRequest(
-	targetUser: User,
-	system?: User
+	targetUser: Pick<User, "id" | "username">,
+	isSystem: boolean = false
 ): Promise<{ success: boolean; message: string }> {
 	return withCurrentUser(async (currentUser: User) => {
 		try {
 			console.log("Starting friendship accept...");
 
-			const room_id = system ? getDMRoom(targetUser.id, system.id) : getDMRoom(targetUser.id, currentUser.id);
-			const [user1_id, user2_id] = system
-				? [currentUser.id, system.id].sort((a, b) => a.localeCompare(b))
+			const room_id = isSystem ? getDMRoom(targetUser.id, SYSTEM_USER.id) : getDMRoom(targetUser.id, currentUser.id);
+			const [user1_id, user2_id] = isSystem
+				? [currentUser.id, SYSTEM_USER.id].sort((a, b) => a.localeCompare(b))
 				: [currentUser.id, targetUser.id].sort((a, b) => a.localeCompare(b));
 
 			await sql.begin(async (tx) => {
@@ -1130,9 +1126,7 @@ export async function acceptFriendshipRequest(
 
 			return {
 				success: true,
-				message: system
-					? "Ai ChatBot has been added as friend."
-					: `Friend request from ${targetUser.username} accepted.`,
+				message: isSystem ? "AI ChatBot Room has been added." : `Friend request from ${targetUser.username} accepted.`,
 			};
 		} catch (error) {
 			console.error("error in accept friend req", error);

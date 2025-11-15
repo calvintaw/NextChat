@@ -60,6 +60,14 @@ const ContactTabs = ({ user, initialFriendRequests }: ContactTabsProps) => {
 
 	const [request, formAction, isPending] = useActionState(
 		async (prevState: { success: boolean; message: string }, formData: FormData) => {
+			let username = (formData.get("username") as string | null)?.trim() ?? "";
+			if (username.startsWith("@")) username = username.slice(1);
+
+			if (username === "system") {
+				const result = await acceptFriendshipRequest(user, true);
+				return { success: result.success, message: result.message };
+			}
+
 			const result = await requestFriendship(prevState, formData);
 			if (result.success && result.targetUser) {
 				// socket.emit("refresh-contacts-page", user.id, result.targetUser.id);

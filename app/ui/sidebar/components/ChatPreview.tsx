@@ -480,6 +480,7 @@ export const CreateDMButton = ({ currentUser }: { currentUser: User }) => {
 		// e.preventDefault();
 		// const formData = new FormData(e.currentTarget);
 		// const username = formData.get("q")?.toString().trim();
+		
 		if (username === currentUser.username) {
 			setError("Invalid DM");
 			return;
