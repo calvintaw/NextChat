@@ -119,7 +119,7 @@ const ContactTabs = ({ user, initialFriendRequests }: ContactTabsProps) => {
 	useEffect(() => {
 		const fetchContacts = async () => {
 			const contacts = await getContacts(user.id);
-			setContacts(contacts);
+			setContacts(prioritizeSystemUser(contacts));
 			setInitialLoad(false);
 		};
 
@@ -235,6 +235,12 @@ const ContactTabs = ({ user, initialFriendRequests }: ContactTabsProps) => {
 	const [activeTab, setActiveTab] = useState<string | undefined>(undefined);
 
 	const router = useRouter();
+
+	const prioritizeSystemUser = (contacts: ContactType[]): ContactType[] => {
+		const systemUser = contacts.find((c) => c.username === "system");
+		const others = contacts.filter((c) => c.username !== "system");
+		return systemUser ? [systemUser, ...others] : others;
+	};
 
 	return (
 		<>
