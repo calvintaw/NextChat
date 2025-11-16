@@ -1,5 +1,5 @@
 "use client";
-import { getLocalTimeString, isRoom } from "@/app/lib/utilities";
+import { getLocalTimeString, isRoom, WEB_URL_REGEX } from "@/app/lib/utilities";
 import clsx from "clsx";
 import React, { useEffect, useRef, useState } from "react";
 import { Avatar } from "../../general/Avatar";
@@ -37,6 +37,9 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 	const { msgToEdit, messages, setMessages, setMsgToEdit, roomId, replyToMsg, user, recipient } = useChatProvider();
 	const toast = useToast();
 	const [clipboard, setClipboard] = useState("");
+
+
+
 	useEffect(() => {
 		if (clipboard) {
 			setTimeout(() => setClipboard(""), 5000);
@@ -155,6 +158,7 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 	};
 
 	const [videoChatLink, ___] = useState(msg.type === "video-call" ? JSON.parse(msg.content)[0] : "");
+	const linkMsgContent = msg.type === "link" ? useRenderedLinks(msg.content) : [];
 
 	return (
 		<div
@@ -235,7 +239,7 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 							</>
 						)}
 
-						{(msg.type === "text" || msg.type === "video-call") &&
+						{(msg.type === "text" || msg.type === "video-call" || msg.type === "link") &&
 							(msgToEdit !== msg.id ? (
 								<div className="w-full flex max-sm:justify-between relative">
 									<div
@@ -253,6 +257,9 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 										/>
 										{msg.type === "text" ? (
 											msg.content
+										) : msg.type === "link" ? (
+											// @ts-ignore
+											{linkMsgContent}
 										) : (
 											<span className="mr-2 ">
 												Link:{" "}
@@ -291,13 +298,13 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 
 									{typeof msg.synced === "undefined" && msg.sender_id === user.id && (
 										<>
-											<p className={clsx("msg-synced-indicator", !isFirstGroup && "!bottom-0 ")}>sent ✅</p>
+											<p className={clsx("msg-synced-indicator", !isFirstGroup && "!bottom-0")}>sent ✅</p>
 										</>
 									)}
 
 									{msg.synced && msg.sender_id === user.id && (
 										<>
-											<div className={clsx("msg-synced-indicator", !isFirstGroup && "!bottom-0 ")}>
+											<div className={clsx("msg-synced-indicator", !isFirstGroup && "!bottom-0")}>
 												<p>
 													{typeof msg.synced === "boolean" && msg.synced && "sent ✅"}
 													{typeof msg.synced === "boolean" && !msg.synced && "failed ❌"}
@@ -590,7 +597,7 @@ const JoinCallButton = ({
 	content: string;
 	roomId: string;
 }) => {
-	const videoChatLinkCreatedAt = JSON.parse(content);
+	const [videoChatLink, videoChatLinkCreatedAt] = JSON.parse(content);
 	const local_is_expired = link_expired ?? dayjs().diff(dayjs(videoChatLinkCreatedAt), "minute") >= 3;
 	const [expired, setExpired] = useState(local_is_expired);
 
@@ -641,3 +648,50 @@ const JoinCallButton = ({
 import { FaCrown } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
 import { supabase } from "@/app/lib/supabase";
+
+//@ts-ignore
+import extractUrls from "extract-urls";
+
+import { useMemo } from "react";
+
+export function useRenderedLinks(text: string): React.ReactNode[] {
+	return useMemo(() => {
+		const linkSet = new Set(text.match(WEB_URL_REGEX));
+		const links: string[] = extractUrls(text, true) || [];
+		const mergedLinks: string[] = Array.from(new Set([...linkSet, ...links]));
+
+		if (mergedLinks.length === 0) return [text];
+
+		const result: React.ReactNode[] = [];
+		let cursor = 0;
+
+		for (let i = 0; i < mergedLinks.length; i++) {
+			const url = mergedLinks[i];
+			const index = text.indexOf(url, cursor);
+
+			if (index > cursor) {
+				result.push(text.slice(cursor, index));
+			}
+
+			result.push(
+				<a
+					key={i}
+					href={url.startsWith("http") ? url : `https://${url}`}
+					target="_blank"
+					rel="noopener noreferrer"
+					className="text-primary hover:underline"
+				>
+					{url}
+				</a>
+			);
+
+			cursor = index + url.length;
+		}
+
+		if (cursor < text.length) {
+			result.push(text.slice(cursor));
+		}
+
+		return result;
+	}, [text]);
+}

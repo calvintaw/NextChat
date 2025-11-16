@@ -166,10 +166,10 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 	function resetRefs() {
 		messageIdsRef.current.clear();
-		oldestMsgCreatedAt.current = "";
-		scrollHeightBefore.current = 0;
-		lastBatchLength.current = limit;
-		offsetRef.current = 0;
+		// oldestMsgCreatedAt.current = "";
+		// scrollHeightBefore.current = 0;
+		// lastBatchLength.current = limit;
+		// offsetRef.current = 0;
 	}
 	// // initial setup for blocking/system status
 	// useEffect(() => {

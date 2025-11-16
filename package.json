@@ -23,6 +23,7 @@
 		"browser-image-compression": "^2.0.2",
 		"clsx": "^2.1.1",
 		"dayjs": "^1.11.13",
+		"extract-urls": "^1.4.1",
 		"google-fonts": "^1.0.0",
 		"idb-keyval": "^6.2.2",
 		"jotai": "^2.14.0",

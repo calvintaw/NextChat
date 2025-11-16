@@ -19,7 +19,7 @@ import { useToast } from "@/app/lib/hooks/useToast";
 // NEW: Import Supabase client
 import { supabase } from "@/app/lib/supabase";
 import { readFile } from "fs/promises";
-import { getLinks } from "@/app/lib/utilities";
+import { includeLinks } from "@/app/lib/utilities";
 
 type ChatInputBoxProps = {
 	activePersons: string[];
@@ -91,7 +91,7 @@ const ChatInputBox = forwardRef<ChatInputBoxRef, ChatInputBoxProps>((props, ref)
 		if (isSystem) setIsPending(true);
 		if (roomId.startsWith("system-room")) setActivePersons((prev: string[]) => [...prev, "system"]);
 
-		const { isLink, links } = type === "text" ? getLinks(input) : { isLink: false, links: [] };
+		const hasLinks = type === "text" ? includeLinks(input) : false;
 
 		const temp_msg = {
 			id: tempId,
@@ -104,7 +104,7 @@ const ChatInputBox = forwardRef<ChatInputBoxRef, ChatInputBoxProps>((props, ref)
 			createdAt: new Date().toISOString(),
 			edited: false,
 			reactions: {},
-			type: isLink ? "link" : type,
+			type: hasLinks ? "link" : type,
 		};
 
 		cancelTypingAnimation(750); // stop the typing animation 1.5s after use has stopped typing
