@@ -1,5 +1,5 @@
 "use client";
-import { SHORT_URL_REGEX, isRoom, URL_REGEX_ADVANCED } from "@/app/lib/utilities";
+import { SHORT_URL_REGEX, isRoom, URL_REGEX_ADVANCED, includeLinks } from "@/app/lib/utilities";
 import clsx from "clsx";
 import React, { useEffect, useRef, useState } from "react";
 import { Avatar } from "../../general/Avatar";
@@ -63,9 +63,11 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 			if (!newContent) return prev;
 
 			const updatedMessages = [...prev];
+
 			updatedMessages[index] = {
 				...updatedMessages[index],
 				content: newContent,
+				type: includeLinks(newContent) ? "link" : updatedMessages[index].type,
 				edited: true,
 			};
 
@@ -646,7 +648,7 @@ import { Tooltip } from "react-tooltip";
 import { supabase } from "@/app/lib/supabase";
 //@ts-ignore
 import extractUrls from "extract-urls";
-import { match } from "assert";
+//@ts-ignore
 // function attachInternalLinks(str: string): string {
 // 	return str.replace(DOMAIN_REGEX, (domain) => {
 // 		return `https://${domain} [modified]`;
@@ -658,21 +660,19 @@ export function renderLinks(text: string) {
 	const linksAdvanced: string[] = text.match(URL_REGEX_ADVANCED) || [];
 	const linksShort: string[] = text.match(SHORT_URL_REGEX) || [];
 	const links: string[] = extractUrls(text, true) || [];
-
 	const mergedLinks = Array.from(new Set([...links, ...linksAdvanced, ...linksShort]));
 
 	if (mergedLinks.length === 0) return [text];
 
 	// Sort by index in text to prevent overlaps
 	const positions: { start: number; end: number; url: string }[] = [];
-
-	mergedLinks.forEach((url) => {
-		let match;
-		const regex = new RegExp(url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"); // escape special chars
-		while ((match = regex.exec(text)) !== null) {
-			positions.push({ start: match.index, end: match.index + url.length, url });
+	for (let i = 0; i < mergedLinks.length; i++) {
+		const url = mergedLinks[i];
+		const startIndex = text.indexOf(url);
+		if (startIndex !== -1) {
+			positions.push({ start: startIndex, end: startIndex + url.length, url });
 		}
-	});
+	}
 
 	// Sort by start index
 	positions.sort((a, b) => a.start - b.start);

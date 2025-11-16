@@ -171,7 +171,7 @@ export const NavigationSections = [
 
 
 
-	export const SHORT_URL_REGEX =
+export const SHORT_URL_REGEX =
 		/^(?!www\.)(?!.*\.\.)(?!.*-\.)(?!.*\.-)(?!.*\.$)[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*\.[a-z]{2,63}$/i;
 
 // const regex = /^(?:(?!www\.)[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/g;
@@ -180,10 +180,45 @@ export const NavigationSections = [
 export const URL_REGEX_ADVANCED =
 	/\b((?:[a-z][\w-]+:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/gi;
 
-
 export function includeLinks(text: string) {
 	const matches1 = text.match(SHORT_URL_REGEX);
 	const matches2 = text.match(URL_REGEX_ADVANCED);
 
 	return !!matches1?.length || !!matches2?.length;
 }
+
+const testPassage = `omg bro look at this 😂 https://youtu.be/dQw4w9WgXcQ??t=43 and ALSO check this weird one http://192.168.1.15:3000/test?debug=true lol. btw I found another link→www.example.com/page#section-2 but it only works if u add https so see if your code handles that. oh and watch out for this: https://google.com,...yeah the comma shouldn't be part of the link. same for this one: https://openai.com/) where the ) is just punctuation. 
+
+last one: "http://lol.test" inside quotes… make sure your regex doesn’t break it 😭
+`;
+
+
+const testText = `
+Check out these links:
+1. http://example.com
+2. https://example.com
+3. http://example.com/
+4. https://example.com/path
+5. https://example.com/path/
+6. https://example.com/path?ref=123
+7. https://www.example.com/path?ref=123
+8. https://example.com/path#section
+9. www.test-site.org
+10. test-site.org
+11. https://sub.domain.com
+12. http://sub.domain.com/page
+13. https://sub.domain.com/page?query=value
+14. https://xn--fsq.com (human-readable punycode: 🐱.com)
+15. https://example.co.uk/path
+16. example.co.uk
+17. http://example.co.uk/path?utm_source=newsletter
+18. https://example.com/path/to/resource
+19. https://example.com/path/to/resource/  // trailing slash
+20. https://example.com/path/to/resource?foo=bar
+21. https://example.com:8080/path
+22. https://example.com/path(with-parentheses)
+23. https://example.com/path%20with%20spaces
+24. https://example.com/path-with-dash
+25. http://localhost:3000/test
+26. http://127.0.0.1:8000/page
+`;
