@@ -165,14 +165,25 @@ export const NavigationSections = [
 	// },
 ];
 
-export const WEB_URL_REGEX_ADVANCED =
+// const regex = /^ (?:(?!www\.)[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,} /g;
+// const regex =
+// 	// /^(?!:\/\/)(?!.{256})(?!.*\.{2})[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*\.[a-z]{2,63}$/gi;
+
+
+
+	export const SHORT_URL_REGEX =
+		/^(?!www\.)(?!.*\.\.)(?!.*-\.)(?!.*\.-)(?!.*\.$)[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*\.[a-z]{2,63}$/i;
+
+// const regex = /^(?:(?!www\.)[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/g;
+// const regex = /(?<![a-zA-Z0-9-])(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(?![a-zA-Z0-9-])/g;
+
+export const URL_REGEX_ADVANCED =
 	/\b((?:[a-z][\w-]+:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/gi;
 
-export const DOMAIN_RAW_REGEX = /\b(?!https?:\/\/)(?!www\.)[a-z0-9-]+(?:\.[a-z0-9-]+)*\.[a-z]{2,20}\b/gi;
 
 export function includeLinks(text: string) {
-	const matches1 = text.match(DOMAIN_RAW_REGEX);
-	const matches2 = text.match(WEB_URL_REGEX_ADVANCED);
+	const matches1 = text.match(SHORT_URL_REGEX);
+	const matches2 = text.match(URL_REGEX_ADVANCED);
 
 	return !!matches1?.length || !!matches2?.length;
 }

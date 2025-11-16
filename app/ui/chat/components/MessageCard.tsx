@@ -1,5 +1,5 @@
 "use client";
-import { DOMAIN_RAW_REGEX, isRoom, WEB_URL_REGEX_ADVANCED } from "@/app/lib/utilities";
+import { SHORT_URL_REGEX, isRoom, URL_REGEX_ADVANCED } from "@/app/lib/utilities";
 import clsx from "clsx";
 import React, { useEffect, useRef, useState } from "react";
 import { Avatar } from "../../general/Avatar";
@@ -102,7 +102,7 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 						src={reply_img_url}
 						statusIndicator={false}
 						displayName={reply_displayName}
-						parentClassName=" ml-1 text-xs relative top-0.25"
+						parentClassName=" ml-1 text-xs relative top-0.25 !no-underline"
 					/>
 					<Link className="no-underline" title={`Go to ${reply_displayName}'s Profile`} href={`/users/${msg.replyTo}`}>
 						<span className="text-muted">@{reply_displayName}</span>
@@ -199,7 +199,7 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 								statusIndicator={false}
 								fontSize="text-xs !no-underline"
 								displayName={msg.sender_display_name}
-								parentClassName="mt-1 cursor-pointer min-sm:hidden"
+								parentClassName="mt-1 cursor-pointer min-sm:hidden !no-underline"
 							></Avatar>
 							<Link
 								className="no-underline font-semibold text-foreground hover:underline hover:cursor-pointer"
@@ -647,11 +647,19 @@ import { supabase } from "@/app/lib/supabase";
 //@ts-ignore
 import extractUrls from "extract-urls";
 import { match } from "assert";
+// function attachInternalLinks(str: string): string {
+// 	return str.replace(DOMAIN_REGEX, (domain) => {
+// 		return `https://${domain} [modified]`;
+// 	});
+// }
+
 // regex codes are written by chatgpt except the one in utilities. src: https://daringfireball.net/2010/07/improved_regex_for_matching_urls
 export function renderLinks(text: string) {
-	const linksAdvanced: string[] = text.match(WEB_URL_REGEX_ADVANCED) || [];
+	const linksAdvanced: string[] = text.match(URL_REGEX_ADVANCED) || [];
+	const linksShort: string[] = text.match(SHORT_URL_REGEX) || [];
 	const links: string[] = extractUrls(text, true) || [];
-	const mergedLinks = Array.from(new Set([...links, ...linksAdvanced]));
+
+	const mergedLinks = Array.from(new Set([...links, ...linksAdvanced, ...linksShort]));
 
 	if (mergedLinks.length === 0) return [text];
 

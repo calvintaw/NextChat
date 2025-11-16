@@ -149,7 +149,7 @@ export const Avatar = ({
 								getBackgroundColorByInitial(displayName)
 							)}
 						>
-							<span className={clsx("font-medium !no-underline", fontSize)}>{fallback}</span>
+							<div className={clsx("font-medium !no-underline !decoration-0", fontSize)}>{fallback}</div>
 						</div>
 						{statusIndicator && (
 							<div className={onlineStatusContainer}>

@@ -104,6 +104,8 @@ const ChatInputBox = forwardRef<ChatInputBoxRef, ChatInputBoxProps>((props, ref)
 			type: hasLinks ? "link" : type,
 		};
 
+		console.log("does my msg has Links: ", hasLinks)
+
 		cancelTypingAnimation(750); // stop the typing animation 1.5s after use has stopped typing
 
 		// Optimistic UI update
