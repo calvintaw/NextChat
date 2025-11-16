@@ -154,7 +154,11 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 		}
 	};
 
-	const [videoChatLink, ___] = useState(msg.type === "video-call" ? JSON.parse(msg.content)[0] : "");
+	const [videoChatLink, ___toggleChat] = useState(msg.type === "video-call" ? JSON.parse(msg.content)[0] : "");
+	const [linkExpired, ___toggleLink] = useState(() => {
+		if (msg.type !== "video-call") return false;
+		return msg.link_expired ?? dayjs().diff(dayjs(JSON.parse(msg.content)[1]), "minute") >= 3;
+	});
 
 	return (
 		<div
@@ -259,10 +263,16 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 											<span className="mr-2 ">
 												Link:{" "}
 												<span
-													data-tooltip-id="message-card-icons-tooltip"
-													data-tooltip-content={clipboard === videoChatLink ? "Copied!" : "Copy"}
-													className="select-none cursor-grab hover:underline decoration-primary not-dark:text-primary text-blue-400"
+													data-tooltip-id={linkExpired ? undefined : "message-card-icons-tooltip"}
+													data-tooltip-content={
+														linkExpired ? undefined : clipboard === videoChatLink ? "Copied!" : "Copy"
+													}
+													className={clsx(
+														"select-none cursor-grab hover:underline decoration-primary not-dark:text-primary text-blue-400",
+														linkExpired && "!pointer-events-none"
+													)}
 													onClick={() => {
+														if (linkExpired) return;
 														navigator.clipboard.writeText(videoChatLink);
 														setClipboard(videoChatLink);
 													}}
@@ -271,7 +281,9 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 												</span>
 											</span>
 										)}{" "}
-										{msg.type === "video-call" && <JoinCallButton roomId={roomId} id={msg.id} content={msg.content} />}
+										{msg.type === "video-call" && (
+											<JoinCallButton link_expired={linkExpired} roomId={roomId} id={msg.id} content={msg.content} />
+										)}
 										{msg.edited && (
 											<span className="text-[11px] tracking-wide text-muted relative top-[1px]">{"(edited)"}</span>
 										)}
@@ -593,7 +605,7 @@ const JoinCallButton = ({
 	roomId: string;
 }) => {
 	const [videoChatLink, videoChatLinkCreatedAt] = JSON.parse(content);
-	const local_is_expired = link_expired ?? dayjs().diff(dayjs(videoChatLinkCreatedAt), "minute") >= 3;
+	const local_is_expired = link_expired;
 	const [expired, setExpired] = useState(local_is_expired);
 
 	const channel = React.useMemo(() => {
