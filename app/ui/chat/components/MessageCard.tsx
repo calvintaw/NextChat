@@ -22,8 +22,9 @@ type MessageCardType = {
 };
 
 const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
-	const msg_date = dayjs(msg.createdAt).format("M/D/YYYY, h:mm A");
 	const msg_date_short = dayjs(msg.createdAt).format("h:mm A");
+	const msg_date =
+		dayjs().diff(dayjs(msg.createdAt), "day") < 1 ? msg_date_short : dayjs(msg.createdAt).format("M/D/YYYY, h:mm A");
 
 	const editInputRef = useRef<HTMLInputElement | null>(null);
 	const { msgToEdit, messages, setMessages, setMsgToEdit, roomId, replyToMsg, user, recipient } = useChatProvider();
