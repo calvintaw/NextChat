@@ -95,7 +95,7 @@ const ContactTabs = ({ user, initialFriendRequests }: ContactTabsProps) => {
 		const fetchContacts = async () => {
 			const contacts = await getContacts(user.id);
 			setContacts(prioritizeSystemUser(contacts));
-			console.log("CONTACTS: ", contacts)
+			console.log("CONTACTS: ", contacts);
 			setInitialLoad(false);
 		};
 
@@ -244,7 +244,12 @@ const ContactTabs = ({ user, initialFriendRequests }: ContactTabsProps) => {
 
 						{/* {(friendRequests.sent.length > 0 || friendRequests.incoming.length > 0) && ( */}
 						<Tabs.Trigger value="request" asChild>
-							<Button className="bg-accent/15 border-transparent text-text hover:bg-accent/80 data-[state=active]:bg-accent/80 data-[state=active]:cursor-default flex items-center gap-2">
+							<Button
+								className={clsx(
+									friendRequests.incoming.length >= 1 && "pr-1.5",
+									"bg-accent/15 border-transparent text-text hover:bg-accent/80 data-[state=active]:bg-accent/80 data-[state=active]:cursor-default flex items-center gap-2"
+								)}
+							>
 								Pending
 								{friendRequests.incoming.length >= 1 && <Badge count={friendRequests.incoming.length}></Badge>}
 							</Button>

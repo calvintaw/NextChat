@@ -26,7 +26,7 @@ const Page = () => {
 		if (data.message.trim() !== "") {
 			setData(data);
 		} else {
-			router.push("/dashboard");
+			router.push("/?tab=all");
 		}
 	};
 
@@ -61,6 +61,7 @@ const Page = () => {
 
 					<div className="flex mb-0.5 sm:flex-row flex-col sm:gap-2 gap-1.5">
 						<InputField
+							defaultValue={""}
 							required
 							errors={data.errors.displayName}
 							name="displayName"
@@ -72,6 +73,7 @@ const Page = () => {
 							errors={data.errors.username}
 							name="username"
 							placeholder="username"
+							defaultValue={""}
 							icon={<RiAtLine />}
 						/>
 					</div>
@@ -80,6 +82,7 @@ const Page = () => {
 						<InputField
 							errors={data.errors.email}
 							name="email"
+							defaultValue={""}
 							type="email"
 							icon={<RiMailLine />}
 							required
@@ -90,6 +93,7 @@ const Page = () => {
 							setIsAllowed={setIsAllowed}
 							required
 							errors={data.errors.password}
+							defaultValue={""}
 							name="password"
 						></PasswordField>
 					</div>

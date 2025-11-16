@@ -136,6 +136,7 @@ export type MessageType = {
 	reactions: Record<string, string[]>;
 	replyTo: string | null;
 	synced?: boolean | "pending";
+	link_expired?: boolean;
 };
 
 export type ChatType = Omit<User, "createdAt"> & {

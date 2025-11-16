@@ -835,36 +835,26 @@ export async function updateOnlineStatus(status: boolean, user_id: string) {
 }
 
 export async function getFriendRequests(userId: string) {
+	console.log("FETCHING FRIEND REQUESTS ---------");
+
 	try {
 		const incoming: User[] = await sql<User[]>`
-      SELECT
-        users.id,
-        users.username,
-        users.display_name AS "displayName",
-        users.email,
-        users.created_at AS "createdAt"
-      FROM friends
-      JOIN users ON friends.request_sender_id = users.id
-      WHERE (friends.user1_id = ${userId} OR friends.user2_id = ${userId})
-        AND friends.status = 'pending'
-        AND friends.request_sender_id != ${userId};
-    `;
+			SELECT u.id, u.username, u.display_name AS "displayName", u.email, u.created_at AS "createdAt"
+			FROM friends f
+			JOIN users u ON u.id = f.request_sender_id
+			WHERE f.status = 'pending'
+				AND (f.user1_id = ${userId} OR f.user2_id = ${userId})
+				AND f.request_sender_id != ${userId};
+		`;
 
 		const sent: User[] = await sql<User[]>`
-			SELECT
-				users.id,
-				users.username,
-				users.display_name AS "displayName",
-				users.email,
-				users.created_at AS "createdAt"
-			FROM friends
-			JOIN users ON users.id = CASE
-				WHEN friends.user1_id = ${userId} THEN friends.user2_id
-				ELSE friends.user1_id
-			END
-			WHERE friends.status = 'pending'
-				AND friends.request_sender_id = ${userId};
-    `;
+			SELECT u.id, u.username, u.display_name AS "displayName", u.email, u.created_at AS "createdAt"
+			FROM friends f
+			JOIN users u ON u.id = f.request_sender_id
+			WHERE f.status = 'pending'
+				AND (f.user1_id = ${userId} OR f.user2_id = ${userId})
+				AND f.request_sender_id = ${userId};
+		`;
 
 		return { sent, incoming };
 	} catch (error) {

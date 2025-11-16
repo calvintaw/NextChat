@@ -24,7 +24,7 @@ export const CallVideoChatDialog = ({ user }: { user: User }) => {
 		});
 
 		const videoChatLink = `/video_chat/${roomId}?${params.toString()}`;
-		const videoChatLink_msg_form = `[/video_chat/${roomId}, ${new Date()}]`;
+		const videoChatLink_msg_form = JSON.stringify([`/video_chat/${roomId}`, `${new Date()}`]);
 		// router.push(videoChatLink as Route);
 		navigator.clipboard.writeText(videoChatLink_msg_form);
 		handleSendMessageFromParent(videoChatLink_msg_form, "video-call");
@@ -39,7 +39,7 @@ export const CallVideoChatDialog = ({ user }: { user: User }) => {
 		});
 
 		const videoChatLink = `/video_chat/${roomId}?${params.toString()}`;
-		const videoChatLink_msg_form = `[/video_chat/${roomId}, ${new Date()}]`;
+		const videoChatLink_msg_form = JSON.stringify([`/video_chat/${roomId}`, `${new Date()}`]);
 		// router.push(videoChatLink as Route);
 		navigator.clipboard.writeText(videoChatLink_msg_form);
 		handleSendMessageFromParent(videoChatLink_msg_form, "video-call");

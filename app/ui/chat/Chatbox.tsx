@@ -34,16 +34,17 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 	const containerRef = useRef<HTMLDivElement>(null);
 	const observerRef = useRef<HTMLDivElement>(null);
-	const scrollHeightBefore = useRef(0);
-	const offsetRef = useRef(0);
 	const limit = 25;
-	const lastBatchLength = useRef(limit);
-	const oldestMsgCreatedAt = useRef<string>("");
 	const [hasMore, setHasMore] = useState(true);
 	const [isLoadingOldMsg, setIsLoadingOldMsg] = useState(false);
-	const messageIdsRef = useRef<Set<string>>(new Set());
-	const toast = useToast();
 	const chatInputBoxRef = useRef<ChatInputBoxRef>(null);
+	const toast = useToast();
+
+	const messageIdsRef = useRef<Set<string>>(new Set());
+	const oldestMsgCreatedAt = useRef<string>("");
+	const scrollHeightBefore = useRef(0);
+	const lastBatchLength = useRef(limit);
+	const offsetRef = useRef(0);
 
 	//checks duplicates (due to netwrok errors, etc)
 	const filterNewMessages = (msgs: MessageType[]) => {
@@ -115,6 +116,10 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 			}
 		});
 
+		channel.on("broadcast", { event: "link_expired" }, ({ payload }) => {
+			setMessages((prev) => prev.map((chat) => (chat.id === payload.id ? { ...chat, link_expired: true } : chat)));
+		});
+
 		// B. Broadcast Events
 		// channel
 		// 	.on("broadcast", { event: "msg_inserted" }, ({ payload }) => {
@@ -154,13 +159,18 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 			if (status === "SUBSCRIBED") console.log(`Subscribed to room ${roomId}`);
 		});
 
-		// Cleanup
 		return () => {
 			supabase.removeChannel(channel);
-			messageIdsRef.current.clear();
 		};
 	}, [roomId, isBlocked, isSystem, user.id]);
 
+	function resetRefs() {
+		messageIdsRef.current.clear();
+		oldestMsgCreatedAt.current = "";
+		scrollHeightBefore.current = 0;
+		lastBatchLength.current = limit;
+		offsetRef.current = 0;
+	}
 	// // initial setup for blocking/system status
 	// useEffect(() => {
 	// 	// ... (unchanged)
@@ -215,7 +225,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 	useEffect(() => {
 		const initialize = async () => {
-			messageIdsRef.current.clear();
+			resetRefs();
 
 			let blocked = false;
 			if (type === "dm" && recipient) blocked = await checkIfBlocked(user, recipient as User);
@@ -253,7 +263,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		initialize();
 
 		return () => {
-			messageIdsRef.current.clear();
+			resetRefs();
 		};
 	}, [type, recipient, roomId, user.id]);
 

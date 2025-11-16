@@ -96,15 +96,23 @@ export const DarkModeBtn = ({ className }: { className?: string }) => {
 	);
 };
 
-type BadgeProps = {
-	count: number;
-	max?: number; // optional max value to display
-};
 
-export const Badge = ({ count, max = 9 }: BadgeProps) => {
+interface BadgeProps {
+	count: number;
+	max?: number;
+	className?: string;
+}
+
+export const Badge = ({ count, max = 9, className }: BadgeProps) => {
 	const display = count > max ? `${max}+` : count;
+
 	return (
-		<span className="inline-flex min-w-[1.25rem] h-5 px-2 text-xs font-light text-white bg-error rounded-full items-center justify-center">
+		<span
+			className={clsx(
+				"inline-flex size-6 text-xs font-light text-white bg-error rounded-full items-center justify-center",
+				className
+			)}
+		>
 			{display}
 		</span>
 	);

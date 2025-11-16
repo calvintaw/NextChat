@@ -43,7 +43,6 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 		}
 	}, [clipboard]);
 
-
 	const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setMsgToEdit(null);
@@ -159,9 +158,9 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 
 	return (
 		<div
-			data-image-url={msg.sender_image}
-			data-displayname={msg.sender_display_name}
-			data-content={msg.content.slice(0, 200)}
+			// data-image-url={msg.sender_image}
+			// data-displayname={msg.sender_display_name}
+			// data-content={msg.content.slice(0, 200)}
 			id={msg.id}
 			className={clsx(
 				"flex flex-col w-full dark:hover:bg-background/75 hover:bg-accent/75 px-2 pr-0 pl-3 py-1  relative ",
@@ -270,7 +269,7 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 												</span>
 											</span>
 										)}{" "}
-										{msg.type === "video-call" && <JoinCallButton content={msg.content} />}
+										{msg.type === "video-call" && <JoinCallButton roomId={roomId} id={msg.id} content={msg.content} />}
 										{msg.edited && (
 											<span className="text-[11px] tracking-wide text-muted relative top-[1px]">{"(edited)"}</span>
 										)}
@@ -580,24 +579,65 @@ const CornerSVG = () => {
 	);
 };
 
-const JoinCallButton = ({ content }: { content: string }) => {
-	const [videoChatLink, videoChatLinkCreatedAt] = JSON.parse(content);
-	const expired = dayjs().diff(dayjs(videoChatLinkCreatedAt), "minute") >= 5;
+const JoinCallButton = ({
+	link_expired,
+	id,
+	content,
+	roomId,
+}: {
+	link_expired?: boolean;
+	id: string;
+	content: string;
+	roomId: string;
+}) => {
+	const videoChatLinkCreatedAt = JSON.parse(content);
+	const local_is_expired = link_expired ?? dayjs().diff(dayjs(videoChatLinkCreatedAt), "minute") >= 3;
+	const [expired, setExpired] = useState(local_is_expired);
+
+	const channel = React.useMemo(() => {
+		if (local_is_expired) return null;
+		return supabase.channel(`room:${roomId}`);
+	}, [roomId]);
+
+	useEffect(() => {
+		if (expired) return;
+		const interval = setInterval(() => {
+			setExpired(dayjs().diff(dayjs(videoChatLinkCreatedAt), "minute") >= 3);
+		}, 1000);
+
+		return () => clearInterval(interval);
+	}, []);
+
+	useEffect(() => {
+		if (expired && channel) {
+			channel.send({
+				type: "broadcast",
+				event: "link_expired",
+				payload: { id },
+			});
+		}
+	}, [expired]);
 
 	return (
-		<Link className={clsx("no-underline", expired && "cursor-not-allowed")} href={expired ? undefined : videoChatLink}>
-			<button
-				className={clsx(
-					"text-xs px-2 py-0.5 rounded-full  text-white",
-					expired ? "bg-red-600 not-dark:bg-red-500" : "bg-green-600 not-dark:bg-green-500"
-				)}
-			>
-				{expired ? "Expired" : "Join Call"}
-			</button>
-		</Link>
+		<>
+			{expired ? (
+				<button
+					disabled={expired}
+					className="text-xs px-2 py-0.5 rounded-full text-white bg-red-500 not-dark:bg-red-400 cursor-not-allowed"
+				>
+					Expired
+				</button>
+			) : (
+				<Link className={"no-underline"} href={videoChatLink}>
+					<button className={clsx("text-xs px-2 py-0.5 rounded-full text-white", "bg-green-600 not-dark:bg-green-500")}>
+						Join Call
+					</button>
+				</Link>
+			)}
+		</>
 	);
 };
 
 import { FaCrown } from "react-icons/fa";
-import { Route } from "next";
 import { Tooltip } from "react-tooltip";
+import { supabase } from "@/app/lib/supabase";
