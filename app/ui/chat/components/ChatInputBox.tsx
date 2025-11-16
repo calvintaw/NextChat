@@ -85,8 +85,10 @@ const ChatInputBox = forwardRef<ChatInputBoxRef, ChatInputBoxProps>((props, ref)
 
 	const sendMessage = async (input: string, type: MessageContentType = "text") => {
 		const tempId = uuidv4();
-		if (isSystem) setIsPending(true);
-		if (roomId.startsWith("system-room")) setActivePersons((prev: string[]) => [...prev, "system"]);
+		if (isSystem) {
+			setIsPending(true);
+			setActivePersons(["system"]);
+		}
 
 		const hasLinks = type === "text" ? includeLinks(input) : false;
 
@@ -104,7 +106,7 @@ const ChatInputBox = forwardRef<ChatInputBoxRef, ChatInputBoxProps>((props, ref)
 			type: hasLinks ? "link" : type,
 		};
 
-		console.log("does my msg has Links: ", hasLinks)
+		console.log("does my msg has Links: ", hasLinks);
 
 		cancelTypingAnimation(750); // stop the typing animation 1.5s after use has stopped typing
 
@@ -138,8 +140,10 @@ const ChatInputBox = forwardRef<ChatInputBoxRef, ChatInputBoxProps>((props, ref)
 			});
 		}
 
-		if (isSystem) setIsPending(false);
-		setActivePersons((prev: string[]) => prev.filter((name) => name != "system"));
+		if (isSystem) {
+			setIsPending(false);
+			setActivePersons([]);
+		}
 	};
 
 	useImperativeHandle(ref, () => ({
