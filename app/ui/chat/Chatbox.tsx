@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-// REMOVED: import { socket } from "../../lib/socket"; // <-- Removed
 import { MessageContentType, MessageType, Room, sql, User } from "../../lib/definitions";
 import { checkIfBlocked, deleteMsg, getRecentMessages, getUserProfileForMsg } from "../../lib/actions";
 import dayjs from "dayjs";
@@ -17,7 +16,7 @@ import { DirectMessageCard } from "./components/ChatHeader/ChatHeaderForDM";
 import { ServerCardHeader } from "./components/ChatHeader/ChatHeaderForServer";
 import ChatInputBox, { ChatInputBoxRef } from "./components/ChatInputBox";
 import ChatMessages from "./components/ChatMessages";
-import { supabase } from "@/app/lib/supabase"; // <-- Retained/Corrected Import
+import { supabase } from "@/app/lib/supabase";
 
 dayjs.extend(isToday);
 dayjs.extend(isYesterday);
@@ -45,23 +44,6 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	const scrollHeightBefore = useRef(0);
 	const lastBatchLength = useRef(limit);
 	const offsetRef = useRef(0);
-
-	//checks duplicates (due to netwrok errors, etc)
-	// const filterNewMessages = (newMsgs: MessageType[]) => {
-	// 	// return newMsgs.filter((msg) => {
-	// 	// 	if (messageIdsRef.current.has(msg.id)) return false;
-	// 	// 	messageIdsRef.current.add(msg.id);
-	// 	// 	return true;
-	// 	// });
-	// };
-
-	useEffect(() => {
-		toast({ title: "Test 1", subtitle: "Empty", mode: "positive", infinite: true });
-		toast({ title: "Test 2", subtitle: "Empty", mode: "positive", infinite: true });
-		toast({ title: "Test 3", subtitle: "Empty", mode: "positive", infinite: true });
-		toast({ title: "Test 4", subtitle: "Empty", mode: "positive", infinite: true });
-		toast({ title: "Test 5", subtitle: "Empty", mode: "positive", infinite: true });
-	}, []);
 
 	const filterNewMessages = (newMsgs: MessageType[]) => {
 		const existingIds = new Set(messages.map((m) => m.id));
@@ -187,57 +169,6 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		lastBatchLength.current = limit;
 		offsetRef.current = 0;
 	}
-	// // initial setup for blocking/system status
-	// useEffect(() => {
-	// 	// ... (unchanged)
-	// 	if (type === "dm" && recipient) {
-	// 		const check = async () => {
-	// 			const blocked = await checkIfBlocked(user, recipient as User);
-	// 			setIsBlocked(blocked);
-	// 			setInitialLoading(false);
-	// 		};
-
-	// 		check();
-	// 	} else {
-	// 		setIsBlocked(false);
-	// 	}
-
-	// 	if (roomId.startsWith("system-room")) {
-	// 		setIsSystem(true);
-	// 		setInitialLoading(false);
-	// 	}
-	// }, [type, recipient, user.id]);
-
-	// fetching msgs at startup and add listeners for typing event (ONLY FETCHING REMAINS)
-	// useEffect(() => {
-	// 	if (isBlocked || (isSystem && isBlocked)) {
-	// 		setInitialLoading(false);
-	// 		setHasMore(false);
-	// 		return;
-	// 	}
-
-	// 	const fetchMessages = async () => {
-	// 		try {
-	// 			const recent = await getRecentMessages(roomId, { limit });
-	// 			if (recent.length !== 0) {
-	// 				offsetRef.current = recent.length;
-	// 				lastBatchLength.current = recent.length;
-	// 				oldestMsgCreatedAt.current = recent[recent.length - 1].createdAt;
-	// 				setMessages(sortMessagesAsc(filterNewMessages(recent)));
-	// 			}
-
-	// 			if (recent.length < limit) setHasMore(false);
-	// 		} catch (err) {
-	// 			console.error("Failed to fetch recent messages:", err);
-	// 			// Added toast to show error to user
-	// 			toast({ title: "Error!", mode: "negative", subtitle: "Failed to load messages. Please refresh the page." });
-	// 		} finally {
-	// 			setInitialLoading(false); // Ensure loading stops even on failure
-	// 		}
-	// 	};
-
-	// 	fetchMessages();
-	// }, [isBlocked, isSystem, roomId]);
 
 	useEffect(() => {
 		const initialize = async () => {

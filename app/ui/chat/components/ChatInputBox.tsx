@@ -5,7 +5,6 @@ import { ChatToolbar } from "./ChatToolBar";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { clsx } from "clsx";
 import React from "react";
-// REMOVED: import { socket } from "@/app/lib/socket";
 import { MessageContentType, MessageType, User } from "@/app/lib/definitions";
 import useDebounce from "@/app/lib/hooks/useDebounce";
 import { useChatProvider } from "../ChatBoxWrapper";
@@ -16,9 +15,7 @@ import { v4 as uuidv4 } from "uuid";
 import useEventListener from "@/app/lib/hooks/useEventListener";
 import { insertMessageInDB } from "@/app/lib/actions";
 import { useToast } from "@/app/lib/hooks/useToast";
-// NEW: Import Supabase client
 import { supabase } from "@/app/lib/supabase";
-import { readFile } from "fs/promises";
 import { includeLinks } from "@/app/lib/utilities";
 
 type ChatInputBoxProps = {

@@ -14,17 +14,3 @@ const NewsGridWrapper = () => {
 };
 
 export default NewsGridWrapper;
-
-
-// temporary mock for testing
-
-// "use client"
-// import { fetchNews, mockFetchNews } from "@/app/lib/actions";
-// import { NewsArticle } from "@/app/lib/definitions";
-// import { newsData } from "@/app/lib/news";
-// import NewsGrid from "@/app/ui/NewsGrid";
-
-// export default function NewsPage() {
-
-// 	return <NewsGrid query={"home"} articles={newsData.articles} error={""}></NewsGrid>;
-// }

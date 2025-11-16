@@ -341,12 +341,7 @@ export const ChatPanelHeader = ({ user }: { user: User }) => {
 						<Link
 							key={id}
 							href={href as Route}
-							// className={clsx(
-							// 	"btn btn-secondary w-full text-base py-1.5 px-4 pl-3 text-left btn-with-icon no-underline",
-							// 	pathname === href
-							// 		? "bg-accent/85 text-text hover:bg-surface cursor-default"
-							// 		: "bg-transparent hover:bg-accent/25 not-dark:hover:bg-accent/50 text-muted hover:text-text"
-							// )}
+							
 							className={clsx(
 								"btn btn-secondary w-full text-base py-2 px-4 pl-3 text-left btn-with-icon no-underline rounded-md transition-colors duration-200",
 								pathname === href
@@ -385,92 +380,6 @@ import { IoSearch } from "react-icons/io5";
 import InputField from "../../form/InputField";
 import { IconWithSVG } from "../../general/Buttons";
 import { BiLoaderAlt } from "react-icons/bi";
-import router from "next/router";
-
-// const CreateDMButton = () => {
-// 	const [isPending, setIsPending]
-// 	const [error, seterror];
-
-// 	const [user, setUser] = useState<User>([])
-
-// 	return (
-// 		<>
-// 			<Dialog.Root>
-// 				<Dialog.Trigger asChild>
-// 					<FaPlus
-// 						data-tooltip-id="dm-icon-tooltip"
-// 						data-tooltip-content="Create DM"
-// 						className="hover:text-text text-muted ml-auto text-sm"
-// 					/>
-// 				</Dialog.Trigger>
-
-// 				<Dialog.Portal>
-// 					<Dialog.Overlay className="fixed inset-0 bg-black/50" />
-// 					<Dialog.Content
-// 						className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface rounded-xl p-6 pt-4 w-full max-w-md shadow-lg border border-border
-// 			z-[12000]							"
-// 					>
-// 						<Dialog.Title className="text-xl font-semibold text-text mb-4">Create a new DM</Dialog.Title>
-
-// 						<form onSubmit={(formdata) => {
-// 							const user = await getUserByUsername(formdata.q)
-// 							setUser(user)
-// 						}} className="w-full md:ml-auto">
-// 							<InputField
-// 								name="q"
-// 								type="text"
-// 								placeholder="Enter username"
-// 								disabled={isPending}
-// 								place="right"
-// 								className="w-full flex-1"
-// 								parentClassName="w-full min-h-0 h-10 px-1.5 "
-
-// 								icon={
-// 									<IconWithSVG type="submit" className="icon-small">
-// 										{isPending ? <BiLoaderAlt className="animate-spin text-lg" /> : <IoSearch />}
-// 									</IconWithSVG>
-// 								}
-// 							/>
-// 						</form>
-
-// 						{user && (
-
-// 								)}
-
-// 						{error && <p className="text-red-500 mt-2">{error}</p>}
-// 					</Dialog.Content>
-// 				</Dialog.Portal>
-// 			</Dialog.Root>
-// 		</>
-// 	);
-// };
-
-// const usercard = ({user}) => {
-// 	return (
-// 		<div className="rounded-lg h-15 px-2.5 hover:bg-accent/25 flex items-start gap-2.5">
-// 						{/* Avatar */}
-// 						<div className="h-full flex flex-row py-2.5">
-// 							<Avatar
-// 								disableTooltip={true}
-// 								id={user.id}
-// 								src={user.image}
-// 								size="size-8.5"
-// 								displayName={user.displayName}
-// 								statusIndicator={true}
-// 								status={user.username === "system" ? true : user.online}
-// 							/>
-// 						</div>
-
-// 						{/* user name + status */}
-// 						<div className="text-sm h-full flex flex-col justify-center flex-1 font-medium text-text truncate">
-// 							{user.displayName}
-// 							{user.username}
-// 						</div>
-
-// 						<button>Create DM</button>
-// 					</div>
-// 	)
-// }
 
 export const CreateDMButton = ({ currentUser }: { currentUser: User }) => {
 	const [isPending, setIsPending] = useState(false);
@@ -478,9 +387,6 @@ export const CreateDMButton = ({ currentUser }: { currentUser: User }) => {
 	const [user, setUser] = useState<User | null>(null);
 
 	const handleSubmit = async (username: string) => {
-		// e.preventDefault();
-		// const formData = new FormData(e.currentTarget);
-		// const username = formData.get("q")?.toString().trim();
 
 		if (username === currentUser.username) {
 			setError("Invalid DM");
