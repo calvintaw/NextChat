@@ -11,7 +11,7 @@ const Toaster = () => {
 
 	return (
 		<Toast.Provider swipeDirection="right">
-			{list.map((props) => (
+			{list.slice(-3).map((props) => (
 				<SingleToast {...props} key={props.id} />
 			))}
 			<Toast.Viewport className="fixed bottom-8 right-8 flex flex-col gap-3 min-w-80 max-w-125 m-0 list-none !z-[999] outline-none " />

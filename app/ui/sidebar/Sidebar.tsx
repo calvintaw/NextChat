@@ -4,6 +4,8 @@ import NavigationBar from "./components/NavigationBar";
 import UserPanel from "./components/UserPanel";
 import { getJoinedServers } from "@/app/lib/actions";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
+import { NavigationBarSkeleton } from "./components/NavigationBarSkeleton";
 
 const Sidebar = async () => {
 	const session = await auth();
@@ -16,8 +18,10 @@ const Sidebar = async () => {
 			id="sidebar"
 			className="relative max-w-86  h-full flex flex-row items-start w-min border-contrast lg:border-r bg-background"
 		>
-
-			<NavigationBar joined_servers={joined_servers} user={user}></NavigationBar>
+			<Suspense fallback={<NavigationBarSkeleton />}>
+				{/* <NavigationBarSkeleton /> */}
+				<NavigationBar joined_servers={joined_servers} user={user}></NavigationBar>
+			</Suspense>
 			<ChatPanel user={user} />
 
 			<UserPanel user={user}></UserPanel>

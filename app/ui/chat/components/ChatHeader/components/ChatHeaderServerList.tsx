@@ -71,7 +71,7 @@ export const ServerList = ({ servers }: { servers: Room[] }) => {
 							displayName={server.name}
 							size="size-6"
 							radius="rounded-sm"
-							fontSize="text-sm"
+							fontSize="text-sm !no-underline"
 							statusIndicator={false}
 						/>
 						<span className="text-xs max-w-[15ch] text-text truncate">{server.name}</span>

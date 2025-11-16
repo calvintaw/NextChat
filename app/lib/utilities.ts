@@ -1,5 +1,9 @@
+import z from "zod";
 import { NewsArticle, Room, User } from "./definitions";
 import { socket } from "./socket";
+import { BsChatDotsFill } from "react-icons/bs";
+import { RiCompassDiscoverFill } from "react-icons/ri";
+import CreateServerFormDialog from "../ui/form/CreateServerForm";
 
 export function getDMRoom(a: string, b?: string) {
 	if (typeof b === "undefined") {
@@ -99,15 +103,6 @@ export function isRoom(input: any): input is Room {
 	return input && typeof input === "object" && typeof input.owner_id === "string" && typeof input.type === "string";
 }
 
-export const WEB_URL_REGEX =
-	/\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\((?:[^\s()<>]+|\([^\s()<>]+\))*\))+(?:\((?:[^\s()<>]+|\([^\s()<>]+\))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/gi;
-
-export function includeLinks(text: string) {
-	const matches = text.match(WEB_URL_REGEX);
-	return !!matches?.length
-}
-
-
 export function isUser(input: any): input is User {
 	return (
 		input && typeof input === "object" && typeof input.username === "string" && typeof input.displayName === "string"
@@ -141,3 +136,66 @@ export function isUser(input: any): input is User {
 // 		attempt();
 // 	});
 // }
+
+export const NavigationSections = [
+	{
+		name: "Direct Messages",
+		href: "/",
+		icon: BsChatDotsFill,
+		description: "Direct Messages",
+	},
+	{
+		name: "Add New",
+		href: null,
+		icon: CreateServerFormDialog,
+		description: "Add/Join a server",
+	},
+	{
+		name: "Discover",
+		href: "/discover",
+		icon: RiCompassDiscoverFill,
+		description: "Discover Communities",
+	},
+	// {
+	// 	name: "Star",
+	// 	href: "https://github.com/calvintaw/discord_clone",
+	// 	icon: FaStar,
+	// 	description: "Star my repo ;)",
+	// 	external: true,
+	// },
+];
+
+export const WEB_URL_REGEX_ADVANCED =
+	/\b((?:[a-z][\w-]+:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/gi;
+
+export const WEB_URL_REGEX_SIMPLE =
+	/\b((?:https?:\/\/)?(?:www\.)?[a-z0-9-]+(?:\.[a-z]{2,})(?:\.[a-z]{2,})?)(\/[^\s]*)?\b/gi;
+
+export const commonTLDs = [
+	"com",
+	"net",
+	"org",
+	"io",
+	"co",
+	"us",
+	"uk",
+	"edu",
+	"gov",
+	"info",
+	"biz",
+	"dev",
+	"app",
+	"xyz",
+];
+export const domainRegex = new RegExp(
+	`\\b(?:www\\.)?[a-z0-9-]+\\.(?:${commonTLDs.join("|")})(?:\\.[a-z]{2,})?\\b`,
+	"gi"
+);
+
+export function includeLinks(text: string) {
+	const matches1 = text.match(domainRegex);
+	const matches2 = text.match(WEB_URL_REGEX_ADVANCED);
+	const matches3 = text.match(WEB_URL_REGEX_SIMPLE);
+
+	return !!matches1?.length || !!matches2?.length || !!matches3?.length;
+}

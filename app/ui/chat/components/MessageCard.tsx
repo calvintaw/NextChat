@@ -1,5 +1,11 @@
 "use client";
-import { getLocalTimeString, isRoom, WEB_URL_REGEX } from "@/app/lib/utilities";
+import {
+	domainRegex,
+	getLocalTimeString,
+	isRoom,
+	WEB_URL_REGEX_ADVANCED,
+	WEB_URL_REGEX_SIMPLE,
+} from "@/app/lib/utilities";
 import clsx from "clsx";
 import React, { useEffect, useRef, useState } from "react";
 import { Avatar } from "../../general/Avatar";
@@ -37,8 +43,6 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 	const { msgToEdit, messages, setMessages, setMsgToEdit, roomId, replyToMsg, user, recipient } = useChatProvider();
 	const toast = useToast();
 	const [clipboard, setClipboard] = useState("");
-
-
 
 	useEffect(() => {
 		if (clipboard) {
@@ -99,7 +103,7 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 				<div className="flex items-center gap-1 text-sm font-extralight font-chunk">
 					<Avatar
 						size="size-5"
-						fontSize="text-xs"
+						fontSize="text-xs !no-underline"
 						id={msg.replyTo}
 						src={reply_img_url}
 						statusIndicator={false}
@@ -158,7 +162,6 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 	};
 
 	const [videoChatLink, ___] = useState(msg.type === "video-call" ? JSON.parse(msg.content)[0] : "");
-	const linkMsgContent = msg.type === "link" ? useRenderedLinks(msg.content) : [];
 
 	return (
 		<div
@@ -200,7 +203,7 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 								id={msg.sender_id}
 								src={msg.sender_image}
 								statusIndicator={false}
-								fontSize="text-xs"
+								fontSize="text-xs !no-underline"
 								displayName={msg.sender_display_name}
 								parentClassName="mt-1 cursor-pointer min-sm:hidden"
 							></Avatar>
@@ -258,15 +261,14 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 										{msg.type === "text" ? (
 											msg.content
 										) : msg.type === "link" ? (
-											// @ts-ignore
-											{linkMsgContent}
+											renderLinks(msg.content)
 										) : (
 											<span className="mr-2 ">
 												Link:{" "}
 												<span
 													data-tooltip-id="message-card-icons-tooltip"
 													data-tooltip-content={clipboard === videoChatLink ? "Copied!" : "Copy"}
-													className="select-none cursor-grab underline decoration-primary text-primary"
+													className="select-none cursor-grab hover:underline decoration-primary not-dark:text-primary text-blue-400"
 													onClick={() => {
 														navigator.clipboard.writeText(videoChatLink);
 														setClipboard(videoChatLink);
@@ -648,50 +650,252 @@ const JoinCallButton = ({
 import { FaCrown } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
 import { supabase } from "@/app/lib/supabase";
-
 //@ts-ignore
 import extractUrls from "extract-urls";
+// regex codes are written by chatgpt except the one in utilities. src: https://daringfireball.net/2010/07/improved_regex_for_matching_urls
+export function renderLinks(text: string) {
+	const linksAdvanced = text.match(WEB_URL_REGEX_ADVANCED) || [];
+	const linksDomain = text.match(domainRegex) || [];
+	// const linksSimple = text.match(WEB_URL_REGEX_SIMPLE) || [];
+	// const linksSimple: string[] = [];
+	// const linksDomain: string[] = [];
+	const links: string[] = extractUrls(text, true) || [];
+	const mergedLinks = Array.from(new Set([...links, ...linksAdvanced, ...linksDomain]));
 
-import { useMemo } from "react";
+	// const words = text.split(/\s+/);
+	// words.forEach((word) => {
+	// 	// Skip if already in mergedLinks
+	// 	if (mergedLinks.includes(word)) return;
 
-export function useRenderedLinks(text: string): React.ReactNode[] {
-	return useMemo(() => {
-		const linkSet = new Set(text.match(WEB_URL_REGEX));
-		const links: string[] = extractUrls(text, true) || [];
-		const mergedLinks: string[] = Array.from(new Set([...linkSet, ...links]));
+	// 	const parsed = parse(word);
+	// 	if (parsed) {
+	// 		mergedLinks.push(word);
+	// 	}
+	// });
 
-		if (mergedLinks.length === 0) return [text];
+	// if (linksDomain) {
+	// 	for (let i = 0; i < linksDomain.length; i++){
+	// 		const link = linksDomain[i]
 
-		const result: React.ReactNode[] = [];
-		let cursor = 0;
+	// 	}
+	// }
 
-		for (let i = 0; i < mergedLinks.length; i++) {
-			const url = mergedLinks[i];
-			const index = text.indexOf(url, cursor);
+	// const matches = text.match(urlRegex);
 
-			if (index > cursor) {
-				result.push(text.slice(cursor, index));
-			}
+	// if (matches) {
+	// 	matches.forEach((match) => {
+	// 		// Remove trailing punctuation if any
+	// 		const cleanLink = match.replace(/[.,;!?]$/, "");
 
-			result.push(
-				<a
-					key={i}
-					href={url.startsWith("http") ? url : `https://${url}`}
-					target="_blank"
-					rel="noopener noreferrer"
-					className="text-primary hover:underline"
-				>
-					{url}
-				</a>
-			);
+	// 		if (!mergedLinks.includes(cleanLink)) {
+	// 			mergedLinks.push(cleanLink);
+	// 		}
+	// 	});
+	// }
 
-			cursor = index + url.length;
+	if (mergedLinks.length === 0) return [text];
+
+	useEffect(() => {
+		console.log("FINAL Links: ", mergedLinks);
+	}, []);
+
+	// Sort by index in text to prevent overlaps
+	const positions: { start: number; end: number; url: string }[] = [];
+
+	mergedLinks.forEach((url) => {
+		let match;
+		const regex = new RegExp(url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"); // escape special chars
+		while ((match = regex.exec(text)) !== null) {
+			positions.push({ start: match.index, end: match.index + url.length, url });
+		}
+	});
+
+	// Sort by start index
+	positions.sort((a, b) => a.start - b.start);
+
+	const result: React.ReactNode[] = [];
+	let cursor = 0;
+
+	for (let i = 0; i < positions.length; i++) {
+		const { start, end, url } = positions[i];
+
+		if (start > cursor) {
+			result.push(text.slice(cursor, start));
 		}
 
-		if (cursor < text.length) {
-			result.push(text.slice(cursor));
-		}
+		result.push(
+			<a
+				key={i}
+				href={url.startsWith("http") ? url : `https://${url}`}
+				target="_blank"
+				rel="noopener noreferrer"
+				className="not-dark:text-primary text-blue-400 no-underline hover:underline"
+			>
+				{url}
+			</a>
+		);
 
-		return result;
-	}, [text]);
+		cursor = end;
+	}
+
+	if (cursor < text.length) {
+		result.push(text.slice(cursor));
+	}
+
+	return result;
 }
+
+const testText = `
+Check out these links:
+1. http://example.com
+2. https://example.com
+3. http://example.com/
+4. https://example.com/path
+5. https://example.com/path/
+6. https://example.com/path?ref=123
+7. https://www.example.com/path?ref=123
+8. https://example.com/path#section
+9. www.test-site.org
+10. test-site.org
+11. https://sub.domain.com
+12. http://sub.domain.com/page
+13. https://sub.domain.com/page?query=value
+14. https://xn--fsq.com (human-readable punycode: 🐱.com)
+15. https://example.co.uk/path
+16. example.co.uk
+17. http://example.co.uk/path?utm_source=newsletter
+18. https://example.com/path/to/resource
+19. https://example.com/path/to/resource/  // trailing slash
+20. https://example.com/path/to/resource?foo=bar
+21. https://example.com:8080/path
+22. https://example.com/path(with-parentheses)
+23. https://example.com/path%20with%20spaces
+24. https://example.com/path-with-dash
+25. http://localhost:3000/test
+26. http://127.0.0.1:8000/page
+`;
+
+
+
+
+
+
+// /*
+
+
+
+//  const WEB_URL_REGEX_ADVANCED =
+// 	/\b((?:[a-z][\w-]+:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/gi;
+
+//  const WEB_URL_REGEX_SIMPLE =
+// 	/\b((?:https?:\/\/)?(?:www\.)?[a-z0-9-]+(?:\.[a-z]{2,})(?:\.[a-z]{2,})?)(\/[^\s]*)?\b/gi;
+
+//  const commonTLDs = [
+// 	"com",
+// 	"net",
+// 	"org",
+// 	"io",
+// 	"co",
+// 	"us",
+// 	"uk",
+// 	"edu",
+// 	"gov",
+// 	"info",
+// 	"biz",
+// 	"dev",
+// 	"app",
+// 	"xyz",
+// ];
+//  const domainRegex = new RegExp(
+// 	`\\b(?:www\\.)?[a-z0-9-]+\\.(?:${commonTLDs.join("|")})(?:\\.[a-z]{2,})?\\b`,
+// 	"gi"
+// );
+
+//  function includeLinks(text) {
+// 	const matches1 = text.match(domainRegex);
+// 	const matches2 = text.match(WEB_URL_REGEX_ADVANCED);
+// 	const matches3 = text.match(WEB_URL_REGEX_SIMPLE);
+
+// 	return !!matches1?.length || !!matches2?.length || !!matches3?.length;
+// }
+//  function test (text) {
+
+//   const linksAdvanced = text.match(WEB_URL_REGEX_ADVANCED) || [];
+// 	const linksDomain = text.match(domainRegex) || [];
+// 	// const linksSimple = text.match(WEB_URL_REGEX_SIMPLE) || [];
+
+// 	const linksSimple = [];
+// 	// const linksDomain: string[] = [];
+// 	const links = extractUrls(text, true) || [];
+
+// 	const mergedLinksSet = new Set([...links, ...linksAdvanced, ...linksSimple]);
+
+// 	// const words = text.split(/\s+/);
+// 	// words.forEach((word) => {
+// 	// 	// Skip if already in mergedLinks
+// 	// 	if (mergedLinks.includes(word)) return;
+
+// 	// 	const parsed = parse(word);
+// 	// 	if (parsed) {
+// 	// 		mergedLinks.push(word);
+// 	// 	}
+// 	// });
+
+// 	if (linksDomain) {
+// 		for (let i = 0; i < linksDomain.length; i++){
+// 			const link = linksDomain[i]
+// 			if (!mergedLinksSet.has(link)) mergedLinksSet.add(link);
+			
+// 		}
+// 	}
+
+// 	// const matches = text.match(urlRegex);
+
+// 	// if (matches) {
+// 	// 	matches.forEach((match) => {
+// 	// 		// Remove trailing punctuation if any
+// 	// 		const cleanLink = match.replace(/[.,;!?]$/, "");
+
+// 	// 		if (!mergedLinks.includes(cleanLink)) {
+// 	// 			mergedLinks.push(cleanLink);
+// 	// 		}
+// 	// 	});
+// 	// }
+
+// 	const mergedLinks = [...mergedLinksSet]
+// 	if (mergedLinks.length) console.log(mergedLinks);
+//  }
+
+// const text = `
+// Check out these links:
+// 1. http://example.com
+// 2. https://example.com
+// 3. http://example.com/
+// 4. https://example.com/path
+// 5. https://example.com/path/
+// 6. https://example.com/path?ref=123
+// 7. https://www.example.com/path?ref=123
+// 8. https://example.com/path#section
+// 9. www.test-site.org
+// 10. test-site.org
+// 11. https://sub.domain.com
+// 12. http://sub.domain.com/page
+// 13. https://sub.domain.com/page?query=value
+// 14. https://xn--fsq.com (human-readable punycode: 🐱.com)
+// 15. https://example.co.uk/path
+// 16. example.co.uk
+// 17. http://example.co.uk/path?utm_source=newsletter
+// 18. https://example.com/path/to/resource
+// 19. https://example.com/path/to/resource/  // trailing slash
+// 20. https://example.com/path/to/resource?foo=bar
+// 21. https://example.com:8080/path
+// 22. https://example.com/path(with-parentheses)
+// 23. https://example.com/path%20with%20spaces
+// 24. https://example.com/path-with-dash
+// 25. http://localhost:3000/test
+// 26. http://127.0.0.1:8000/page
+// `;
+
+// test(text)
+
+// /*

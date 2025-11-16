@@ -19,35 +19,8 @@ import { HiDotsHorizontal } from "react-icons/hi";
 import { useServersProvider } from "@/app/lib/contexts/ServersContext";
 import { IoLogoPolymer } from "react-icons/io";
 import { FiSidebar } from "react-icons/fi";
+import { NavigationSections } from "@/app/lib/utilities";
 type ActionIcon = React.FC<{ user: User; className?: string }>;
-
-const NavigationSections = [
-	{
-		name: "Direct Messages",
-		href: "/",
-		icon: BsChatDotsFill,
-		description: "Direct Messages",
-	},
-	{
-		name: "Add New",
-		href: null,
-		icon: CreateServerFormDialog,
-		description: "Add/Join a server",
-	},
-	{
-		name: "Discover",
-		href: "/discover",
-		icon: RiCompassDiscoverFill,
-		description: "Discover Communities",
-	},
-	// {
-	// 	name: "Star",
-	// 	href: "https://github.com/calvintaw/discord_clone",
-	// 	icon: FaStar,
-	// 	description: "Star my repo ;)",
-	// 	external: true,
-	// },
-];
 
 const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: Room[] }) => {
 	const { setJoinedServers } = useServersProvider();
@@ -328,3 +301,4 @@ const SeeMoreBtn = () => {
 // 		profile: "https://example.com/profiles/tech.png",
 // 	},
 // ];
+

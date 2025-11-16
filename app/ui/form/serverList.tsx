@@ -146,7 +146,7 @@ const Card = ({ server, user }: { server: Room; user: User }) => {
 					<div className=" border-4 rounded-[18px] overflow-hidden border-surface">
 						<Avatar
 							statusIndicator={false}
-							fontSize="text-xl"
+							fontSize="text-xl !no-underline"
 							radius="rounded-lg"
 							disableTooltip
 							size="size-12"

@@ -72,7 +72,7 @@ export const CallVideoChatDialog = ({ user }: { user: User }) => {
 							disableTooltip
 							id={user.id}
 							size={"size-30"}
-							fontSize="text-3xl"
+							fontSize="text-3xl !no-underline"
 							displayName={user.displayName}
 							src={user.image ?? ""}
 							statusIndicator={false}

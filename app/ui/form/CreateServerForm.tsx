@@ -71,7 +71,7 @@ export default function CreateServerFormDialog({ className, user }: { className:
 		form?.reset();
 	};
 
-const joinFormHandleSubmit = async (e: any) => {
+	const joinFormHandleSubmit = async (e: any) => {
 		e.preventDefault();
 
 		setIsPendingJoin(true);
@@ -192,7 +192,14 @@ const joinFormHandleSubmit = async (e: any) => {
 
 	useEffect(() => setMounted(true), []);
 
-	if (!mounted) return null;
+	if (!mounted)
+		return (
+			<>
+				<div className="icon-add_server w-full h-full">
+					<FiPlus className={` ${className}`} />
+				</div>
+			</>
+		);
 
 	return (
 		<Dialog.Root open={open} onOpenChange={setOpen}>

@@ -40,19 +40,33 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	const chatInputBoxRef = useRef<ChatInputBoxRef>(null);
 	const toast = useToast();
 
-	const messageIdsRef = useRef<Set<string>>(new Set());
+	// const messageIdsRef = useRef<Set<string>>(new Set());
 	const oldestMsgCreatedAt = useRef<string>("");
 	const scrollHeightBefore = useRef(0);
 	const lastBatchLength = useRef(limit);
 	const offsetRef = useRef(0);
 
 	//checks duplicates (due to netwrok errors, etc)
-	const filterNewMessages = (msgs: MessageType[]) => {
-		return msgs.filter((msg) => {
-			if (messageIdsRef.current.has(msg.id)) return false;
-			messageIdsRef.current.add(msg.id);
-			return true;
-		});
+	// const filterNewMessages = (newMsgs: MessageType[]) => {
+	// 	// return newMsgs.filter((msg) => {
+	// 	// 	if (messageIdsRef.current.has(msg.id)) return false;
+	// 	// 	messageIdsRef.current.add(msg.id);
+	// 	// 	return true;
+	// 	// });
+	// };
+
+	useEffect(() => {
+		toast({ title: "Test 1", subtitle: "Empty", mode: "positive", infinite: true });
+		toast({ title: "Test 2", subtitle: "Empty", mode: "positive", infinite: true });
+		toast({ title: "Test 3", subtitle: "Empty", mode: "positive", infinite: true });
+		toast({ title: "Test 4", subtitle: "Empty", mode: "positive", infinite: true });
+		toast({ title: "Test 5", subtitle: "Empty", mode: "positive", infinite: true });
+	}, []);
+
+	const filterNewMessages = (newMsgs: MessageType[]) => {
+		const existingIds = new Set(messages.map((m) => m.id));
+		const unique = newMsgs.filter((msg) => !existingIds.has(msg.id));
+		return [...unique, ...messages]; // prepend older messages
 	};
 
 	const sortMessagesAsc = (msgs: MessageType[]) =>
@@ -86,12 +100,13 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 				};
 
 				if (payload.eventType === "INSERT") {
-					if (!messageIdsRef.current.has(msg.id) && msg.sender_id !== user.id) {
-						messageIdsRef.current.add(msg.id);
+					// if (!messageIdsRef.current.has(msg.id) && msg.sender_id !== user.id) {
+					if (msg.sender_id !== user.id) {
+						// messageIdsRef.current.add(msg.id);
 						setMessages((prev) => [...prev, msg]);
 					}
 				} else if (payload.eventType === "DELETE") {
-					messageIdsRef.current.delete(payload.old.id);
+					// messageIdsRef.current.delete(payload.old.id);
 					setMessages((prev) => prev.filter((tx) => tx.id !== payload.old.id));
 				} else if (payload.eventType === "UPDATE") {
 					setMessages((prev) =>
@@ -160,16 +175,17 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		});
 
 		return () => {
+			resetRefs();
 			supabase.removeChannel(channel);
 		};
 	}, [roomId, isBlocked, isSystem, user.id]);
 
 	function resetRefs() {
-		messageIdsRef.current.clear();
-		// oldestMsgCreatedAt.current = "";
-		// scrollHeightBefore.current = 0;
-		// lastBatchLength.current = limit;
-		// offsetRef.current = 0;
+		// messageIdsRef.current.clear();
+		oldestMsgCreatedAt.current = "";
+		scrollHeightBefore.current = 0;
+		lastBatchLength.current = limit;
+		offsetRef.current = 0;
 	}
 	// // initial setup for blocking/system status
 	// useEffect(() => {
@@ -283,7 +299,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		// The deletion in the DB inside deleteMsg() triggers the Supabase
 		// "postgres_changes" DELETE event automatically for other clients.
 
-		messageIdsRef.current.delete(id);
+		// messageIdsRef.current.delete(id);
 	};
 
 	// ... (fetchOlderMessages, isTopVisible, scroll position effects, caching - all UNCHANGED)
