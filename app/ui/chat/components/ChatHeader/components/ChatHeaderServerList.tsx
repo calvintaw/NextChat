@@ -61,7 +61,7 @@ export const ServerList = ({ servers }: { servers: Room[] }) => {
 						key={server.id}
 						href={server.type === "dm" ? `/chat/${server.id}` : `/chat/server/${server.id}`}
 						className={clsx(
-							"flex items-center gap-1.5 p-1 pr-1.5 rounded-sm no-underline cursor-pointer transition-colors duration-150",
+							"flex items-center gap-1.5 p-1 pr-1.5 rounded-sm no-underline decoration-0 cursor-pointer transition-colors duration-150",
 							"bg-background/50 hover:bg-background/70 dark:bg-accent/50 dark:hover:bg-accent/70"
 						)}
 					>
@@ -71,7 +71,7 @@ export const ServerList = ({ servers }: { servers: Room[] }) => {
 							displayName={server.name}
 							size="size-6"
 							radius="rounded-sm"
-							fontSize="text-sm !no-underline"
+							fontSize="text-sm"
 							statusIndicator={false}
 						/>
 						<span className="text-xs max-w-[15ch] text-text truncate">{server.name}</span>

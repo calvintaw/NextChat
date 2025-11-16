@@ -161,7 +161,11 @@ const ContactCard = ({
 	};
 
 	return (
-		<Link className={clsx("group/contact no-underline cursor-pointer")} href={`/chat/${room_id}`} onClick={handleClick}>
+		<Link
+			className={clsx("group/contact no-underline decoration-0 cursor-pointer")}
+			href={`/chat/${room_id}`}
+			onClick={handleClick}
+		>
 			<div className="rounded-lg h-15 px-2.5 hover:bg-accent/25 flex items-start gap-2.5">
 				{/* Avatar */}
 				<div className="h-full flex flex-row py-2.5">

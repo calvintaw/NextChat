@@ -495,7 +495,7 @@ html {
 
 	/* --- Link & Button Styles --- */
 	.link {
-		@apply text-indigo-600 no-underline font-semibold hover:underline;
+		@apply text-indigo-600 no-underline decoration-0 font-semibold hover:underline;
 	}
 
 	.btn {

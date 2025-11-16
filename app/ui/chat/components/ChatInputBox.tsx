@@ -273,7 +273,7 @@ const ReplyToBox = () => {
 		<a
 			href={`#${replyToMsg.id}`}
 			id="replyToBox"
-			className="border p-4 py-2 text-sm no-underline
+			className="border p-4 py-2 text-sm no-underline decoration-0
 		flex justify-between items-center gap-2 bg-background/75 dark:bg-accent border-muted/25 not-dark:border-foreground/30 relative rounded-t-lg border-b-0 
 		"
 		>

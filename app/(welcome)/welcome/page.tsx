@@ -23,7 +23,7 @@ export default function Page() {
 					<div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
 						<a
 							href="#features"
-							className="w-full no-underline sm:w-auto px-6 py-3 sm:px-8 sm:py-4 rounded-full border-2 border-[#39FF14] text-[#39FF14] text-xl font-semibold hover:bg-[#39FF14] hover:text-black transition-all"
+							className="w-full no-underline decoration-0 sm:w-auto px-6 py-3 sm:px-8 sm:py-4 rounded-full border-2 border-[#39FF14] text-[#39FF14] text-xl font-semibold hover:bg-[#39FF14] hover:text-black transition-all"
 						>
 							Explore Features
 						</a>
@@ -31,7 +31,7 @@ export default function Page() {
 							href="https://next-chat-discord-clone.vercel.app/"
 							target="_blank"
 							rel="noopener noreferrer"
-							className="w-full no-underline sm:w-auto px-6 py-3 sm:px-8 sm:py-4 rounded-full border-2 border-[#00FFFF] text-[#00FFFF] text-xl font-semibold hover:bg-[#00FFFF] hover:text-black transition-all"
+							className="w-full no-underline decoration-0 sm:w-auto px-6 py-3 sm:px-8 sm:py-4 rounded-full border-2 border-[#00FFFF] text-[#00FFFF] text-xl font-semibold hover:bg-[#00FFFF] hover:text-black transition-all"
 						>
 							Start Chatting Now
 						</a>
@@ -108,7 +108,7 @@ export default function Page() {
 						href="https://github.com/calvintaw/discord_clone"
 						target="_blank"
 						rel="noopener noreferrer"
-						className="no-underline px-8 py-4 rounded-full border-2 border-[#00FFFF] text-[#00FFFF] text-lg font-semibold hover:bg-[#00FFFF] hover:text-black transition-all"
+						className="no-underline decoration-0 px-8 py-4 rounded-full border-2 border-[#00FFFF] text-[#00FFFF] text-lg font-semibold hover:bg-[#00FFFF] hover:text-black transition-all"
 					>
 						Star on Github
 					</a>
@@ -118,7 +118,7 @@ export default function Page() {
 			{/* Footer */}
 			<footer className="py-8 text-center text-gray-500 border-t border-[#1A1F2C] bg-[#0A0F1C]">
 				Created by{" "}
-				<a href="https://github.com/calvintaw" className="no-underline text-white hover:text-[#39FF14]">
+				<a href="https://github.com/calvintaw" className="no-underline decoration-0 text-white hover:text-[#39FF14]">
 					Calvin Taw
 				</a>{" "}
 				&copy; 2025
@@ -148,7 +148,7 @@ export function Navbar() {
 					<a
 						key={item}
 						href={`#${item.toLowerCase().replace(" ", "-")}`}
-						className="text-gray-200 hover:text-[#39FF14] transition-colors no-underline"
+						className="text-gray-200 hover:text-[#39FF14] transition-colors no-underline decoration-0"
 					>
 						{item}
 					</a>
@@ -157,7 +157,7 @@ export function Navbar() {
 					href="https://github.com/calvintaw/discord_clone"
 					target="_blank"
 					rel="noopener noreferrer"
-					className="text-gray-200 hover:text-[#00FFFF] transition-colors no-underline"
+					className="text-gray-200 hover:text-[#00FFFF] transition-colors no-underline decoration-0"
 				>
 					GitHub
 				</a>
@@ -181,7 +181,7 @@ export function Navbar() {
 					<a
 						key={item}
 						href={`#${item.toLowerCase().replace(" ", "-")}`}
-						className="text-gray-200 hover:text-[#39FF14] transition-colors no-underline py-2 text-lg"
+						className="text-gray-200 hover:text-[#39FF14] transition-colors no-underline decoration-0 py-2 text-lg"
 						onClick={() => setOpen(false)}
 					>
 						{item}
@@ -191,7 +191,7 @@ export function Navbar() {
 					href="https://github.com/calvintaw/discord_clone"
 					target="_blank"
 					rel="noopener noreferrer"
-					className="text-gray-200 hover:text-[#00FFFF] transition-colors py-2 text-lg no-underline"
+					className="text-gray-200 hover:text-[#00FFFF] transition-colors py-2 text-lg no-underline decoration-0"
 					onClick={() => setOpen(false)}
 				>
 					GitHub

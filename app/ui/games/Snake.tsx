@@ -255,7 +255,7 @@ export default function SnakeHome({ user }: { user: User }) {
 						</div>
 					)}
 
-					<Link href="/?tab=games" className="no-underline absolute left-2 top-2">
+					<Link href="/?tab=games" className="no-underline decoration-0 absolute left-2 top-2">
 						<button className=" btn-small text-sm btn-with-icon items-center gap-1 !w-fit px-2 pr-2.5">
 							<FaArrowLeft />
 							Go Back

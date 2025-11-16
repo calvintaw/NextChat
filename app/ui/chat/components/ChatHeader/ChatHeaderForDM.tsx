@@ -92,7 +92,7 @@ export function DirectMessageCard({
 						size={"size-5.5"}
 						displayName={user.username}
 						src={user.image}
-						fontSize={"text-[11px] !no-underline"}
+						fontSize={"text-[11px]"}
 						statusIndicator={false}
 					></Avatar>
 					<h2 className="text-sm">{user.username}</h2>

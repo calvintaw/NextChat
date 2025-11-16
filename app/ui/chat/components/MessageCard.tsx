@@ -21,18 +21,10 @@ type MessageCardType = {
 	arr_index: number;
 };
 
-const formatMessageDate = (date: string) => {
-	const d = dayjs(date);
-
-	if (d.isSame(dayjs(), "day")) {
-		return d.format("h:mm A");
-	}
-
-	return d.format("M/D/YYYY, h:mm A");
-};
-
 const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
-	const msg_date = formatMessageDate(msg.createdAt);
+	const msg_date = dayjs(msg.createdAt).format("M/D/YYYY, h:mm A");
+	const msg_date_short = dayjs(msg.createdAt).format("h:mm A");
+
 	const editInputRef = useRef<HTMLInputElement | null>(null);
 	const { msgToEdit, messages, setMessages, setMsgToEdit, roomId, replyToMsg, user, recipient } = useChatProvider();
 	const toast = useToast();
@@ -99,14 +91,18 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 				<div className="flex items-center gap-1 text-sm font-extralight font-chunk">
 					<Avatar
 						size="size-5"
-						fontSize="text-xs !no-underline"
+						fontSize="text-xs"
 						id={msg.replyTo}
 						src={reply_img_url}
 						statusIndicator={false}
 						displayName={reply_displayName}
-						parentClassName=" ml-1 text-xs relative top-0.25 !no-underline"
+						parentClassName=" ml-1 text-xs relative top-0.25"
 					/>
-					<Link className="no-underline" title={`Go to ${reply_displayName}'s Profile`} href={`/users/${msg.replyTo}`}>
+					<Link
+						className="no-underline decoration-0 "
+						title={`Go to ${reply_displayName}'s Profile`}
+						href={`/users/${msg.replyTo}`}
+					>
 						<span className="text-muted">@{reply_displayName}</span>
 					</Link>{" "}
 					<a
@@ -122,7 +118,7 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 								});
 							}
 						}}
-						className="no-underline text-text/90 font-extralight cursor-pointer"
+						className="no-underline decoration-0  text-text/90 font-extralight cursor-pointer"
 					>
 						{reply_content}
 					</a>
@@ -190,7 +186,7 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 						></Avatar>
 					</div>
 				)}
-				<div className="flex flex-1 flex-col">
+				<div className="flex flex-1 flex-col justify-center">
 					{/* User Name and MSG sent time */}
 					{(isFirstGroup || msg.replyTo) && (
 						<div className="text-sm text-muted flex items-center gap-2 mb-1">
@@ -199,12 +195,12 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 								id={msg.sender_id}
 								src={msg.sender_image}
 								statusIndicator={false}
-								fontSize="text-xs !no-underline"
+								fontSize="text-xs"
 								displayName={msg.sender_display_name}
-								parentClassName="mt-1 cursor-pointer min-sm:hidden !no-underline"
+								parentClassName="mt-1 cursor-pointer min-sm:hidden"
 							></Avatar>
 							<Link
-								className="no-underline font-semibold text-foreground hover:underline hover:cursor-pointer"
+								className="no-underline decoration-0  font-semibold text-foreground hover:underline hover:cursor-pointer"
 								title={`Go to ${msg.sender_display_name}'s Profile`}
 								href={`/users/${msg.sender_id}`}
 							>
@@ -232,7 +228,7 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 									className="max-sm:hidden 
 								w-9 h-auto font-mono text-center whitespace-nowrap text-nowrap flex items-center justify-center pl-0.5 text-[10px] text-muted -z-50 group-hover:z-0"
 								>
-									<p className="mt-0.5">{msg_date}</p>
+									<p className="mt-0.5">{msg_date_short}</p>
 								</div>
 								<div className="min-sm:hidden"></div>
 							</>
@@ -281,11 +277,11 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 									</div>
 									<div
 										className={clsx(
-											"min-sm:hidden relative -bottom-1 w-11 h-auto font-mono text-center whitespace-nowrap text-nowrap flex items-center justify-center text-[11px] text-muted -z-50 group-hover:z-0 								",
-											isFirstGroup && "justify-end"
+											"min-sm:hidden shrink-0 relative w-11 h-full font-mono text-center whitespace-nowrap text-nowrap flex items-center justify-center text-[11px] text-muted -z-50 group-hover:z-0 								",
+											isFirstGroup ? "-top-5 h-fit !items-start" : "-bottom-1 !items-end "
 										)}
 									>
-										{isFirstGroup ? null : msg_date}{" "}
+										{!isFirstGroup ? msg_date_short : null}{" "}
 										{((typeof msg.synced === "boolean" && msg.synced) ||
 											// msg is from server, then synced is undefine as there is no such column as synced on DB
 											typeof msg.synced === "undefined") &&
@@ -395,11 +391,11 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 						>
 							<div
 								className={clsx(
-									"min-sm:hidden w-11 h-auto font-mono text-center whitespace-nowrap text-nowrap flex items-center justify-center text-[11px] text-muted -z-50 group-hover:z-0",
+									"min-sm:hidden shrink-0 w-11 h-auto font-mono text-center whitespace-nowrap text-nowrap flex items-center justify-center text-[11px] text-muted -z-50 group-hover:z-0",
 									isFirstGroup && "justify-end"
 								)}
 							>
-								{!isFirstGroup && msg_date}{" "}
+								{!isFirstGroup && msg_date_short}{" "}
 								{((typeof msg.synced === "boolean" && msg.synced) ||
 									// msg is from server, then synced is undefine as there is no such column as synced on DB
 									typeof msg.synced === "undefined") &&
@@ -633,7 +629,7 @@ const JoinCallButton = ({
 					Expired
 				</button>
 			) : (
-				<Link className={"no-underline"} href={videoChatLink}>
+				<Link className={"no-underline decoration-0 "} href={videoChatLink}>
 					<button className={clsx("text-xs px-2 py-0.5 rounded-full text-white", "bg-green-600 not-dark:bg-green-500")}>
 						Join Call
 					</button>
@@ -693,7 +689,7 @@ export function renderLinks(text: string) {
 				href={url.startsWith("http") ? url : `https://${url}`}
 				target="_blank"
 				rel="noopener noreferrer"
-				className="not-dark:text-primary text-blue-400 no-underline hover:underline"
+				className="not-dark:text-primary text-blue-400 no-underline decoration-0  hover:underline break-all"
 			>
 				{url}
 			</a>

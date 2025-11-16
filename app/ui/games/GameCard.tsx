@@ -18,7 +18,7 @@ const GameCard = ({ imgSrc, title, description, href }: GameCardProps) => {
 					<h3 className="text-lg font-semibold text-text">{title}</h3>
 					<p className={`mt-1 text-sm text-muted line-clamp-2 break-normal`}>{description}</p>
 					<div className="flex gap-2 mt-2">
-						<Link href={href} className="no-underline">
+						<Link href={href} className="no-underline decoration-0">
 							<button className="btn-third">Play</button>
 						</Link>
 						<button className="btn-secondary-border">Like</button>

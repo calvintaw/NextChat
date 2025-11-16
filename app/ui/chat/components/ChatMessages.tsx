@@ -58,7 +58,7 @@ const ChatMessages = ({ messages }: { messages: MessageType[] }) => {
 							const isFirstGroup =
 								i === 0 ||
 								prevMsg?.sender_id !== msg.sender_id ||
-								dayjs(msg.createdAt).diff(dayjs(prevMsg.createdAt), "minute") >= 5;
+								dayjs(msg.createdAt).diff(dayjs(prevMsg.createdAt), "minute") >= 10;
 
 							const separateLogic = prevMsg && dayjs(msg.createdAt).diff(dayjs(prevMsg.createdAt), "day") >= 1;
 

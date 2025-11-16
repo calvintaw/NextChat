@@ -57,7 +57,7 @@ export default function GlobalNotFound() {
 					<Link
 						href="/"
 						className="
-        no-underline
+        no-underline decoration-0
         flex items-center px-3 py-1 gap-2 btn bg-primary rounded-lg shadow text-white hover:bg-primary/90 transition
         "
 					>

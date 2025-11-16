@@ -131,7 +131,7 @@ Stay tuned for updates!`
 							src={user.image}
 							displayName={user.displayName}
 							size="size-[clamp(32px,15vw,64px)]"
-							fontSize="text-[clamp(1em,5vw,1.5em)] !no-underline"
+							fontSize="text-[clamp(1em,5vw,1.5em)]"
 							radius="rounded-full"
 							statusIndicator={false}
 						/>

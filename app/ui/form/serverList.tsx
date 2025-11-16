@@ -146,7 +146,7 @@ const Card = ({ server, user }: { server: Room; user: User }) => {
 					<div className=" border-4 rounded-[18px] overflow-hidden border-surface">
 						<Avatar
 							statusIndicator={false}
-							fontSize="text-xl !no-underline"
+							fontSize="text-xl"
 							radius="rounded-lg"
 							disableTooltip
 							size="size-12"
@@ -200,7 +200,10 @@ const Card = ({ server, user }: { server: Room; user: User }) => {
 
 					<Link
 						onClick={() => server.type === "public" && joinServer(server.id)}
-						className={clsx("no-underline", server.type === "private" && !hasJoined && "!cursor-not-allowed")}
+						className={clsx(
+							"no-underline decoration-0",
+							server.type === "private" && !hasJoined && "!cursor-not-allowed"
+						)}
 						href={server.type === "dm" ? `/chat/${server.id}` : `/chat/server/${server.id}`}
 					>
 						<button

@@ -217,7 +217,7 @@ const SeeMoreBtn = () => {
 			data-tooltip-content={"View all joined servers"}
 			role="navigation"
 			key={"nav-see-more-btn"}
-			className={"px-2 max-sm:px-1.5 sm:min-h-13 relative flex items-center justify-center no-underline"}
+			className={"px-2 max-sm:px-1.5 sm:min-h-13 relative flex items-center justify-center no-underline decoration-0"}
 		>
 			<IconWithSVG className={nav_icon_styles}>
 				<HiDotsHorizontal className="not-dark:group-hover:text-background text-[24px] max-sm:text-[20px]" />

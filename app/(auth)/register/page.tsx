@@ -112,7 +112,7 @@ const Page = () => {
 					</Button>
 					<p className="text-muted text-sm">
 						Already have an account?{" "}
-						<Link href={"/login"} className="text-primary no-underline font-semibold hover:underline">
+						<Link href={"/login"} className="text-primary no-underline decoration-0 font-semibold hover:underline">
 							Login
 						</Link>
 					</p>

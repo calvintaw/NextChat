@@ -33,7 +33,11 @@ const UserLink = ({ id, disable = false, children }: UserLinkProps) => {
 		return <>{children}</>;
 	}
 
-	return <Link href={`/users/${id}`}>{children}</Link>;
+	return (
+		<Link href={`/users/${id}`} className="no-underline decoration-0">
+			{children}
+		</Link>
+	);
 };
 
 export const Avatar = ({
@@ -93,7 +97,7 @@ export const Avatar = ({
 						{!loaded && (
 							<div
 								className={clsx(
-									"absolute top-0 left-0 w-full h-full transition-opacity duration-500",
+									"absolute top-0 left-0 w-full h-full transition-opacity duration-500 ",
 									"bg-gray-500 not-dark:bg-gray-300",
 									{
 										"animate-pulse": !loaded,
@@ -149,7 +153,7 @@ export const Avatar = ({
 								getBackgroundColorByInitial(displayName)
 							)}
 						>
-							<div className={clsx("font-medium !no-underline !decoration-0", fontSize)}>{fallback}</div>
+							<div className={clsx("font-medium", fontSize)}>{fallback}</div>
 						</div>
 						{statusIndicator && (
 							<div className={onlineStatusContainer}>

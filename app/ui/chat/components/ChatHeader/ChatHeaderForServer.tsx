@@ -47,7 +47,7 @@ export function ServerCardHeader({ server, user }: { server: Room; user: User })
 						disableTooltip
 						id={localServer.id}
 						size={"size-5.5"}
-						fontSize={"text-[11px] !no-underline"}
+						fontSize={"text-[11px]"}
 						displayName={localServer.name}
 						src={localServer.profile ?? ""}
 						statusIndicator={false}

@@ -386,7 +386,7 @@ export default function CreateServerFormDialog({ className, user }: { className:
 								<Dialog.Close asChild>
 									<Link
 										href={"/discover"}
-										className="no-underline btn btn-secondary w-full text-base py-3 px-3 text-left btn-with-icon border border-foreground/10 gap-2.5 my-5"
+										className="no-underline decoration-0 btn btn-secondary w-full text-base py-3 px-3 text-left btn-with-icon border border-foreground/10 gap-2.5 my-5"
 									>
 										<div className="flex items-center justify-center rounded-full bg-primary shrink-0 p-1.5">
 											<RiCompass3Fill className="text-3xl text-white" />

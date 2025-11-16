@@ -276,7 +276,7 @@ export const ChatPreview = ({
 
 	return (
 		<Link
-			className="cursor-pointer no-underline group/parent"
+			className="cursor-pointer no-underline decoration-0 group/parent"
 			href={chat.room_type === "dm" ? `/chat/${chat.room_id}` : `/chat/server/${chat.room_id}`}
 		>
 			<div
@@ -343,7 +343,7 @@ export const ChatPanelHeader = ({ user }: { user: User }) => {
 							href={href as Route}
 							
 							className={clsx(
-								"btn btn-secondary w-full text-base py-2 px-4 pl-3 text-left btn-with-icon no-underline rounded-md transition-colors duration-200",
+								"btn btn-secondary w-full text-base py-2 px-4 pl-3 text-left btn-with-icon no-underline decoration-0 rounded-md transition-colors duration-200",
 								pathname === href
 									? "bg-accent/80 text-text cursor-default"
 									: "bg-surface/25 not-dark:bg-surface/35 text-muted hover:bg-accent/30 not-dark:hover:bg-accent/50 hover:text-text"
@@ -361,7 +361,7 @@ export const ChatPanelHeader = ({ user }: { user: User }) => {
 
 			<Link
 				href="/"
-				className="no-underline btn btn-secondary w-full text-sm !p-0 !px-2 !bg-transparent group text-left btn-with-icon"
+				className="no-underline decoration-0 btn btn-secondary w-full text-sm !p-0 !px-2 !bg-transparent group text-left btn-with-icon"
 			>
 				<span className="group-hover:text-text text-muted max-lg:[#sidebar.active_&]:mb-1.5 max-lg:[#sidebar.active_&]:mt-1">
 					Direct Messages
