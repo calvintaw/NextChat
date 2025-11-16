@@ -124,7 +124,7 @@ export function MessageDropdownMenu({ msg, retrySendingMessage }: Props) {
 						😃
 					</IconWithSVG>
 
-					{msg.sender_id === user.id && (
+					{msg.sender_id === user.id && msg.type !== "video-call" && (
 						<IconWithSVG
 							data-tooltip-id="icon-message-dropdown-menu-id"
 							data-tooltip-content="Edit"

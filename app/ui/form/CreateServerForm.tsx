@@ -49,7 +49,8 @@ export default function CreateServerFormDialog({ className, user }: { className:
 	const [uploaded, setUploaded] = useState<string>("");
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
 	const [publicImgUrl, setPublicImgUrl] = useState("");
-	const createFormHandleSubmit = async () => {
+	const createFormHandleSubmit = async (e: any) => {
+		e.preventDefault();
 		setIsPendingCreate(true);
 		const form = create_formRef.current;
 		const formData = new FormData(form!);
@@ -70,7 +71,7 @@ export default function CreateServerFormDialog({ className, user }: { className:
 		form?.reset();
 	};
 
-	const joinFormHandleSubmit = async (e) => {
+const joinFormHandleSubmit = async (e: any) => {
 		e.preventDefault();
 
 		setIsPendingJoin(true);

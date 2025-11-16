@@ -58,7 +58,7 @@ export default function AuthForm() {
 					<>
 						<p className="flex items-center text-sm text-red-500">
 							<FaExclamation className="h-5 w-5 text-red-500" />
-							{errorMessage}
+							{errorMessage.error}
 						</p>
 					</>
 				)}

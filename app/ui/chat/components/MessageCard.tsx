@@ -13,17 +13,36 @@ import { RxCross2 } from "react-icons/rx";
 import { IconWithSVG } from "../../general/Buttons";
 import Link from "next/link";
 import { AiOutlineReload } from "react-icons/ai";
+import dayjs from "dayjs";
 
 type MessageCardType = {
 	msg: MessageType;
 	isFirstGroup: boolean;
+	arr_index: number;
 };
 
-const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
-	const msg_date = getLocalTimeString(msg.createdAt, { hour: "numeric", minute: "numeric", hour12: true });
+const formatMessageDate = (date: string) => {
+	const d = dayjs(date);
+
+	if (d.isSame(dayjs(), "day")) {
+		return d.format("h:mm A");
+	}
+
+	return d.format("M/D/YYYY, h:mm A");
+};
+
+const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
+	const msg_date = formatMessageDate(msg.createdAt);
 	const editInputRef = useRef<HTMLInputElement | null>(null);
 	const { msgToEdit, messages, setMessages, setMsgToEdit, roomId, replyToMsg, user, recipient } = useChatProvider();
 	const toast = useToast();
+	const [clipboard, setClipboard] = useState("");
+	useEffect(() => {
+		if (clipboard) {
+			setTimeout(() => setClipboard(""), 5000);
+		}
+	}, [clipboard]);
+
 
 	const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -83,7 +102,7 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 						src={reply_img_url}
 						statusIndicator={false}
 						displayName={reply_displayName}
-						parentClassName="ml-1 text-xs relative top-0.25"
+						parentClassName=" ml-1 text-xs relative top-0.25"
 					/>
 					<Link className="no-underline" title={`Go to ${reply_displayName}'s Profile`} href={`/users/${msg.replyTo}`}>
 						<span className="text-muted">@{reply_displayName}</span>
@@ -136,6 +155,8 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 		}
 	};
 
+	const [videoChatLink, ___] = useState(msg.type === "video-call" ? JSON.parse(msg.content)[0] : "");
+
 	return (
 		<div
 			data-image-url={msg.sender_image}
@@ -143,9 +164,10 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 			data-content={msg.content.slice(0, 200)}
 			id={msg.id}
 			className={clsx(
-				"flex flex-col w-full dark:hover:bg-background/75 hover:bg-accent/75 px-2 pr-0 pl-3 py-2  relative ",
+				"flex flex-col w-full dark:hover:bg-background/75 hover:bg-accent/75 px-2 pr-0 pl-3 py-1  relative ",
 				msgToEdit === msg.id ? "dark:bg-background/75 bg-accent" : "group",
-				msg.type === "image" || msg.type === "video" ? "!pb-5" : "max-sm:pb-1",
+				msg.type === "image" || msg.type === "video" ? (isFirstGroup ? "!pb-2" : "!pb-5") : "max-sm:pb-1",
+				isFirstGroup && arr_index > 0 && "mt-2",
 				replyToMsg &&
 					replyToMsg.id === msg.id &&
 					"bg-primary/20 border-3 border-b-0 border-t-0 border-primary hover:!bg-primary/10"
@@ -157,12 +179,12 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 				{(isFirstGroup || msg.replyTo) && (
 					<div className="min-w-11 flex justify-center max-sm:hidden">
 						<Avatar
-							size="size-8.5"
+							size="size-9"
 							id={msg.sender_id}
 							src={msg.sender_image}
 							statusIndicator={false}
 							displayName={msg.sender_display_name}
-							parentClassName="cursor-pointer"
+							parentClassName="mt-1 cursor-pointer"
 						></Avatar>
 					</div>
 				)}
@@ -177,7 +199,7 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 								statusIndicator={false}
 								fontSize="text-xs"
 								displayName={msg.sender_display_name}
-								parentClassName="cursor-pointer min-sm:hidden"
+								parentClassName="mt-1 cursor-pointer min-sm:hidden"
 							></Avatar>
 							<Link
 								className="no-underline font-semibold text-foreground hover:underline hover:cursor-pointer"
@@ -197,7 +219,7 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 								</span>
 							)}
 
-							<span className="text-xs">{msg_date}</span>
+							<span className="text-[11px]">{msg_date}</span>
 						</div>
 					)}
 					{/* Message bubble */}
@@ -205,16 +227,16 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 						{!isFirstGroup && !msg.replyTo && (
 							<>
 								<div
-									className="max-sm:hidden w-9 h-auto font-mono text-center whitespace-nowrap text-nowrap flex items-center justify-center pl-0.5 text-[10px] text-muted -z-50 group-hover:z-0"
-									title={msg_date}
+									className="max-sm:hidden 
+								w-9 h-auto font-mono text-center whitespace-nowrap text-nowrap flex items-center justify-center pl-0.5 text-[10px] text-muted -z-50 group-hover:z-0"
 								>
-									{msg_date}
+									<p className="mt-0.5">{msg_date}</p>
 								</div>
 								<div className="min-sm:hidden"></div>
 							</>
 						)}
 
-						{msg.type === "text" &&
+						{(msg.type === "text" || msg.type === "video-call") &&
 							(msgToEdit !== msg.id ? (
 								<div className="w-full flex max-sm:justify-between relative">
 									<div
@@ -223,47 +245,60 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 											isFirstGroup && "max-sm:pl-3 max-sm:mt-1"
 										)}
 									>
-										{msg.content}{" "}
+										<Tooltip
+											id={`message-card-icons-tooltip`}
+											place="top"
+											className="small-tooltip"
+											border="var(--tooltip-border)"
+											offset={0}
+										/>
+										{msg.type === "text" ? (
+											msg.content
+										) : (
+											<span className="mr-2 ">
+												Link:{" "}
+												<span
+													data-tooltip-id="message-card-icons-tooltip"
+													data-tooltip-content={clipboard === videoChatLink ? "Copied!" : "Copy"}
+													className="select-none cursor-grab underline decoration-primary text-primary"
+													onClick={() => {
+														navigator.clipboard.writeText(videoChatLink);
+														setClipboard(videoChatLink);
+													}}
+												>
+													{videoChatLink}
+												</span>
+											</span>
+										)}{" "}
+										{msg.type === "video-call" && <JoinCallButton content={msg.content} />}
 										{msg.edited && (
 											<span className="text-[11px] tracking-wide text-muted relative top-[1px]">{"(edited)"}</span>
 										)}
 									</div>
 									<div
 										className={clsx(
-											"min-sm:hidden w-11 h-auto font-mono text-center whitespace-nowrap text-nowrap flex items-center justify-center text-[11px] text-muted -z-50 group-hover:z-0",
+											"min-sm:hidden relative -bottom-1 w-11 h-auto font-mono text-center whitespace-nowrap text-nowrap flex items-center justify-center text-[11px] text-muted -z-50 group-hover:z-0 								",
 											isFirstGroup && "justify-end"
 										)}
-										title={msg_date}
 									>
 										{isFirstGroup ? null : msg_date}{" "}
 										{((typeof msg.synced === "boolean" && msg.synced) ||
 											// msg is from server, then synced is undefine as there is no such column as synced on DB
 											typeof msg.synced === "undefined") &&
-											msg.sender_id === user.id &&
-											"✅"}
+											msg.sender_id === user.id && <>{isFirstGroup ? "sent ✅" : "✅"}</>}
 										{typeof msg.synced === "boolean" && !msg.synced && msg.sender_id === user.id && "❌"}
 										{msg.synced === "pending" && msg.sender_id === user.id && "⌛"}
 									</div>
 
 									{typeof msg.synced === "undefined" && msg.sender_id === user.id && (
 										<>
-											<p
-												className="
-												msg-synced-indicator
-											"
-											>
-												sent ✅
-											</p>
+											<p className={clsx("msg-synced-indicator", !isFirstGroup && "!bottom-0 ")}>sent ✅</p>
 										</>
 									)}
 
 									{msg.synced && msg.sender_id === user.id && (
 										<>
-											<div
-												className="
-												msg-synced-indicator
-											"
-											>
+											<div className={clsx("msg-synced-indicator", !isFirstGroup && "!bottom-0 ")}>
 												<p>
 													{typeof msg.synced === "boolean" && msg.synced && "sent ✅"}
 													{typeof msg.synced === "boolean" && !msg.synced && "failed ❌"}
@@ -348,20 +383,23 @@ const MessageCard = ({ msg, isFirstGroup }: MessageCardType) => {
 					</div>
 					<ReactionsRow msg={msg} isFirstGroup={isFirstGroup}></ReactionsRow>
 					{(msg.type == "image" || msg.type == "video") && (
-						<div className="absolute right-5 max-sm:right-4 bottom-1 flex gap-1 items-center">
+						<div
+							className={clsx(
+								"absolute right-5 max-sm:right-4 flex gap-1 items-center",
+								isFirstGroup ? "min-sm:top-2 top-4" : "botom-1"
+							)}
+						>
 							<div
 								className={clsx(
 									"min-sm:hidden w-11 h-auto font-mono text-center whitespace-nowrap text-nowrap flex items-center justify-center text-[11px] text-muted -z-50 group-hover:z-0",
 									isFirstGroup && "justify-end"
 								)}
-								title={msg_date}
 							>
-								{msg_date}{" "}
+								{!isFirstGroup && msg_date}{" "}
 								{((typeof msg.synced === "boolean" && msg.synced) ||
 									// msg is from server, then synced is undefine as there is no such column as synced on DB
 									typeof msg.synced === "undefined") &&
-									msg.sender_id === user.id &&
-									"✅"}
+									msg.sender_id === user.id && <>{isFirstGroup ? "sent ✅" : "✅"}</>}
 								{typeof msg.synced === "boolean" && !msg.synced && msg.sender_id === user.id && "❌"}
 								{msg.synced === "pending" && msg.sender_id === user.id && "⌛"}
 							</div>
@@ -541,4 +579,25 @@ const CornerSVG = () => {
 		</svg>
 	);
 };
+
+const JoinCallButton = ({ content }: { content: string }) => {
+	const [videoChatLink, videoChatLinkCreatedAt] = JSON.parse(content);
+	const expired = dayjs().diff(dayjs(videoChatLinkCreatedAt), "minute") >= 5;
+
+	return (
+		<Link className={clsx("no-underline", expired && "cursor-not-allowed")} href={expired ? undefined : videoChatLink}>
+			<button
+				className={clsx(
+					"text-xs px-2 py-0.5 rounded-full  text-white",
+					expired ? "bg-red-600 not-dark:bg-red-500" : "bg-green-600 not-dark:bg-green-500"
+				)}
+			>
+				{expired ? "Expired" : "Join Call"}
+			</button>
+		</Link>
+	);
+};
+
 import { FaCrown } from "react-icons/fa";
+import { Route } from "next";
+import { Tooltip } from "react-tooltip";

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { MdSpaceDashboard } from "react-icons/md";
 import { RiCompassDiscoverFill } from "react-icons/ri";
 import Link from "next/link";
@@ -17,6 +17,8 @@ import useEventListener from "@/app/lib/hooks/useEventListener";
 import { FaStar } from "react-icons/fa";
 import { HiDotsHorizontal } from "react-icons/hi";
 import { useServersProvider } from "@/app/lib/contexts/ServersContext";
+import { IoLogoPolymer } from "react-icons/io";
+import { FiSidebar } from "react-icons/fi";
 type ActionIcon = React.FC<{ user: User; className?: string }>;
 
 const NavigationSections = [
@@ -185,6 +187,8 @@ const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: R
 };
 
 const DashboardBtn = () => {
+	const [isHovered, setIsHovered] = useState(false);
+
 	const handleResize = () => {
 		const isLargeScreen = window.innerWidth > 767;
 		if (isLargeScreen) {
@@ -213,8 +217,15 @@ const DashboardBtn = () => {
 				data-tooltip-id={"navigation-bar-tooltips"}
 				data-tooltip-content={"Toggle Sidebar"}
 				className={nav_icon_styles}
+				onMouseEnter={() => setIsHovered(true)}
+				onMouseLeave={() => setIsHovered(false)}
 			>
-				<MdSpaceDashboard className={"not-dark:group-hover:text-background text-[24px] max-sm:text-[20px]"} />
+				{!isHovered && (
+					<IoLogoPolymer
+						className={"not-dark:group-hover:text-background text-[24px] max-sm:text-[20px]"}
+					></IoLogoPolymer>
+				)}
+				{isHovered && <FiSidebar className={"not-dark:group-hover:text-background text-[24px] max-sm:text-[20px]"} />}
 			</IconWithSVG>
 		</div>
 	);

@@ -198,6 +198,7 @@ export default function SnakeHome({ user }: { user: User }) {
 		setRunning(false);
 		setGameState("over");
 
+		//@ts-ignore
 		setMe((prev) => ({ ...prev, best_score: score }));
 
 		// send score + refresh leaderboard

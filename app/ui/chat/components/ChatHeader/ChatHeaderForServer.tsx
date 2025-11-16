@@ -5,10 +5,10 @@ import { User } from "@/app/lib/definitions";
 import { useEffect, useState } from "react";
 import { FaCheck } from "react-icons/fa6";
 import { Tooltip } from "react-tooltip";
-import { Avatar } from "../../general/Avatar";
-import { ServerEditForm } from "./Server_edit_form";
+import { Avatar } from "../../../general/Avatar";
+import { ServerEditForm } from "../Server_edit_form";
 import { GrHistory } from "react-icons/gr";
-import { IconWithSVG } from "../../general/Buttons";
+import { IconWithSVG } from "../../../general/Buttons";
 import { clearMsgHistory, leaveServer } from "@/app/lib/actions";
 import { usePathname, useRouter } from "next/navigation";
 

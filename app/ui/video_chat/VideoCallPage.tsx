@@ -250,7 +250,7 @@ export default function VideoCallPage({
 			</div>
 
 			{/* Local Mini Preview */}
-			<div className="absolute bottom-28 right-6 w-40 h-28 rounded-lg overflow-hidden shadow-xl border border-border/40 bg-black/40 backdrop-blur">
+			<div className="absolute bottom-24 right-6 w-40 h-28 rounded-lg overflow-hidden shadow-xl border border-border/40 bg-black/40 backdrop-blur">
 				<video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-cover" />{" "}
 				<div
 					className="text-[11px] opacity-50 text-white

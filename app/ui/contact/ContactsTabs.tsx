@@ -95,6 +95,7 @@ const ContactTabs = ({ user, initialFriendRequests }: ContactTabsProps) => {
 		const fetchContacts = async () => {
 			const contacts = await getContacts(user.id);
 			setContacts(prioritizeSystemUser(contacts));
+			console.log("CONTACTS: ", contacts)
 			setInitialLoad(false);
 		};
 

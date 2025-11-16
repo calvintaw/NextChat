@@ -180,6 +180,8 @@ export async function clearMsgHistory(
 }
 
 export async function getChats(currentUserId: string): Promise<ChatType[]> {
+	console.log("GETCHATS: CURRENT USER ID: ", currentUserId);
+
 	return await sql`
 			SELECT 
 				r.name as "room_name",
@@ -287,7 +289,7 @@ export async function insertMessageInDB(msg: LocalMessageType): Promise<{ succes
 					{
 						role: "system",
 						content:
-							"You are a helpful assistant. Answer the question in 1–2 short sentences. Do not include lengthy reasoning.",
+							"You are a helpful assistant with a cool duck avatar. Quack occasionally and act like a friendly duck. Answer questions in 1–2 short sentences. Avoid lengthy reasoning.",
 					},
 					{ role: "user", content: msg.content },
 				],
@@ -734,8 +736,7 @@ export async function registerUser(formData: FormData): Promise<FormState> {
 				returning id;
 			`;
 
-			const systemUserId = process.env.SYSTEM_USER_ID!;
-			const [user1_id, user2_id] = [id, systemUserId].sort((a, b) => a.localeCompare(b));
+			const [user1_id, user2_id] = [id, SYSTEM_USER.id].sort((a, b) => a.localeCompare(b));
 			const roomId = `system-room-${id}`;
 
 			await sql`
@@ -745,14 +746,15 @@ export async function registerUser(formData: FormData): Promise<FormState> {
 							${user2_id}::UUID,
 							${id}::UUID,
 							'accepted'
-						);
+						)
+						ON CONFLICT DO NOTHING;
 					`;
 			// Create system room
 			await sql`
 			  INSERT INTO rooms (id, owner_id, description, type)
 			  VALUES (
 			    ${roomId},
-			    ${systemUserId},
+			    ${SYSTEM_USER.id},
 			    'Chat between system and user.',
 			    'dm'
 			  )
@@ -763,7 +765,7 @@ export async function registerUser(formData: FormData): Promise<FormState> {
 			await sql`
 			  INSERT INTO room_members (room_id, user_id, role)
 			  VALUES
-			    (${roomId}, ${systemUserId}, 'admin'),
+			    (${roomId}, ${SYSTEM_USER.id}, 'admin'),
 			    (${roomId}, ${id}, 'user')
 			  ON CONFLICT (user_id, room_id) DO NOTHING;
 			`;
@@ -1097,7 +1099,6 @@ export async function acceptFriendshipRequest(
 				: [currentUser.id, targetUser.id].sort((a, b) => a.localeCompare(b));
 
 			await sql.begin(async (tx) => {
-
 				if (isSystem) {
 					await tx`
 					INSERT INTO friends (user1_id, user2_id, request_sender_id,  status)
@@ -1135,9 +1136,22 @@ export async function acceptFriendshipRequest(
 			};
 		} catch (error) {
 			console.error("error in accept friend req", error);
+			//@ts-ignore
+			if (error.code === "23505") {
+				// Already exists
+				return {
+					success: false,
+					message: isSystem
+						? "AI Chatbot Room is already in your DMs."
+						: `You are already friends with ${targetUser.username}.`,
+				};
+			}
+
 			return {
 				success: false,
-				message: `Failed to accept friend request from ${targetUser.username}. Please try again.`,
+				message: isSystem
+					? "Something went wrong. Please try again later."
+					: `Failed to accept friend request from ${targetUser.username}. Please try again.`,
 			};
 		}
 	});

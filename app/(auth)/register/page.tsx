@@ -23,7 +23,6 @@ const Page = () => {
 
 	const handleFormSubmit = async (formData: FormData) => {
 		const data = await registerUser(formData);
-
 		if (data.message.trim() !== "") {
 			setData(data);
 		} else {
@@ -38,7 +37,7 @@ const Page = () => {
 					onSubmit={async (e) => {
 						e.preventDefault();
 						if (!isAllowed) {
-							// console.log("not allowed register");
+							console.log("Not allowed to register");
 							return;
 						}
 
@@ -46,6 +45,8 @@ const Page = () => {
 						const formData = new FormData(e.currentTarget);
 						await handleFormSubmit(formData);
 						setIsPending(false);
+						setIsAllowed(false);
+						setData({ errors: {}, message: "" });
 					}}
 					className="form gap-1.5"
 				>

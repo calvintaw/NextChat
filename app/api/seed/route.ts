@@ -45,7 +45,7 @@ async function seedMessages() {
 	await sql`
 		CREATE TABLE IF NOT EXISTS messages (
 			id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-			type TEXT DEFAULT 'text' CHECK (type IN ('text', 'image', 'video', 'system', 'file', 'reaction', 'reply')),
+			type TEXT DEFAULT 'text' CHECK (type IN ('text', 'image', 'video', 'video-call', 'file', 'link')),
 			room_id TEXT NOT NULL,
 			sender_id UUID NOT NULL,
 			content TEXT NOT NULL,

@@ -122,7 +122,7 @@ export type User = {
 	password?: string;
 };
 
-export type MessageContentType = "text" | "video" | "image" | "system" | "file" | "reaction" | "reply";
+export type MessageContentType = "text" | "video" | "image" | "video-call" | "file" | "link";
 
 export type MessageType = {
 	id: string;

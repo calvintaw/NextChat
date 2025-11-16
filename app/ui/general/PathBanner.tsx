@@ -49,7 +49,7 @@ export const PathBanner = () => {
 		<div
 			id="path-banner"
 			className="hidden lg:block p-1 w-full  text-center 
-			text-base text-muted font-sans font-semibold
+			text-sm text-muted font-sans font-semibold
 			border-contrast
 			max-lg:border-l
 			max-lg:left-15.5

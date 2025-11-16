@@ -5,7 +5,6 @@ import { RiLockLine } from "react-icons/ri";
 import clsx from "clsx";
 import zxcvbn from "zxcvbn";
 import { useToast } from "@/app/lib/hooks/useToast";
-import { only } from "node:test";
 
 type InputFieldProps = {
 	label?: string | React.ReactNode;
@@ -59,11 +58,11 @@ export default function InputField({
 }
 
 const RULES = [
-	{ regex: /[a-z]/, label: "Includes a lowercase letter" },
-	{ regex: /[A-Z]/, label: "Includes an uppercase letter" },
-	{ regex: /\d/, label: "Includes a number" },
-	{ regex: /[\W_]/, label: "Includes a special character" },
-	{ regex: /.{9,}/, label: "Longer than 8 characters" },
+	{ label: "At least 1 uppercase letter", regex: /[A-Z]/ },
+	{ label: "At least 1 lowercase letter", regex: /[a-z]/ },
+	{ label: "At least 1 number", regex: /\d/ },
+	{ label: "At least 1 symbol", regex: /[!@#$%^&*()\[\]{}\-_.+=<>?/\\|~]/ },
+	{ label: "Minimum 8 characters", regex: /.{8,}/ },
 ];
 
 type PasswordFieldProps = InputFieldProps & {
@@ -88,6 +87,7 @@ export function PasswordField({
 	const [value, setValue] = useState("");
 	const [score, setScore] = useState(0);
 	const [zxcvbnScore, setZxcvbnScore] = useState<number | null>(null);
+	const toast = useToast()
 
 	useEffect(() => {
 		if (!actionStatus) return;
@@ -99,17 +99,23 @@ export function PasswordField({
 
 	useEffect(() => {
 		if (hideRules) return;
-		const newScore = RULES.reduce((acc, rule) => (rule.regex.test(value) ? acc + 1 : acc), 0);
+		const newScore = RULES.reduce((acc, rule) => {
+			const matched = rule.regex.test(value);
+			console.log(`[RULES CHECK] ${rule.label}:`, matched); // log each rule check
+			return matched ? acc + 1 : acc;
+		}, 0);
 		setScore(newScore);
+
 		if (value.trim() === "") {
+			console.log("ZXCVBN SCORE SET TO NULL");
 			setZxcvbnScore(null);
 			return;
 		}
+
 		const result = zxcvbn(value);
 		setZxcvbnScore(result.score); // 0 - 4
+		console.log("[ZXCVBN SCORE]", result.score, result); // log full result
 	}, [value, hideRules]);
-
-	const toast = useToast();
 
 	useEffect(() => {
 		if (hideRules) return;
@@ -122,13 +128,18 @@ export function PasswordField({
 
 		const handleSubmit = (e: Event) => {
 			const isValid = RULES.every((rule) => rule.regex.test(value));
+			console.log("[FORM SUBMIT] value:", value);
+			console.log("[FORM SUBMIT] RULES valid:", isValid);
+			console.log("[FORM SUBMIT] zxcvbnScore:", zxcvbnScore);
 
 			if (!isValid || (zxcvbnScore && zxcvbnScore < 3)) {
 				e.preventDefault(); // stop form submission
+				console.log("[FORM SUBMIT] Password rejected");
 				toast({ title: "Warning!", mode: "negative", subtitle: "Please fix your password first!" });
 			}
 
 			if (isValid && setIsAllowed && zxcvbnScore && zxcvbnScore >= 3) {
+				console.log("[FORM SUBMIT] Password allowed");
 				setIsAllowed(true);
 			}
 		};
@@ -136,7 +147,7 @@ export function PasswordField({
 		form.addEventListener("submit", handleSubmit);
 
 		return () => form.removeEventListener("submit", handleSubmit);
-	}, [value, name, hideRules]);
+	}, [value, name, hideRules, zxcvbnScore]);
 
 	return (
 		<fieldset className="mb-2">

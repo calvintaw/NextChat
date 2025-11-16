@@ -2,7 +2,7 @@
 import { AttachmentDropdown } from "./AttachmentDropdown";
 import TextareaAutosize from "react-textarea-autosize";
 import { ChatToolbar } from "./ChatToolBar";
-import { useEffect, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { clsx } from "clsx";
 import React from "react";
 // REMOVED: import { socket } from "@/app/lib/socket";
@@ -18,6 +18,8 @@ import { insertMessageInDB } from "@/app/lib/actions";
 import { useToast } from "@/app/lib/hooks/useToast";
 // NEW: Import Supabase client
 import { supabase } from "@/app/lib/supabase";
+import { readFile } from "fs/promises";
+import { getLinks } from "@/app/lib/utilities";
 
 type ChatInputBoxProps = {
 	activePersons: string[];
@@ -27,7 +29,13 @@ type ChatInputBoxProps = {
 	isBlocked: boolean;
 };
 
-const ChatInputBox = ({ activePersons, roomId, user, setMessages, isBlocked }: ChatInputBoxProps) => {
+export type ChatInputBoxRef = {
+	sendMessage: (input: string, type?: MessageContentType) => void;
+};
+
+const ChatInputBox = forwardRef<ChatInputBoxRef, ChatInputBoxProps>((props, ref) => {
+	const { activePersons, roomId, user, setMessages, isBlocked } = props;
+
 	const { input, setInput, replyToMsg, setReplyToMsg, textRef, isSystem, setActivePersons } = useChatProvider();
 	const [isFocused, setIsFocused] = useState(false);
 	const [style, setStyle] = useState("!max-h-10");
@@ -83,6 +91,8 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, isBlocked }: C
 		if (isSystem) setIsPending(true);
 		if (roomId.startsWith("system-room")) setActivePersons((prev: string[]) => [...prev, "system"]);
 
+		const { isLink, links } = type === "text" ? getLinks(input) : { isLink: false, links: [] };
+
 		const temp_msg = {
 			id: tempId,
 			room_id: roomId,
@@ -94,7 +104,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, isBlocked }: C
 			createdAt: new Date().toISOString(),
 			edited: false,
 			reactions: {},
-			type,
+			type: isLink ? "link" : type,
 		};
 
 		cancelTypingAnimation(750); // stop the typing animation 1.5s after use has stopped typing
@@ -132,6 +142,10 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, isBlocked }: C
 		if (isSystem) setIsPending(false);
 		setActivePersons((prev: string[]) => prev.filter((name) => name != "system"));
 	};
+
+	useImperativeHandle(ref, () => ({
+		sendMessage,
+	}));
 
 	const handleFileUpload = (url: string[], type: "image" | "video") => {
 		if (isBlocked || (isBlocked && isSystem) || isSystem) return;
@@ -172,7 +186,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, isBlocked }: C
 	return (
 		<div className={clsx("relative", (isBlocked || (isSystem && isBlocked)) && "cursor-not-allowed")}>
 			<div
-				className={clsx("p-4 ", (isBlocked || (isSystem && isBlocked)) && "pointer-events-none")}
+				className={clsx("p-4 pt-0", (isBlocked || (isSystem && isBlocked)) && "pointer-events-none")}
 				data-tooltip-id={"typing-indicator"}
 			>
 				<TypingIndicator displayName={activePersons} />
@@ -248,7 +262,7 @@ const ChatInputBox = ({ activePersons, roomId, user, setMessages, isBlocked }: C
 			</div>
 		</div>
 	);
-};
+});
 
 const ReplyToBox = () => {
 	const { replyToMsg, setReplyToMsg } = useChatProvider();

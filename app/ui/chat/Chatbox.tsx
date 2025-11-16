@@ -13,9 +13,9 @@ import Loading from "@/app/(root)/chat/[room_id]/loading";
 import useOnScreen from "@/app/lib/hooks/useOnScreen";
 import { useToast } from "@/app/lib/hooks/useToast";
 import ChatProvider from "./ChatBoxWrapper";
-import { DirectMessageCard } from "./components/ChatHeaderForDM";
-import { ServerCardHeader } from "./components/ChatHeaderForServer";
-import ChatInputBox from "./components/ChatInputBox";
+import { DirectMessageCard } from "./components/ChatHeader/ChatHeaderForDM";
+import { ServerCardHeader } from "./components/ChatHeader/ChatHeaderForServer";
+import ChatInputBox, { ChatInputBoxRef } from "./components/ChatInputBox";
 import ChatMessages from "./components/ChatMessages";
 import { supabase } from "@/app/lib/supabase"; // <-- Retained/Corrected Import
 
@@ -43,6 +43,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	const [isLoadingOldMsg, setIsLoadingOldMsg] = useState(false);
 	const messageIdsRef = useRef<Set<string>>(new Set());
 	const toast = useToast();
+	const chatInputBoxRef = useRef<ChatInputBoxRef>(null);
 
 	//checks duplicates (due to netwrok errors, etc)
 	const filterNewMessages = (msgs: MessageType[]) => {
@@ -156,6 +157,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		// Cleanup
 		return () => {
 			supabase.removeChannel(channel);
+			messageIdsRef.current.clear();
 		};
 	}, [roomId, isBlocked, isSystem, user.id]);
 
@@ -249,6 +251,10 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		};
 
 		initialize();
+
+		return () => {
+			messageIdsRef.current.clear();
+		};
 	}, [type, recipient, roomId, user.id]);
 
 	const deleteMessage = async (id: string, type: MessageContentType = "text", content: string) => {
@@ -335,9 +341,12 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		}
 	}, [initialLoading, messages]);
 
-	useEffect(() => {
-		console.log("MESSAGE USEFFECT: ", messages, " LENGTH: ", messages.length);
-	}, [messages]);
+	// Function to call child method
+	const handleSendMessageFromParent = (input: string, type: MessageContentType = "text") => {
+		if (chatInputBoxRef.current) {
+			chatInputBoxRef.current.sendMessage(input, type);
+		}
+	};
 
 	return (
 		<>
@@ -356,6 +365,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 						containerRef,
 						isBlocked,
 						isSystem,
+						handleSendMessageFromParent,
 						deleteMessage,
 						setActivePersons,
 					}}
@@ -399,6 +409,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 					</div>
 
 					<ChatInputBox
+						ref={chatInputBoxRef}
 						isBlocked={isBlocked}
 						setMessages={setMessages}
 						roomId={roomId}

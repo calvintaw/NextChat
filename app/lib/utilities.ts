@@ -99,6 +99,18 @@ export function isRoom(input: any): input is Room {
 	return input && typeof input === "object" && typeof input.owner_id === "string" && typeof input.type === "string";
 }
 
+const WEB_URL_REGEX =
+	/\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\((?:[^\s()<>]+|\([^\s()<>]+\))*\))+(?:\((?:[^\s()<>]+|\([^\s()<>]+\))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/gi;
+
+export function getLinks(text: string) {
+	const matches = text.match(WEB_URL_REGEX);
+	return {
+		isLink: !!matches?.length, // true if at least one link found
+		links: matches || [], // array of all matched links
+	};
+}
+
+
 export function isUser(input: any): input is User {
 	return (
 		input && typeof input === "object" && typeof input.username === "string" && typeof input.displayName === "string"

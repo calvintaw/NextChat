@@ -1,7 +1,7 @@
 import { Room } from "@/app/lib/definitions";
+import { Avatar } from "@/app/ui/general/Avatar";
 import clsx from "clsx";
 import Link from "next/link";
-import { Avatar } from "../../general/Avatar";
 import { useState, useRef, useEffect } from "react";
 import { MdExpandLess, MdExpandMore } from "react-icons/md";
 

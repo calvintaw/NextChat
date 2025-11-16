@@ -1,26 +1,26 @@
 "use client";
+
 import { joinServer } from "@/app/lib/actions";
-import Link from "next/link";
+import { useServersProvider } from "@/app/lib/contexts/ServersContext";
 import { Room, User } from "@/app/lib/definitions";
-import { Avatar } from "../general/Avatar";
+import { getBannerColor, formatNumber } from "@/app/lib/utilities";
 import clsx from "clsx";
-import { formatNumber, getBannerColor } from "@/app/lib/utilities";
+import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
+import { FaArrowRight } from "react-icons/fa";
+import { HiServerStack } from "react-icons/hi2";
 import { IoSearch } from "react-icons/io5";
+
+import { MdPeopleAlt } from "react-icons/md";
+import src from "react-textarea-autosize";
+import { Avatar } from "../general/Avatar";
 import { IconWithSVG } from "../general/Buttons";
 import InputField from "./InputField";
-import src from "react-textarea-autosize";
-type FilterType = "all" | "public" | "private";
-import { HiServerStack } from "react-icons/hi2";
-import { useServersProvider } from "@/app/lib/contexts/ServersContext";
-import { FaArrowRight } from "react-icons/fa";
-import { MdPeopleAlt } from "react-icons/md";
 
 export const ServerList = ({ user, servers }: { user: User; servers: Room[] }) => {
 	const [search, setSearch] = useState("");
 	const formRef = useRef<HTMLFormElement>(null);
 
-	const [filterType, setFilterType] = useState<FilterType>("all");
 	const filteredServers = servers.filter((s) => s.name.toLowerCase().includes(search.toLowerCase()));
 
 	return (

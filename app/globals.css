@@ -592,7 +592,7 @@ html {
 	}
 
 	.msg-synced-indicator {
-		@apply max-sm:hidden flex gap-0.5 items-center h-fit w-fit m-0 p-0 text-muted absolute !bottom-1 right-0 text-[11px] -z-50 group-hover:z-0;
+		@apply max-sm:hidden flex gap-0.5 items-center h-fit w-fit m-0 p-0 text-muted absolute bottom-1 right-0 text-[11px] -z-50 group-hover:z-0;
 	}
 }
 
@@ -1011,9 +1011,9 @@ html {
 	word-break: break-word !important;
 }
 
-.register-section {
+/* .register-section {
 	background: url("/auth_bg.svg");
-}
+} */
 
 .custom-scrollbar {
 	scrollbar-width: thin; /* options: auto, thin, none */
@@ -1048,5 +1048,24 @@ html {
 @keyframes showInstructions {
 	100% {
 		display: flex !important;
+	}
+}
+
+.chat-header-mini::before {
+	content: "";
+	position: absolute;
+	height: 100%;
+	background: red;
+	top: 0;
+	bottom: 0;
+	left: -4px;
+	right: -4px;
+	background-color: transparent;
+	pointer-events: none;
+}
+
+@media (min-width: 1024px) {
+	.chat-header-mini::before {
+		background-color: var(--color-background) !important;
 	}
 }

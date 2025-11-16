@@ -18,7 +18,7 @@ dayjs.extend(isYesterday);
 dayjs.extend(weekday);
 
 const ChatMessages = ({ messages }: { messages: MessageType[] }) => {
-	const { isBlocked, isSystem, isLoadingOldMsg} = useChatProvider();
+	const { isBlocked, isSystem, isLoadingOldMsg } = useChatProvider();
 
 	return (
 		<div
@@ -65,7 +65,7 @@ const ChatMessages = ({ messages }: { messages: MessageType[] }) => {
 							return (
 								<React.Fragment key={msg.id}>
 									{separateLogic && <MessageSeparator date={msg.createdAt} />}
-									<MessageCard msg={msg} isFirstGroup={isFirstGroup} />
+									<MessageCard msg={msg} isFirstGroup={isFirstGroup} arr_index={i} />
 								</React.Fragment>
 							);
 						})
@@ -105,11 +105,11 @@ const RefAnchor = () => {
 const MessageSeparator = ({ date }: { date: string }) => {
 	return (
 		<div className="flex items-center my-1">
-			<hr className="flex-1 border-t border-muted/15" />
-			<span className="px-3 text-[10px] text-muted uppercase tracking-wide whitespace-nowrap">
+			<hr className="flex-1 border-t border-muted/15 dark:border-muted/10" />
+			<span className="px-3 text-[10px] text-muted tracking-wide whitespace-nowrap capitalize">
 				{dayjs(date).format("MMMM D, YYYY")}
 			</span>
-			<hr className="flex-1 border-t border-muted/15" />
+			<hr className="flex-1 border-t border-muted/15 dark:border-muted/10" />
 		</div>
 	);
 };

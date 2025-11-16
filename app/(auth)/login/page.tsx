@@ -43,10 +43,10 @@ const images = [
 
 export default function LoginPage() {
 	return (
+				// max-[998px]:bg-[url('/auth_bg.svg')]
 		<>
 			<section
 				className="h-screen w-screen p-2 md:p-6 flex items-center justify-center gap-6 @container *:
-				max-[998px]:bg-[url('/auth_bg.svg')]
 			"
 			>
 				<ImageBox></ImageBox>
