@@ -167,7 +167,7 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 			// data-content={msg.content.slice(0, 200)}
 			id={msg.id}
 			className={clsx(
-				"flex flex-col w-full dark:hover:bg-background/75 hover:bg-accent/75 px-2 pr-0 pl-3 py-1  relative ",
+				"flex flex-col w-full dark:hover:bg-background/75 hover:bg-accent/75 px-2 pl-3 py-1  relative ",
 				msgToEdit === msg.id ? "dark:bg-background/75 bg-accent" : "group",
 				msg.type === "image" || msg.type === "video" ? (isFirstGroup ? "!pb-2" : "!pb-5") : "max-sm:pb-1",
 				isFirstGroup && arr_index > 0 && "mt-2",
@@ -178,7 +178,7 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 		>
 			{replyBlock}
 
-			<div className="flex items-start gap-2 max-w-[95%]">
+			<div className="flex items-start gap-2">
 				{(isFirstGroup || msg.replyTo) && (
 					<div className="min-w-11 flex justify-center max-sm:hidden">
 						<Avatar
@@ -244,7 +244,7 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 								<div className="w-full flex max-sm:justify-between relative">
 									<div
 										className={clsx(
-											"relative max-w-full break-words whitespace-pre-wrap text-sm",
+											"relative max-w-full break-words whitespace-pre-wrap text-sm border",
 											isFirstGroup && "max-sm:pl-3 max-sm:mt-1"
 										)}
 									>
@@ -305,13 +305,19 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 
 									{typeof msg.synced === "undefined" && msg.sender_id === user.id && (
 										<>
-											<p className={clsx("msg-synced-indicator", !isFirstGroup && "!bottom-0")}>sent ✅</p>
+											<p
+												className={clsx("msg-synced-indicator", !isFirstGroup ? "!bottom-0" : "border-red-500 border ")}
+											>
+												sent ✅
+											</p>
 										</>
 									)}
 
 									{msg.synced && msg.sender_id === user.id && (
 										<>
-											<div className={clsx("msg-synced-indicator", !isFirstGroup && "!bottom-0")}>
+											<div
+												className={clsx("msg-synced-indicator", !isFirstGroup ? "!bottom-0" : "border-red-500 border ")}
+											>
 												<p>
 													{typeof msg.synced === "boolean" && msg.synced && "sent ✅"}
 													{typeof msg.synced === "boolean" && !msg.synced && "failed ❌"}

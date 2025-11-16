@@ -49,7 +49,7 @@ const ChatMessages = ({ messages }: { messages: MessageType[] }) => {
 						<div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none pt-6">
 							<div className="bg-accent/30 text-text px-4 py-2 rounded-lg flex items-center gap-2 max-w-[90vw] mx-3">
 								<HiOutlineChatBubbleLeftRight size={20} />
-								<span>No messages yet — start the conversation!</span>
+								<span className="text-center">No messages yet — start the conversation!</span>
 							</div>
 						</div>
 					) : (

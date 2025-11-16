@@ -1,7 +1,7 @@
 "use client";
 
 import { joinServer } from "@/app/lib/actions";
-import { useServersProvider } from "@/app/lib/contexts/ServersContext";
+import { useGeneralProvider } from "@/app/lib/contexts/GeneralContextProvider";
 import { Room, User } from "@/app/lib/definitions";
 import { getBannerColor, formatNumber } from "@/app/lib/utilities";
 import clsx from "clsx";
@@ -116,7 +116,7 @@ const Card = ({ server, user }: { server: Room; user: User }) => {
 		}
 	}, [src]);
 
-	const { joinedServers } = useServersProvider();
+	const { joinedServers } = useGeneralProvider();
 	const hasJoined = joinedServers.some((room) => room.id === server.id);
 
 	return (

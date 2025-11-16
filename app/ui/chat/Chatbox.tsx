@@ -17,6 +17,7 @@ import { ServerCardHeader } from "./components/ChatHeader/ChatHeaderForServer";
 import ChatInputBox, { ChatInputBoxRef } from "./components/ChatInputBox";
 import ChatMessages from "./components/ChatMessages";
 import { supabase } from "@/app/lib/supabase";
+import VideoCallPage from "../video_chat/VideoCallPage";
 
 dayjs.extend(isToday);
 dayjs.extend(isYesterday);
@@ -188,7 +189,11 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 			}
 
 			try {
-				const recent = await getRecentMessages(roomId, { limit });
+				// const recent = await getRecentMessages(roomId, { limit });
+
+				// IMPORTANT
+				const recent: MessageType[] = [];
+
 				console.log("RECENT: ", recent);
 
 				if (recent.length > 0) {
@@ -375,6 +380,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 					/>
 				</ChatProvider>
 			</div>
+			<VideoCallPage roomId={roomId} currentUser={user}></VideoCallPage>
 			<Tooltip
 				className="my-tooltip"
 				id="chatbox-reactions-row-tooltip"

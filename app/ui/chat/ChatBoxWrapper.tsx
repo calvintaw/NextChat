@@ -1,4 +1,5 @@
 import { MessageType } from "@/app/lib/definitions";
+import useToggle from "@/app/lib/hooks/useToggle";
 import React, { createContext, useState, useContext, ReactNode, useRef } from "react";
 
 interface ChatContextType {
@@ -12,9 +13,7 @@ interface ChatContextType {
 	[key: string]: any;
 }
 
-
 interface ChatProviderProps {
-
 	children: ReactNode;
 	config?: Partial<ChatContextType>;
 }
@@ -25,10 +24,10 @@ const ChatProvider = ({ children, config = {} }: ChatProviderProps) => {
 	const [input, setInput] = useState("");
 	const [replyToMsg, setReplyToMsg] = useState<MessageType | null>(null);
 	const [msgToEdit, setMsgToEdit] = useState<string | null>(null);
-		const textRef = useRef<HTMLTextAreaElement |null>(null)
-	
 
-  const contextValue = {
+	const textRef = useRef<HTMLTextAreaElement | null>(null);
+
+	const contextValue = {
 		input,
 		setInput,
 		msgToEdit,

@@ -16,14 +16,14 @@ import { Route } from "next";
 import useEventListener from "@/app/lib/hooks/useEventListener";
 import { FaStar } from "react-icons/fa";
 import { HiDotsHorizontal } from "react-icons/hi";
-import { useServersProvider } from "@/app/lib/contexts/ServersContext";
+import { useGeneralProvider } from "@/app/lib/contexts/GeneralContextProvider";
 import { IoLogoPolymer } from "react-icons/io";
 import { FiSidebar } from "react-icons/fi";
 import { NavigationSections } from "@/app/lib/utilities";
 type ActionIcon = React.FC<{ user: User; className?: string }>;
 
 const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: Room[] }) => {
-	const { setJoinedServers } = useServersProvider();
+	const { setJoinedServers } = useGeneralProvider();
 
 	useEffect(() => {
 		setJoinedServers(joined_servers);

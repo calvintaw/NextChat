@@ -9,9 +9,11 @@ import { IoCall } from "react-icons/io5";
 import { useChatProvider } from "../../../ChatBoxWrapper";
 import { User } from "@/app/lib/definitions";
 import { Route } from "next";
+import { useGeneralProvider } from "@/app/lib/contexts/GeneralContextProvider";
 
 export const CallVideoChatDialog = ({ user }: { user: User }) => {
 	const { handleSendMessageFromParent } = useChatProvider();
+	const { toggleVideoPage } = useGeneralProvider();
 	// Define default allowedParams
 	const router = useRouter();
 
@@ -28,6 +30,8 @@ export const CallVideoChatDialog = ({ user }: { user: User }) => {
 		// router.push(videoChatLink as Route);
 		navigator.clipboard.writeText(videoChatLink_msg_form);
 		handleSendMessageFromParent(videoChatLink_msg_form, "video-call");
+
+		toggleVideoPage(true);
 	};
 
 	// Navigate to video call page with audio call
@@ -43,6 +47,8 @@ export const CallVideoChatDialog = ({ user }: { user: User }) => {
 		// router.push(videoChatLink as Route);
 		navigator.clipboard.writeText(videoChatLink_msg_form);
 		handleSendMessageFromParent(videoChatLink_msg_form, "video-call");
+
+		toggleVideoPage(true);
 	};
 
 	return (

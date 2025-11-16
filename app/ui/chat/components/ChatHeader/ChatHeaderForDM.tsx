@@ -102,6 +102,55 @@ export function DirectMessageCard({
 					{!roomId.startsWith("system-room") && (
 						<>
 							<CallVideoChatDialog user={user} />
+
+							<IconWithSVG
+								onClick={() => {
+									if (isBlocked) {
+										unblockFriendship(currentUserId, user.id);
+									} else {
+										blockFriendship(currentUserId, user.id);
+									}
+								}}
+								className={clsx("!size-7.5", isBlocked ? "btn-inverted" : "btn-secondary")}
+								data-tooltip-id="header-icons-tooltip"
+								data-tooltip-content={isBlocked ? "Unblock" : "Block"}
+							>
+								<MdBlock className="text-lg" />
+							</IconWithSVG>
+
+							<IconWithSVG
+								onClick={async () => {
+									const result = await removeFriendshipRequest({ username: user.username, id: user.id }, "friend");
+									if (result.success) {
+										toast({ title: result.message, mode: "positive", subtitle: "" });
+									}
+								}}
+								className="!size-7.5"
+								data-tooltip-id="header-icons-tooltip"
+								data-tooltip-content="Unfriend"
+							>
+								<MdPersonRemove className="text-lg" />
+							</IconWithSVG>
+						</>
+					)}
+
+					<IconWithSVG
+						onClick={() => {
+							const isConfirmed = window.confirm("Are you sure you want to delete all messages?");
+							if (isConfirmed) clearMsgHistory(roomId, pathname);
+						}}
+						className="!size-7.5"
+						data-tooltip-id="header-icons-tooltip"
+						data-tooltip-content={"Clear history"}
+					>
+						<RiDeleteBin5Line className="text-lg" />
+					</IconWithSVG>
+				</div>
+
+				{/* <div className="flex gap-2 items-center">
+					{!roomId.startsWith("system-room") && (
+						<>
+							<CallVideoChatDialog user={user} />
 							<button
 								className={clsx(
 									"btn btn-small !w-fit p-1 px-1.5 btn-with-icon items-center flex gap-1.5",
@@ -144,7 +193,7 @@ export function DirectMessageCard({
 					>
 						<RiDeleteBin5Line className="text-lg" />
 					</IconWithSVG>
-				</div>
+				</div> */}
 			</div>
 			<div className="bg-contrast text-white px-4 pb-2 rounded-lg max-w-full">
 				<div className="flex items-center justify-between mb-4">

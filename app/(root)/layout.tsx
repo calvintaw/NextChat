@@ -13,7 +13,7 @@ import Toaster from "../ui/Toast";
 import PathProvider from "../lib/contexts/PathContext";
 import ProgressBar from "@/app/ui/ProgressBar";
 import SupabasePresenceWrapper from "../ui/SupabasePresenceWrapper";
-import ServersProvider from "../lib/contexts/ServersContext";
+import GeneralProvider from "../lib/contexts/GeneralContextProvider";
 
 const roboto = localFont({
 	src: [
@@ -65,16 +65,15 @@ export default async function RootLayout({
 				<PathProvider>
 					<PathBanner />
 					<main className="flex flex-1 min-h-0 min-w-0 w-full h-full overflow-hidden">
-						<ServersProvider>
-
-						<FriendsProvider>
-							<SupabasePresenceWrapper />
-							<Sidebar />
-							<div className="flex flex-1 min-h-0 min-w-0 w-full h-full border-t border-contrast overflow-hidden">
-								<Suspense fallback={<Loading className="!w-full !h-full" />}>{children}</Suspense>
-							</div>
-						</FriendsProvider>
-						</ServersProvider>
+						<GeneralProvider>
+							<FriendsProvider>
+								<SupabasePresenceWrapper />
+								<Sidebar />
+								<div className="flex flex-1 min-h-0 min-w-0 w-full h-full border-t border-contrast overflow-hidden">
+									<Suspense fallback={<Loading className="!w-full !h-full" />}>{children}</Suspense>
+								</div>
+							</FriendsProvider>
+						</GeneralProvider>
 					</main>
 					<Toaster />
 				</PathProvider>

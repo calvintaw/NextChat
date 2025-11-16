@@ -2,14 +2,16 @@
 
 import { useEffect, useRef, useState } from "react";
 import { socket } from "@/app/lib/socket";
-import { User } from "next-auth";
-import { HiOutlineMicrophone } from "react-icons/hi";
+import { User } from "@/app/lib/definitions";
+import { HiOutlineMicrophone, HiOutlineX } from "react-icons/hi";
 import { MdCallEnd, MdScreenShare } from "react-icons/md";
 import { PiCamera, PiCameraSlash } from "react-icons/pi";
 import { TbMicrophoneOff } from "react-icons/tb";
 import { IconWithSVG } from "../general/Buttons";
 import { FaPhone } from "react-icons/fa6";
 import { Tooltip } from "react-tooltip";
+import { useChatProvider } from "../chat/ChatBoxWrapper";
+import { useGeneralProvider } from "@/app/lib/contexts/GeneralContextProvider";
 
 type VideoCallSearchParams = {
 	micOn: boolean;
@@ -18,12 +20,15 @@ type VideoCallSearchParams = {
 
 export default function VideoCallPage({
 	currentUser,
-	searchParams,
+	searchParams = {
+		micOn: true,
+		camOn: true,
+	},
 	roomId,
 }: {
 	roomId: string;
 	currentUser: User;
-	searchParams: VideoCallSearchParams;
+	searchParams?: VideoCallSearchParams;
 }) {
 	// ============================
 
@@ -44,6 +49,7 @@ export default function VideoCallPage({
 	const [micOn, setMicOn] = useState(searchParams.micOn);
 	const [camOn, setCamOn] = useState(searchParams.camOn);
 	const [inCall, setInCall] = useState(false);
+	const { toggleVideoPage, isVideoPageOpen } = useGeneralProvider();
 
 	useEffect(() => {
 		socket.emit("join-video", roomId);
@@ -223,11 +229,12 @@ export default function VideoCallPage({
 		};
 	};
 
+	if (!isVideoPageOpen) return null;
 	// ============================================================
 	//                     RENDER (UI NOT CHANGED)
 	// ============================================================
 	return (
-		<div className="relative flex-1 h-[100vh] min-lg:h-[calc(100vh-32px)] flex flex-col bg-background text-text select-none">
+		<div className="relative flex-1 h-[100vh] min-lg:h-[calc(100vh-32px)] !min-w-[365px] flex flex-col bg-background text-text select-none">
 			<Tooltip
 				id={`videochat-toolbar-icons-tooltip`}
 				place="top"
@@ -238,12 +245,19 @@ export default function VideoCallPage({
 
 			{/* Remote Video */}
 			<div className="flex-1 p-4 max-[420px]:p-2">
-				<div className="w-full h-full rounded-xl bg-foreground/30 dark:bg-foreground/20 border border-contrast flex items-center justify-center overflow-hidden relative">
+				<div className="w-full h-full rounded-xl bg-foreground/30 dark:bg-foreground/20 border border-contrast overflow-hidden relative group">
+					<IconWithSVG
+						onClick={() => toggleVideoPage(false)}
+						className="!absolute !top-2 !right-2 rounded-md !size-8 opacity-0 group-hover:opacity-50 hover:bg-background"
+					>
+						<HiOutlineX className="text-lg"></HiOutlineX>
+					</IconWithSVG>
+
 					<div className="text-text opacity-50 text-sm absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
 						Remote Video
 					</div>
 					<video ref={remoteVideoRef} autoPlay playsInline className="w-full h-full object-cover" />
-					<div className="absolute bottom-3 left-3 px-2 py-1 text-xs rounded-md bg-black/40 text-white backdrop-blur-sm">
+					<div className="absolute bottom-2 left-2 px-2 py-1 text-xs rounded-md bg-black/40 text-white backdrop-blur-sm">
 						John Doe
 					</div>
 				</div>
@@ -315,5 +329,3 @@ export default function VideoCallPage({
 		</div>
 	);
 }
-
-
