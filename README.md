@@ -1,10 +1,9 @@
-# Discord Clone
+# NextChat
 
 
-A full-stack Discord-inspired chat app built with [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com/), [React](https://react.dev/), [postgres.js](https://github.com/porsager/postgres), and [Supabase](https://supabase.com/).
+A full-stack Discord & Telegram inspired chat app built with [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com/), [React](https://react.dev/), [postgres.js](https://github.com/porsager/postgres), and [Supabase](https://supabase.com/).
 
-⚠️ **Note:** Some features may not work in realtime and may require refreshing the page.  
-(The backend socket server is on a free tier.)
+⚠️ **Note:** The README is very outdated. A lot of the UI and functionalities have changed. New features have come out. Currently working on updating the doc.
 
 ## Table of Contents
 
