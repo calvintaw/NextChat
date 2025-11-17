@@ -20,7 +20,7 @@ import {
 } from "./definitions";
 import bcrypt from "bcryptjs";
 import z from "zod";
-import { getDMRoom } from "./utilities";
+import { extractFilePath, getDMRoom } from "./utilities";
 import { newsData } from "./news";
 import { cookies } from "next/headers";
 import { supabase } from "./supabase";
@@ -147,18 +147,6 @@ export async function deleteMsg(
 		console.error("Error deleting message:", error);
 		return { success: false, message: "Failed to delete the message. Please try again!" };
 	}
-}
-
-function extractFilePath(urls: string[]) {
-	return urls.map((url) => {
-		const match = url.match(/uploads\/(.+)\/([^\/?#]+)$/);
-		if (match) {
-			const folder = match[1]; // everything between 'uploads/' and the file
-			const fileName = match[2]; // the actual file name
-			return `${folder}/${fileName}`;
-		}
-		return "";
-	});
 }
 
 export async function clearMsgHistory(
@@ -292,7 +280,6 @@ const client = new OpenAI({
 
 export async function insertMessageInDB(msg: LocalMessageType): Promise<{ success: boolean; message?: string }> {
 	try {
-		//TODO: make socket better
 		await sql.begin(async (sql) => {
 			await sql`
 					INSERT INTO messages (id, room_id, sender_id, content, type, replyTo)
@@ -339,6 +326,28 @@ export async function insertMessageInDB(msg: LocalMessageType): Promise<{ succes
 		return {
 			success: false,
 			message: "Failed to send message. Please try again.",
+		};
+	}
+}
+
+export async function updateImageMSG(
+	msg: Pick<MessageType, "content" | "id">
+): Promise<{ success: boolean; message?: string }> {
+	try {
+		await sql.begin(async (sql) => {
+			await sql`
+				UPDATE messages
+				SET content = ${msg.content}
+				WHERE id = ${msg.id}
+			`;
+		});
+
+		return { success: true };
+	} catch (error) {
+		console.error("updateImageMSG ERROR:", error);
+		return {
+			success: false,
+			message: "Failed to update message. Please try again.",
 		};
 	}
 }

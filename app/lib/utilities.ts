@@ -187,6 +187,18 @@ export function includeLinks(text: string) {
 	return !!matches1?.length || !!matches2?.length;
 }
 
+export function extractFilePath(urls: string[]) {
+	return urls.map((url) => {
+		const match = url.match(/uploads\/(.+)\/([^\/?#]+)$/);
+		if (match) {
+			const folder = match[1]; // everything between 'uploads/' and the file
+			const fileName = match[2]; // the actual file name
+			return `${folder}/${fileName}`;
+		}
+		return "";
+	});
+}
+
 const testPassage = `omg bro look at this 😂 https://youtu.be/dQw4w9WgXcQ??t=43 and ALSO check this weird one http://192.168.1.15:3000/test?debug=true lol. btw I found another link→www.example.com/page#section-2 but it only works if u add https so see if your code handles that. oh and watch out for this: https://google.com,...yeah the comma shouldn't be part of the link. same for this one: https://openai.com/) where the ) is just punctuation. 
 
 last one: "http://lol.test" inside quotes… make sure your regex doesn’t break it 😭

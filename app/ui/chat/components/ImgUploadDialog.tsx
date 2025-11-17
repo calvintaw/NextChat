@@ -37,7 +37,10 @@ const ImageUploadDialog = ({
 }: ImageUploadDialogProps) => {
 	const getFileType = (url: string): "image" | "video" => {
 		if (url.startsWith("data:image/")) return "image";
-		return "video";
+		const extension = url.split("/").pop()?.split(".").pop()?.toLowerCase() ?? "";
+
+		const imageExtensions = ["png", "jpg", "jpeg", "gif", "webp", "bmp", "svg"];
+		return imageExtensions.includes(extension) ? "image" : "video";
 	};
 
 	return (

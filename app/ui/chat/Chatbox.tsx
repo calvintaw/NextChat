@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { MessageContentType, MessageType, Room, sql, User } from "../../lib/definitions";
-import { checkIfBlocked, deleteMsg, getRecentMessages, getUserProfileForMsg } from "../../lib/actions";
+import { checkIfBlocked, deleteMsg, getRecentMessages, getUserProfileForMsg, updateImageMSG } from "../../lib/actions";
 import dayjs from "dayjs";
 import isToday from "dayjs/plugin/isToday";
 import isYesterday from "dayjs/plugin/isYesterday";
@@ -49,7 +49,6 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	const offsetRef = useRef(0);
 
 	const { isVideoPageOpen, toggleVideoPage } = useGeneralProvider();
-
 
 	const sortMessagesAsc = (msgs: MessageType[]) =>
 		[...msgs].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
@@ -312,6 +311,21 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		}
 	};
 
+	const handleUpdateImageFromParent = async (msg: Pick<MessageType, "content" | "id">) => {
+		
+
+		const result = await updateImageMSG({ content: msg.content, id: msg.id });
+
+		if (!result.success) {
+			toast({
+				title: "Error!",
+				mode: "negative",
+				subtitle: result.message || "Failed to update the message. Please try again.",
+			});
+		} else {
+			setMessages((prev) => prev.map((item) => (item.id !== msg.id ? item : { ...item, content: msg.content })));
+		}
+	};
 
 	return (
 		<>
@@ -335,6 +349,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 						isBlocked,
 						isSystem,
 						handleSendMessageFromParent,
+						handleUpdateImageFromParent,
 						deleteMessage,
 						setActivePersons,
 					}}
