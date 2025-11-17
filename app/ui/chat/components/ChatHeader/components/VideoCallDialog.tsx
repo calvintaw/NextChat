@@ -73,7 +73,7 @@ export const CallVideoChatDialog = ({ user }: { user: User }) => {
 						</IconWithSVG>
 					</Dialog.Close>
 					<Dialog.Title className="sr-only">DialogBox From calling {user.displayName}</Dialog.Title>
-					<div className="mt-10 p-1 bg-linear-to-r from-pink-500 via-red-500 to-orange-500 rounded-full">
+					<div className="mt-10 p-1  rounded-full relative overflow-clip">
 						<Avatar
 							disableTooltip
 							id={user.id}
@@ -83,6 +83,12 @@ export const CallVideoChatDialog = ({ user }: { user: User }) => {
 							src={user.image ?? ""}
 							statusIndicator={false}
 						></Avatar>
+
+						{/* <div className="absolute inset-0 -z-[1] bg-[conic-gradient(from_90deg,_#ff8a8a,_#ff4d6d,_#c9184a,_#ff8a8a)] blur-sm opacity-90 animate-ping"></div> */}
+
+						<div className="absolute inset-0 -z-[1] animate-pulse bg-[conic-gradient(at_center,_#ff00e5,_#ff0055,_#ff4600,_#ffbb00,_#ff00e5)]"></div>
+
+						{/* <div className="bg-linear-to-r from-pink-500 via-red-500 to-orange-500 absolute top-0 left-0 bottom-0 right-0 animate-spin -z-[1]"></div> */}
 					</div>{" "}
 					<p className="text-3xl mt-8">{user.displayName}</p>
 					<p className="text-base font-normal text-muted mt-1">Click on the camera icon if you want to start a call.</p>
