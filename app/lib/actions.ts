@@ -117,7 +117,10 @@ export async function deleteMsg(
 			let files: string[] = [];
 			try {
 				files = JSON.parse(content);
+				console.log("Json Parsed FILES: ", files);
 				if (!Array.isArray(files)) files = []; // guard in case it's not an array
+
+				files = extractFilePath(files);
 			} catch (err) {
 				console.error("Invalid message format", err);
 				return { success: false, message: "Invalid message format" };
@@ -129,6 +132,8 @@ export async function deleteMsg(
 				console.error("Error deleting file:", error.message);
 				return { success: false, message: "Failed to delete the message. Please try again!" };
 			}
+
+			console.log("Pic DELETE successfully, deleted: ", files);
 		}
 
 		// await supabase.channel(`room:${roomId}`).send({
@@ -142,6 +147,18 @@ export async function deleteMsg(
 		console.error("Error deleting message:", error);
 		return { success: false, message: "Failed to delete the message. Please try again!" };
 	}
+}
+
+function extractFilePath(urls: string[]) {
+	return urls.map((url) => {
+		const match = url.match(/uploads\/(.+)\/([^\/?#]+)$/);
+		if (match) {
+			const folder = match[1]; // everything between 'uploads/' and the file
+			const fileName = match[2]; // the actual file name
+			return `${folder}/${fileName}`;
+		}
+		return "";
+	});
 }
 
 export async function clearMsgHistory(
@@ -267,6 +284,7 @@ import { OpenAI } from "openai";
 import { emoji } from "zod/v4";
 import { id } from "zod/v4/locales";
 import { revalidatePath } from "next/cache";
+import path from "path";
 const client = new OpenAI({
 	baseURL: "https://router.huggingface.co/v1",
 	apiKey: process.env.HF_API_KEY,
@@ -575,11 +593,24 @@ export async function getJoinedServers(userId: string) {
 	`) as Room[];
 }
 
-export async function deleteServer(server_id: string) {
+export async function deleteServer(server_id: string, roomId: string) {
 	return withCurrentUser(async (user: User) => {
 		await sql`
         DELETE FROM rooms WHERE owner_id = ${user.id} AND id = ${server_id}
       `;
+
+		console.log("room delete => clearning process [all msg deleted] ...");
+		const { data: files, error: listError } = await supabase.storage.from("uploads").list(roomId, { limit: 1000 }); // list all files in the folder
+
+		if (listError) throw listError;
+
+		if (files && files.length > 0) {
+			const filePaths = files.map((f) => `${roomId}/${f.name}`);
+			const { error: deleteError } = await supabase.storage.from("uploads").remove(filePaths);
+			if (deleteError) throw deleteError;
+		}
+
+		console.log("room delete => clearning process [all pic deleted] ...");
 	});
 }
 
@@ -909,6 +940,18 @@ export async function deleteDM(targetUser: MinimalUserType): Promise<{ success: 
 				WHERE room_id = ${room_id}
 			`;
 			});
+
+			const { data: files, error: listError } = await supabase.storage.from("uploads").list(room_id, { limit: 1000 }); // list all files in the folder
+
+			if (listError) throw listError;
+
+			if (files && files.length > 0) {
+				const filePaths = files.map((f) => `${room_id}/${f.name}`);
+				const { error: deleteError } = await supabase.storage.from("uploads").remove(filePaths);
+				if (deleteError) throw deleteError;
+			}
+
+			console.log("DM delete => clearning process [all pic deleted] ...");
 
 			console.log(`Success! Deleted DM with ${targetUser.username}.`);
 			return { success: true, message: `Deleted DM with ${targetUser.username}.` };

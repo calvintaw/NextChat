@@ -207,6 +207,8 @@ const ChatInputBox = forwardRef<ChatInputBoxRef, ChatInputBoxProps>((props, ref)
 						roomId={roomId}
 						handleFileUpload={handleFileUpload}
 					/>
+
+					
 					{!isFocused && (
 						<div
 							className="max-[500px]:hidden absolute border top-1/2 -translate-y-1/2 right-22

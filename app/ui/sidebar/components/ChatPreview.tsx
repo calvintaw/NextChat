@@ -7,7 +7,7 @@ import weekday from "dayjs/plugin/weekday";
 import { ChatType, User } from "../../../lib/definitions";
 import Link from "next/link";
 import { Avatar } from "../../general/Avatar";
-import { HiDotsVertical } from "react-icons/hi";
+import { HiDotsVertical, HiOutlineX } from "react-icons/hi";
 import { Tooltip } from "react-tooltip";
 import React, { useActionState, useEffect, useState } from "react";
 import { socket } from "@/app/lib/socket";
@@ -341,7 +341,6 @@ export const ChatPanelHeader = ({ user }: { user: User }) => {
 						<Link
 							key={id}
 							href={href as Route}
-							
 							className={clsx(
 								"btn btn-secondary w-full text-base py-2 px-4 pl-3 text-left btn-with-icon no-underline decoration-0 rounded-md transition-colors duration-200",
 								pathname === href
@@ -387,7 +386,6 @@ export const CreateDMButton = ({ currentUser }: { currentUser: User }) => {
 	const [user, setUser] = useState<User | null>(null);
 
 	const handleSubmit = async (username: string) => {
-
 		if (username === currentUser.username) {
 			setError("Invalid DM");
 			return;
@@ -431,6 +429,11 @@ export const CreateDMButton = ({ currentUser }: { currentUser: User }) => {
 			<Dialog.Portal>
 				<Dialog.Overlay className="fixed inset-0 bg-black/70 z-[11000]" />
 				<Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface rounded-xl p-6 pt-4 w-full max-w-md shadow-lg border border-border z-[12000]">
+					<Dialog.Close asChild className="!absolute !top-2 !right-2">
+						<IconWithSVG className="!rounded-md icon-small bg-accent/40 hover:bg-accent/60">
+							<HiOutlineX />
+						</IconWithSVG>
+					</Dialog.Close>
 					<Dialog.Title className="text-xl font-semibold text-text mb-4">Create a new DM</Dialog.Title>
 
 					<div className="w-full md:ml-auto mb-4">

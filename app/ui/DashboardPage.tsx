@@ -3,7 +3,7 @@
 import { signOut, useSession } from "next-auth/react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Avatar } from "@/app/ui/general/Avatar";
-import { Button } from "@/app/ui/general/Buttons";
+import { Button, IconWithSVG } from "@/app/ui/general/Buttons";
 import { User } from "../lib/definitions";
 import React, { useRef, useState } from "react";
 import { FaUser, FaIdBadge, FaEnvelope } from "react-icons/fa6";
@@ -23,6 +23,7 @@ import rehypeReact from "rehype-react";
 import { useToast } from "../lib/hooks/useToast";
 import { normalizeMarkdown } from "../lib/utilities";
 import { useRouterWithProgress } from "../lib/hooks/useRouterWithProgressBar";
+import { HiOutlineX } from "react-icons/hi";
 
 type EditProfileState = {
 	errors: Record<string, string[]>;
@@ -186,6 +187,12 @@ Stay tuned for updates!`
 											className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface rounded-xl p-6 w-full max-w-md shadow-lg border border-border
 z-[12000]							"
 										>
+											<Dialog.Close asChild className="!absolute !top-2 !right-2">
+												<IconWithSVG className="!rounded-md icon-small bg-accent/40 hover:bg-accent/60">
+													<HiOutlineX />
+												</IconWithSVG>
+											</Dialog.Close>
+
 											<Dialog.Title className="text-xl font-semibold text-text mb-4">Edit Profile</Dialog.Title>
 
 											<form className="flex flex-col gap-2" onSubmit={handleSubmit}>

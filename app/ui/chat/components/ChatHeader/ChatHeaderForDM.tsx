@@ -39,7 +39,7 @@ export function DirectMessageCard({
 	const [commonServers, setCommonServers] = useState<Room[]>([]);
 	const [isPending, setIsPending] = useState(true);
 	const { setPath } = usePathProvider();
-	const { isSystem } = useChatProvider();
+	const { isSystem, setMessages } = useChatProvider();
 	const toast = useToast();
 	const pathname = usePathname();
 
@@ -140,6 +140,7 @@ export function DirectMessageCard({
 						onClick={() => {
 							const isConfirmed = window.confirm("Are you sure you want to delete all messages?");
 							if (isConfirmed) {
+								setMessages([]);
 								clearMsgHistory(roomId, pathname);
 								router.refresh();
 							}

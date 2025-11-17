@@ -117,7 +117,7 @@ export default function CreateServerFormDialog({ className, user }: { className:
 
 		try {
 			const options = {
-				maxSizeMB: 0.25,
+				maxSizeMB: 0.2,
 				maxWidthOrHeight: 128,
 				useWebWorker: true,
 				fileType: "image/jpg",

@@ -20,6 +20,8 @@ import { BiLoaderAlt } from "react-icons/bi";
 import { useRouterWithProgress } from "@/app/lib/hooks/useRouterWithProgressBar";
 import { IoMdSettings } from "react-icons/io";
 import { Tooltip } from "react-tooltip";
+import { useChatProvider } from "../ChatBoxWrapper";
+import { HiOutlineX } from "react-icons/hi";
 
 type EditServerState = {
 	errors: Record<string, string[]>;
@@ -46,6 +48,8 @@ export function ServerEditForm({
 	const [publicBannerImgUrl] = useState<string>(server.banner ?? "");
 	const dialogRef = useRef<HTMLElement | null>(null);
 	const [isOpen, setIsOpen] = useState(false);
+
+	const { roomId } = useChatProvider();
 
 	const [{ errors, message, success, ...data }, setData] = useState<EditServerState>({
 		errors: {},
@@ -151,11 +155,10 @@ export function ServerEditForm({
 
 		try {
 			const bannerOptions = {
-				maxSizeMB: 0.15,
+				maxSizeMB: 0.45,
 				maxWidthOrHeight: 800,
 				useWebWorker: true,
 				fileType: "image/jpg",
-				initialQuality: 0.75,
 			};
 
 			const compressedFile = await imageCompression(selectedBannerFile, bannerOptions);
@@ -198,22 +201,6 @@ export function ServerEditForm({
 
 	return (
 		<div className="flex items-center gap-1 text-gray-400 text-sm">
-			{/* <IconWithSVG
-				onClick={() => {
-					const isConfirmed = window.confirm("Are you sure you want to delete this server?");
-					if (isConfirmed) deleteServer(server.id);
-				}}
-				className="!size-6.5"
-			></IconWithSVG> */}
-			{/* <Tooltip
-				id={`header-icons-tooltip-settings`}
-				place="left-start"
-				className="small-tooltip"
-				border="var(--tooltip-border)"
-				offset={0}
-				
-			/> */}
-
 			<Dialog.Root open={isOpen} onOpenChange={openCloseDialog}>
 				<Dialog.Trigger asChild>
 					<IconWithSVG
@@ -236,6 +223,12 @@ export function ServerEditForm({
 						className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface rounded-xl p-6 py-4 w-full max-w-md shadow-lg border border-border
 z-[12000]					"
 					>
+						<Dialog.Close asChild className="!absolute !top-2 !right-2">
+							<IconWithSVG className="!rounded-md icon-small bg-accent/40 hover:bg-accent/60">
+								<HiOutlineX />
+							</IconWithSVG>
+						</Dialog.Close>
+
 						<Dialog.Title className="text-xl font-semibold text-text mb-4">Edit Server</Dialog.Title>
 
 						{/* Server Edit Form */}
@@ -325,7 +318,8 @@ z-[12000]					"
 										const isConfirmed = window.confirm(
 											"Are you sure you want to delete this server? This will kick out everyone. "
 										);
-										if (isConfirmed) deleteServer(server.id);
+										if (isConfirmed) deleteServer(server.id, roomId);
+										router.push("/");
 									}}
 									className={
 										"btn bg-red-400 hover:bg-red-500 opacity-50 dark:bg-red-500 hover:opacity-100 !w-fit btn-with-icon items-center flex gap-1.5 btn-secondary"

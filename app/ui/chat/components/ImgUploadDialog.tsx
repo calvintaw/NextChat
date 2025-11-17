@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { IconWithSVG } from "../../general/Buttons";
 import { FileUploadBtn } from "./UploadButtons";
 import { Dispatch, SetStateAction } from "react";
+import { HiOutlineX } from "react-icons/hi";
 
 export interface ImageUploadDialogProps {
 	isUploading: boolean;
@@ -45,8 +46,14 @@ const ImageUploadDialog = ({
 				<Dialog.Overlay className="fixed inset-0 bg-black/70 z-[11000] animate-in fade-in-0" />
 				<Dialog.Content
 					onInteractOutside={(e) => e.preventDefault()}
-					className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[95vw] max-w-md h-fit bg-surface text-text rounded-2xl p-6 shadow-xl z-[12000] flex flex-col animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+					className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[95vw] max-w-md h-fit bg-surface text-text rounded-2xl p-6 py-4 shadow-xl z-[12000] flex flex-col animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
 				>
+					<Dialog.Close asChild className="!absolute !top-2 !right-2">
+						<IconWithSVG className="!rounded-md icon-small bg-accent/40 hover:bg-accent/60">
+							<HiOutlineX />
+						</IconWithSVG>
+					</Dialog.Close>
+
 					<Dialog.Title className="text-xl font-semibold text-foreground">Send an Image</Dialog.Title>
 
 					<div className="flex flex-col justify-center my-5 gap-3">

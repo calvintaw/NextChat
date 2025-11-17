@@ -17,6 +17,7 @@ export function ServerCardHeader({ server, user }: { server: Room; user: User })
 	const [localServer, setLocalServer] = useState(() => server);
 	const pathname = usePathname();
 	const router = useRouter();
+	const { setMessages } = useChatProvider();
 	const [leavePending, setLeavePending] = useState(false);
 
 	const handleCopy = async (text: string) => {
@@ -60,9 +61,10 @@ export function ServerCardHeader({ server, user }: { server: Room; user: User })
 						onClick={() => {
 							const isConfirmed = window.confirm("Are you sure you want to delete all messages?");
 							if (isConfirmed) {
+								setMessages([]);
 								clearMsgHistory(server.id, pathname);
-								router.refresh()
-							};
+								router.refresh();
+							}
 						}}
 						className="!size-7.5"
 						data-tooltip-id="header-icons-tooltip"
@@ -196,6 +198,7 @@ import { supabase } from "@/app/lib/supabase";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { MdLink } from "react-icons/md";
 import { BiLoaderAlt } from "react-icons/bi";
+import { useChatProvider } from "../../ChatBoxWrapper";
 
 function OnlineCount({ server, currentUser }: { server: Room; currentUser: User }) {
 	const [onlineUsersCount, setOnlineUsersCount] = useState(0);
