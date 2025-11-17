@@ -14,7 +14,7 @@ import { Avatar } from "@/app/ui/general/Avatar";
 import { IconWithSVG } from "@/app/ui/general/Buttons";
 import clsx from "clsx";
 import { User } from "@/app/lib/definitions";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { FaCheck } from "react-icons/fa";
 import { MdBlock, MdPersonRemove } from "react-icons/md";
@@ -75,11 +75,13 @@ export function DirectMessageCard({
 		fetchCommonServers();
 	}, [user.id]);
 
+	const router = useRouter();
+
 	return (
 		<>
 			<Tooltip
 				id={`header-icons-tooltip`}
-				place="left-start"
+				place="bottom-start"
 				className="small-tooltip"
 				border="var(--tooltip-border)"
 				offset={0}
@@ -137,7 +139,10 @@ export function DirectMessageCard({
 					<IconWithSVG
 						onClick={() => {
 							const isConfirmed = window.confirm("Are you sure you want to delete all messages?");
-							if (isConfirmed) clearMsgHistory(roomId, pathname);
+							if (isConfirmed) {
+								clearMsgHistory(roomId, pathname);
+								router.refresh();
+							}
 						}}
 						className="!size-7.5"
 						data-tooltip-id="header-icons-tooltip"

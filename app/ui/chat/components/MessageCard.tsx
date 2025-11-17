@@ -3,6 +3,7 @@ import { SHORT_URL_REGEX, isRoom, URL_REGEX_ADVANCED, includeLinks } from "@/app
 import clsx from "clsx";
 import React, { useEffect, useRef, useState } from "react";
 import { Avatar } from "../../general/Avatar";
+import TextareaAutosize from "react-textarea-autosize";
 import { MessageType } from "@/app/lib/definitions";
 import { useChatProvider } from "../ChatBoxWrapper";
 import InputField from "../../form/InputField";
@@ -12,7 +13,6 @@ import { useToast } from "@/app/lib/hooks/useToast";
 import { RxCross2 } from "react-icons/rx";
 import { IconWithSVG } from "../../general/Buttons";
 import Link from "next/link";
-import { AiOutlineReload } from "react-icons/ai";
 import dayjs from "dayjs";
 
 type MessageCardType = {
@@ -26,7 +26,7 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 	const msg_date =
 		dayjs().diff(dayjs(msg.createdAt), "day") < 1 ? msg_date_short : dayjs(msg.createdAt).format("M/D/YYYY, h:mm A");
 
-	const editInputRef = useRef<HTMLInputElement | null>(null);
+	const editInputRef = useRef<HTMLTextAreaElement | null>(null);
 	const { msgToEdit, messages, setMessages, setMsgToEdit, roomId, replyToMsg, user, recipient } = useChatProvider();
 	const toast = useToast();
 	// const [clipboard, setClipboard] = useState("");
@@ -119,7 +119,7 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 								});
 							}
 						}}
-						className="no-underline decoration-0  text-text/90 font-extralight cursor-pointer"
+						className="no-underline decoration-0  text-text/90 font-extralight cursor-pointer whitespace-pre-wrap"
 					>
 						{reply_content}
 					</a>
@@ -167,9 +167,9 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 			// data-content={msg.content.slice(0, 200)}
 			id={msg.id}
 			className={clsx(
-				"flex flex-col w-full dark:hover:bg-background/75 hover:bg-accent/75 px-2 pl-3 py-1  relative ",
+				"flex flex-col w-full dark:hover:bg-background/75 hover:bg-accent/75 px-2 pl-3 py-1.5  relative ",
 				msgToEdit === msg.id ? "dark:bg-background/75 bg-accent" : "group",
-				msg.type === "image" || msg.type === "video" ? "pb-1" : "max-sm:pb-1",
+				msg.type === "image" || msg.type === "video" ? "pb-1 pt-3" : "max-sm:pb-1",
 				isFirstGroup && arr_index > 0 && "mt-2",
 				replyToMsg &&
 					replyToMsg.id === msg.id &&
@@ -258,9 +258,9 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 											offset={0}
 										/>
 										{msg.type === "text" ? (
-											msg.content
+											<p className="whitespace-pre-wrap !max-w-[100ch]">{msg.content}</p>
 										) : msg.type === "link" ? (
-											renderLinks(msg.content)
+											<p className="whitespace-pre-wrap">{renderLinks(msg.content)}</p>
 										) : (
 											<div className=" border-contrast border px-3 py-2 rounded-lg bg-background/75 flex flex-wrap items-center gap-1.5">
 												<p>{msg.sender_display_name} started a video call.</p>
@@ -289,7 +289,7 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 
 									{typeof msg.synced === "undefined" && msg.sender_id === user.id && (
 										<>
-											<p className={clsx("msg-synced-indicator self-end border-red-500")}>sent ✅ 1</p>
+											<p className={clsx("msg-synced-indicator self-end border-red-500")}>sent ✅</p>
 										</>
 									)}
 									{/* 
@@ -318,24 +318,31 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 									)} */}
 								</div>
 							) : (
-								<form onSubmit={handleEditSubmit} className="w-full">
-									<InputField
+								<form onSubmit={handleEditSubmit} className="w-full flex flex-col gap-1 relative">
+									<TextareaAutosize
 										ref={editInputRef}
 										name="edit"
+										className="form-textarea_custom !p-1 !px-2 !rounded-md"
 										defaultValue={msg.content}
-										onKeyDown={(e) => {
-											if (e.key === "Enter") {
-												e.preventDefault();
-												e.currentTarget.form?.requestSubmit();
-											}
-										}}
-										place="right"
-										icon={
-											<IconWithSVG className="icon-small" onClick={() => setMsgToEdit(null)}>
-												<RxCross2 />
-											</IconWithSVG>
-										}
+										// onKeyDown={(e) => {
+										// 	if (e.key === "Enter") {
+										// 		e.preventDefault();
+										// 		e.currentTarget.form?.requestSubmit();
+										// 	}
+										// }}
 									/>
+									<div className="h-fit flex gap-1 self-end">
+										<button
+											type="button"
+											className="btn-secondary text-sm opacity-75 hover:opacity-100"
+											onClick={() => setMsgToEdit(null)}
+										>
+											Cancel
+										</button>
+										<button type="submit" className="bg-primary text-sm text-white hover:bg-primary/75">
+											Save
+										</button>
+									</div>
 								</form>
 							))}
 
@@ -382,13 +389,7 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 					</div>
 					<ReactionsRow msg={msg} isFirstGroup={isFirstGroup}></ReactionsRow>
 					{(msg.type == "image" || msg.type == "video") && (
-						<div
-							className={clsx(
-								// removed absolute right-5
-								"max-sm:right-4 flex gap-1 items-center justify-end",
-								isFirstGroup ? "min-sm:top-2 top-4" : ""
-							)}
-						>
+						<div className={clsx("max-sm:right-4 flex gap-1 items-center justify-end")}>
 							<div
 								className={clsx(
 									" shrink-0 w-fit -z-50 h-fit font-mono text-center whitespace-nowrap text-nowrap flex items-center justify-center text-[11px] text-muted group-hover:z-0",
@@ -633,6 +634,7 @@ import { Tooltip } from "react-tooltip";
 import { supabase } from "@/app/lib/supabase";
 //@ts-ignore
 import extractUrls from "extract-urls";
+import { MdDone } from "react-icons/md";
 //@ts-ignore
 // function attachInternalLinks(str: string): string {
 // 	return str.replace(DOMAIN_REGEX, (domain) => {

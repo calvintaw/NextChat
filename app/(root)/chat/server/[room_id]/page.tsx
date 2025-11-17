@@ -19,10 +19,12 @@ export default async function Page({ params }: { params: Promise<{ room_id: stri
 	}
 
 	// Check if the user is a member
-	const memberCheck = await isMember(currentUser.id, decodedRoomId);
-	if (!memberCheck) {
-		throw new Error("Access denied [You must be a member of this server to view it] [disableReload]");
-	}
+
+	// fn dsiabled bc I think there's a better way to do which i don't know
+	// const memberCheck = await isMember(currentUser.id, decodedRoomId);
+	// if (!memberCheck) {
+	// 	throw new Error("Access denied [You must be a member of this server to view it] [disableReload]");
+	// }
 
 	return <Chatbox recipient={recipient[0]} type="server" roomId={decodedRoomId} user={currentUser} />;
 }

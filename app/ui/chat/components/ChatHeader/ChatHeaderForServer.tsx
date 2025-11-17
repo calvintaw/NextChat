@@ -35,7 +35,7 @@ export function ServerCardHeader({ server, user }: { server: Room; user: User })
 		<>
 			<Tooltip
 				id={`header-icons-tooltip`}
-				place="left-start"
+				place="bottom-start"
 				className="small-tooltip"
 				border="var(--tooltip-border)"
 				offset={0}
@@ -59,7 +59,10 @@ export function ServerCardHeader({ server, user }: { server: Room; user: User })
 					<IconWithSVG
 						onClick={() => {
 							const isConfirmed = window.confirm("Are you sure you want to delete all messages?");
-							if (isConfirmed) clearMsgHistory(server.id, pathname);
+							if (isConfirmed) {
+								clearMsgHistory(server.id, pathname);
+								router.refresh()
+							};
 						}}
 						className="!size-7.5"
 						data-tooltip-id="header-icons-tooltip"

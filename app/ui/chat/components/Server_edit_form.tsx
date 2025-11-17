@@ -158,7 +158,7 @@ export function ServerEditForm({
 				initialQuality: 0.75,
 			};
 
-			const compressedFile = await imageCompression(selectedBannerFile, options);
+			const compressedFile = await imageCompression(selectedBannerFile, bannerOptions);
 			const filename = `profile.jpg`;
 			const filePath = `${server.name}/banner:${filename}`;
 			const { data, error } = await supabase.storage.from("uploads").upload(filePath, compressedFile, { upsert: true });

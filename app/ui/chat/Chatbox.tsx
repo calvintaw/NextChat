@@ -48,6 +48,9 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	const lastBatchLength = useRef(limit);
 	const offsetRef = useRef(0);
 
+	const { isVideoPageOpen, toggleVideoPage } = useGeneralProvider();
+
+
 	const sortMessagesAsc = (msgs: MessageType[]) =>
 		[...msgs].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
@@ -309,7 +312,6 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		}
 	};
 
-	const { isVideoPageOpen } = useGeneralProvider();
 
 	return (
 		<>
