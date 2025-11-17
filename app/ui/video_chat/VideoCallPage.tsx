@@ -12,6 +12,7 @@ import { FaPhone } from "react-icons/fa6";
 import { Tooltip } from "react-tooltip";
 import { useChatProvider } from "../chat/ChatBoxWrapper";
 import { useGeneralProvider } from "@/app/lib/contexts/GeneralContextProvider";
+import clsx from "clsx";
 
 type VideoCallSearchParams = {
 	micOn: boolean;
@@ -234,97 +235,104 @@ export default function VideoCallPage({
 	//                     RENDER (UI NOT CHANGED)
 	// ============================================================
 	return (
-		<div className="relative flex-1 h-[100vh] min-lg:h-[calc(100vh-32px)] !min-w-[365px] flex flex-col bg-background text-text select-none">
-			<Tooltip
-				id={`videochat-toolbar-icons-tooltip`}
-				place="top"
-				className="small-tooltip"
-				border="var(--tooltip-border)"
-				offset={5}
-			/>
+		<div
+			className={clsx(
+				"@container relative flex-1 h-[100vh] !min-w-[365px]  bg-background text-text select-none",
+				!isVideoPageOpen ? "min-lg:h-[calc(100vh-32px)]" : ""
+			)}
+		>
+			<div className="flex flex-col h-full">
+				<Tooltip
+					id={`videochat-toolbar-icons-tooltip`}
+					place="top"
+					className="small-tooltip"
+					border="var(--tooltip-border)"
+					offset={5}
+				/>
 
-			{/* Remote Video */}
-			<div className="flex-1 p-4 max-[420px]:p-2">
-				<div className="w-full h-full rounded-xl bg-foreground/30 dark:bg-foreground/20 border border-contrast overflow-hidden relative group">
-					<IconWithSVG
-						onClick={() => toggleVideoPage(false)}
-						className="!absolute !top-2 !right-2 rounded-md !size-8 opacity-0 group-hover:opacity-50 hover:bg-background"
-					>
-						<HiOutlineX className="text-lg"></HiOutlineX>
-					</IconWithSVG>
+				{/* Remote Video */}
+				<div className="flex-1 p-4 max-[420px]:p-2">
+					<div className="w-full h-full rounded-xl bg-foreground/30 dark:bg-foreground/20 border border-contrast overflow-hidden relative group">
+						<IconWithSVG
+							onClick={() => toggleVideoPage(false)}
+							className="!absolute !top-2 !right-2 rounded-md !size-8 opacity-0 group-hover:opacity-50 hover:bg-background"
+						>
+							<HiOutlineX className="text-lg"></HiOutlineX>
+						</IconWithSVG>
 
-					<div className="text-text opacity-50 text-sm absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-						Remote Video
-					</div>
-					<video ref={remoteVideoRef} autoPlay playsInline className="w-full h-full object-cover" />
-					<div className="absolute bottom-2 left-2 px-2 py-1 text-xs rounded-md bg-black/40 text-white backdrop-blur-sm">
-						John Doe
+						<div className="text-text opacity-50 text-sm absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+							Remote Video
+						</div>
+						<video ref={remoteVideoRef} autoPlay playsInline className="w-full h-full object-cover" />
+						<div className="absolute bottom-2 left-2 px-2 py-1 text-xs rounded-md bg-black/40 text-white backdrop-blur-sm">
+							John Doe
+						</div>
 					</div>
 				</div>
-			</div>
 
-			{/* Local Mini Preview */}
-			<div className="absolute bottom-24 right-6 w-40 h-28 rounded-lg overflow-hidden shadow-xl border border-border/40 bg-black/40 backdrop-blur">
-				<video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-cover" />{" "}
-				<div
-					className="text-[11px] opacity-50 text-white
+				{/* Local Mini Preview */}
+				<div className="absolute bottom-24 right-6 w-40 h-28 rounded-lg overflow-hidden shadow-xl border border-border/40 bg-black/40 backdrop-blur">
+					<video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-cover" />{" "}
+					<div
+						className="text-[11px] opacity-50 text-white
 					 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
 				"
-				>
-					Your Camera
-				</div>
-				<div className="absolute bottom-1 left-1 text-[10px] px-1 py-[1px] bg-black/60 rounded text-white">You</div>
-			</div>
-
-			{/* Controls */}
-			<div className="w-full py-3 flex items-center justify-center gap-4 border-t border-contrast bg-contrast/75 backdrop-blur-md">
-				{/* START / LEAVE CALL */}
-				{!inCall ? (
-					<button
-						onClick={startCall}
-						className="btn h-12 hover:bg-foreground/25 bg-green-600 text-white flex btn-with-icon gap-2 items-center"
 					>
-						<FaPhone className="text-lg" />
-						Start Call
-					</button>
-				) : (
-					<IconWithSVG onClick={leaveCall} className="icon bg-red-500 hover:bg-red-600 text-white transition">
-						<MdCallEnd className="text-2xl" />
+						Your Camera
+					</div>
+					<div className="absolute bottom-1 left-1 text-[10px] px-1 py-[1px] bg-black/60 rounded text-white">You</div>
+				</div>
+
+				{/* Controls */}
+				<div className="w-full py-3 flex items-center justify-center gap-4 border-t border-contrast bg-contrast/75 backdrop-blur-md">
+					{/* START / LEAVE CALL */}
+					{!inCall ? (
+						<button
+							onClick={startCall}
+							className="btn h-12 hover:bg-foreground/25 bg-green-600 text-white flex btn-with-icon gap-2 items-center"
+						>
+							<FaPhone className="text-lg" />
+							Start Call
+						</button>
+					) : (
+						<IconWithSVG onClick={leaveCall} className="icon bg-red-500 hover:bg-red-600 text-white transition">
+							<MdCallEnd className="text-2xl" />
+						</IconWithSVG>
+					)}
+
+					{/* MIC */}
+					<IconWithSVG
+						data-tooltip-id="videochat-toolbar-icons-tooltip"
+						data-tooltip-content={micOn ? "Mute microphone" : "Unmute microphone"}
+						onClick={toggleMic}
+						className="hover:bg-foreground/25 bg-accent dark:bg-surface dark:hover:bg-accent"
+						disabled={!inCall}
+					>
+						{micOn ? <HiOutlineMicrophone className="text-2xl" /> : <TbMicrophoneOff className="text-2xl" />}
 					</IconWithSVG>
-				)}
 
-				{/* MIC */}
-				<IconWithSVG
-					data-tooltip-id="videochat-toolbar-icons-tooltip"
-					data-tooltip-content={micOn ? "Mute microphone" : "Unmute microphone"}
-					onClick={toggleMic}
-					className="hover:bg-foreground/25 bg-accent dark:bg-surface dark:hover:bg-accent"
-					disabled={!inCall}
-				>
-					{micOn ? <HiOutlineMicrophone className="text-2xl" /> : <TbMicrophoneOff className="text-2xl" />}
-				</IconWithSVG>
+					{/* CAMERA */}
+					<IconWithSVG
+						data-tooltip-id="videochat-toolbar-icons-tooltip"
+						data-tooltip-content={camOn ? "Turn off camera" : "Turn on camera"}
+						onClick={toggleCam}
+						className="hover:bg-foreground/25 bg-accent dark:bg-surface dark:hover:bg-accent"
+						disabled={!inCall}
+					>
+						{camOn ? <PiCamera className="text-2xl" /> : <PiCameraSlash className="text-2xl" />}
+					</IconWithSVG>
 
-				{/* CAMERA */}
-				<IconWithSVG
-					data-tooltip-id="videochat-toolbar-icons-tooltip"
-					data-tooltip-content={camOn ? "Turn off camera" : "Turn on camera"}
-					onClick={toggleCam}
-					className="hover:bg-foreground/25 bg-accent dark:bg-surface dark:hover:bg-accent"
-					disabled={!inCall}
-				>
-					{camOn ? <PiCamera className="text-2xl" /> : <PiCameraSlash className="text-2xl" />}
-				</IconWithSVG>
-
-				{/* SCREEN SHARE */}
-				<IconWithSVG
-					data-tooltip-id="videochat-toolbar-icons-tooltip"
-					data-tooltip-content="Start/stop screen share"
-					onClick={shareScreen}
-					className="hover:bg-foreground/25 bg-accent dark:bg-surface dark:hover:bg-accent"
-					disabled={!inCall}
-				>
-					<MdScreenShare className="text-2xl" />
-				</IconWithSVG>
+					{/* SCREEN SHARE */}
+					<IconWithSVG
+						data-tooltip-id="videochat-toolbar-icons-tooltip"
+						data-tooltip-content="Start/stop screen share"
+						onClick={shareScreen}
+						className="hover:bg-foreground/25 bg-accent dark:bg-surface dark:hover:bg-accent"
+						disabled={!inCall}
+					>
+						<MdScreenShare className="text-2xl" />
+					</IconWithSVG>
+				</div>
 			</div>
 		</div>
 	);

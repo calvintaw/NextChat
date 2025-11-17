@@ -62,10 +62,10 @@ export default async function RootLayout({
 					<div id="stars4"></div>
 				</div>
 				<ProgressBar></ProgressBar>
-				<PathProvider>
-					<PathBanner />
-					<main className="flex flex-1 min-h-0 min-w-0 w-full h-full overflow-hidden">
-						<GeneralProvider>
+				<GeneralProvider>
+					<PathProvider>
+						<PathBanner />
+						<main className="flex flex-1 min-h-0 min-w-0 w-full h-full overflow-hidden">
 							<FriendsProvider>
 								<SupabasePresenceWrapper />
 								<Sidebar />
@@ -73,10 +73,10 @@ export default async function RootLayout({
 									<Suspense fallback={<Loading className="!w-full !h-full" />}>{children}</Suspense>
 								</div>
 							</FriendsProvider>
-						</GeneralProvider>
-					</main>
-					<Toaster />
-				</PathProvider>
+						</main>
+						<Toaster />
+					</PathProvider>
+				</GeneralProvider>
 			</body>
 		</html>
 	);

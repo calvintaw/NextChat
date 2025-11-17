@@ -9,6 +9,8 @@ import { User } from "@/app/lib/definitions";
 import { signOut } from "next-auth/react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import useStarsBg from "@/app/lib/hooks/useStarsBg";
+import { useGeneralProvider } from "@/app/lib/contexts/GeneralContextProvider";
+import clsx  from "clsx";
 
 type Props = {
 	user: User;
@@ -32,14 +34,28 @@ const UserPanel = ({ user }: Props) => {
 		};
 	}, []);
 
+	const { isVideoPageOpen } = useGeneralProvider();
+
 	return (
 		<div
-			className="@container !absolute !bottom-4 !left-2 !right-2.5 z-40
+			className={clsx(
+				`@container !absolute !bottom-4 !left-2 !right-2.5 z-40
 
-		max-lg:[#sidebar.active_&]:!min-w-78
+		
+		`,
+				!isVideoPageOpen
+					? `
+				max-lg:[#sidebar.active_&]:!min-w-78
 		max-lg:[#sidebar.active_&]:!max-w-81
 		max-sm:[#sidebar.active_&]:!w-[300px]
-		"
+				
+		`
+					: `
+		[#sidebar.active_&]:!min-w-78
+		[#sidebar.active_&]:!max-w-81
+		[#sidebar.active_&]:!w-[300px]
+		`
+			)}
 		>
 			<div className="hidden [#sidebar.active_&]:!flex @min-[200px]:flex p-1 bg-surface rounded-lg border-2 border-contrast items-center gap-1">
 				<div

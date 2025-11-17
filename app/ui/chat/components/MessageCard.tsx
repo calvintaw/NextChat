@@ -29,13 +29,13 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 	const editInputRef = useRef<HTMLInputElement | null>(null);
 	const { msgToEdit, messages, setMessages, setMsgToEdit, roomId, replyToMsg, user, recipient } = useChatProvider();
 	const toast = useToast();
-	const [clipboard, setClipboard] = useState("");
+	// const [clipboard, setClipboard] = useState("");
 
-	useEffect(() => {
-		if (clipboard) {
-			setTimeout(() => setClipboard(""), 5000);
-		}
-	}, [clipboard]);
+	// useEffect(() => {
+	// 	if (clipboard) {
+	// 		setTimeout(() => setClipboard(""), 5000);
+	// 	}
+	// }, [clipboard]);
 
 	const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -169,7 +169,7 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 			className={clsx(
 				"flex flex-col w-full dark:hover:bg-background/75 hover:bg-accent/75 px-2 pl-3 py-1  relative ",
 				msgToEdit === msg.id ? "dark:bg-background/75 bg-accent" : "group",
-				msg.type === "image" || msg.type === "video" ? (isFirstGroup ? "!pb-2" : "!pb-5") : "max-sm:pb-1",
+				msg.type === "image" || msg.type === "video" ? "pb-1" : "max-sm:pb-1",
 				isFirstGroup && arr_index > 0 && "mt-2",
 				replyToMsg &&
 					replyToMsg.id === msg.id &&
@@ -194,9 +194,10 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 				<div className="flex flex-1 flex-col justify-center">
 					{/* User Name and MSG sent time */}
 					{(isFirstGroup || msg.replyTo) && (
+						// removed mb-1
 						<div className="text-sm text-muted flex items-center gap-2 mb-1">
 							<Avatar
-								size="size-6"
+								size="size-7"
 								id={msg.sender_id}
 								src={msg.sender_image}
 								statusIndicator={false}
@@ -226,7 +227,7 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 						</div>
 					)}
 					{/* Message bubble */}
-					<div className={clsx("flex gap-4 max-sm:gap-x-3")}>
+					<div className="flex gap-4 max-sm:gap-x-3 h-fit -mb-1">
 						{!isFirstGroup && !msg.replyTo && (
 							<>
 								<div
@@ -244,7 +245,8 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 								<div className="w-full flex max-sm:justify-between relative">
 									<div
 										className={clsx(
-											"relative max-w-full break-words whitespace-pre-wrap text-sm border",
+											//added bg
+											"relative max-w-full break-words  text-sm",
 											isFirstGroup && "max-sm:pl-3 max-sm:mt-1"
 										)}
 									>
@@ -260,38 +262,20 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 										) : msg.type === "link" ? (
 											renderLinks(msg.content)
 										) : (
-											<span className="mr-2 ">
-												Link:{" "}
-												<span
-													data-tooltip-id={linkExpired ? undefined : "message-card-icons-tooltip"}
-													data-tooltip-content={
-														linkExpired ? undefined : clipboard === videoChatLink ? "Copied!" : "Copy"
-													}
-													className={clsx(
-														"select-none cursor-grab hover:underline decoration-primary not-dark:text-primary text-blue-400",
-														linkExpired && "!pointer-events-none"
-													)}
-													onClick={() => {
-														if (linkExpired) return;
-														navigator.clipboard.writeText(videoChatLink);
-														setClipboard(videoChatLink);
-													}}
-												>
-													{videoChatLink}
-												</span>
-											</span>
+											<div className=" border-contrast border px-3 py-2 rounded-lg bg-background/75 flex flex-wrap items-center gap-1.5">
+												<p>{msg.sender_display_name} started a video call.</p>
+												<JoinCallButton link_expired={linkExpired} roomId={roomId} id={msg.id} content={msg.content} />
+											</div>
 										)}{" "}
-										{msg.type === "video-call" && (
-											<JoinCallButton link_expired={linkExpired} roomId={roomId} id={msg.id} content={msg.content} />
-										)}
 										{msg.edited && (
 											<span className="text-[11px] tracking-wide text-muted relative top-[1px]">{"(edited)"}</span>
 										)}
 									</div>
 									<div
 										className={clsx(
-											"min-sm:hidden shrink-0 relative w-11 h-full font-mono text-center whitespace-nowrap text-nowrap flex items-center justify-center text-[11px] text-muted -z-50 group-hover:z-0 								",
-											isFirstGroup ? "-top-5 h-fit !items-start" : "-bottom-1 !items-end "
+											// IMPORTANT Removed h-full
+											"min-sm:hidden shrink-0 relative w-fit h-fit font-mono text-center whitespace-nowrap text-nowrap flex items-center justify-center text-[11px] text-muted -z-50 group-hover:z-0 								",
+											isFirstGroup ? "-top-5 h-fit !items-start" : "!items-end self-end top-1"
 										)}
 									>
 										{!isFirstGroup ? msg_date_short : null}{" "}
@@ -305,20 +289,16 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 
 									{typeof msg.synced === "undefined" && msg.sender_id === user.id && (
 										<>
-											<p
-												className={clsx("msg-synced-indicator", !isFirstGroup ? "!bottom-0" : "border-red-500 border ")}
-											>
-												sent ✅
-											</p>
+											<p className={clsx("msg-synced-indicator self-end border-red-500")}>sent ✅ 1</p>
 										</>
 									)}
-
+									{/* 
 									{msg.synced && msg.sender_id === user.id && (
 										<>
 											<div
 												className={clsx("msg-synced-indicator", !isFirstGroup ? "!bottom-0" : "border-red-500 border ")}
 											>
-												<p>
+												<p>2
 													{typeof msg.synced === "boolean" && msg.synced && "sent ✅"}
 													{typeof msg.synced === "boolean" && !msg.synced && "failed ❌"}
 													{msg.synced === "pending" && "sending ⌛"}
@@ -335,7 +315,7 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 												)}
 											</div>
 										</>
-									)}
+									)} */}
 								</div>
 							) : (
 								<form onSubmit={handleEditSubmit} className="w-full">
@@ -404,62 +384,52 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 					{(msg.type == "image" || msg.type == "video") && (
 						<div
 							className={clsx(
-								"absolute right-5 max-sm:right-4 flex gap-1 items-center",
-								isFirstGroup ? "min-sm:top-2 top-4" : "botom-1"
+								// removed absolute right-5
+								"max-sm:right-4 flex gap-1 items-center justify-end",
+								isFirstGroup ? "min-sm:top-2 top-4" : ""
 							)}
 						>
 							<div
 								className={clsx(
-									"min-sm:hidden shrink-0 w-11 h-auto font-mono text-center whitespace-nowrap text-nowrap flex items-center justify-center text-[11px] text-muted -z-50 group-hover:z-0",
+									" shrink-0 w-fit -z-50 h-fit font-mono text-center whitespace-nowrap text-nowrap flex items-center justify-center text-[11px] text-muted group-hover:z-0",
 									isFirstGroup && "justify-end"
 								)}
 							>
-								{!isFirstGroup && msg_date_short}{" "}
-								{((typeof msg.synced === "boolean" && msg.synced) ||
-									// msg is from server, then synced is undefine as there is no such column as synced on DB
-									typeof msg.synced === "undefined") &&
-									msg.sender_id === user.id && <>{isFirstGroup ? "sent ✅" : "✅"}</>}
+								{!isFirstGroup && <span className="min-sm:hidden mr-[1ch]">{msg_date_short} </span>}
+								{((typeof msg.synced === "boolean" && msg.synced) || typeof msg.synced === "undefined") &&
+									msg.sender_id === user.id && (
+										<>
+											{isFirstGroup ? (
+												"sent ✅"
+											) : (
+												<span>
+													<span className="max-sm:hidden">sent </span>✅
+												</span>
+											)}
+										</>
+									)}
 								{typeof msg.synced === "boolean" && !msg.synced && msg.sender_id === user.id && "❌"}
 								{msg.synced === "pending" && msg.sender_id === user.id && "⌛"}
 							</div>
 
-							{typeof msg.synced === "undefined" && msg.sender_id === user.id && (
-								<>
-									<p
-										className="
-												msg-synced-indicator static
-											"
+							{/* <div className="msg-synced-indicator bg-red-500 border z-100 ml-10">
+								<p>
+									{typeof msg.synced === "boolean" && msg.synced && "sent ✅"}
+									{typeof msg.synced === undefined && msg.sender_id === user.id && "sent ✅"}
+									{typeof msg.synced === "boolean" && !msg.synced && "failed ❌"}
+									{msg.synced === "pending" && "sending ⌛"}
+								</p>
+								{typeof msg.synced === "boolean" && !msg.synced && (
+									<IconWithSVG
+										data-tooltip-id="icon-message-dropdown-menu-id"
+										data-tooltip-content="Retry"
+										onClick={() => retrySendingMessage(msg)}
+										className="icon-small ml-1"
 									>
-										sent ✅
-									</p>
-								</>
-							)}
-
-							{msg.synced && msg.sender_id === user.id && (
-								<>
-									<div
-										className="
-												msg-synced-indicator static
-											"
-									>
-										<p>
-											{typeof msg.synced === "boolean" && msg.synced && "sent ✅"}
-											{typeof msg.synced === "boolean" && !msg.synced && "failed ❌"}
-											{msg.synced === "pending" && "sending ⌛"}
-										</p>
-										{typeof msg.synced === "boolean" && !msg.synced && (
-											<IconWithSVG
-												data-tooltip-id="icon-message-dropdown-menu-id"
-												data-tooltip-content="Retry"
-												onClick={() => retrySendingMessage(msg)}
-												className="icon-small ml-1"
-											>
-												<AiOutlineReload />
-											</IconWithSVG>
-										)}
-									</div>
-								</>
-							)}
+										<AiOutlineReload />
+									</IconWithSVG>
+								)}
+							</div> */}
 						</div>
 					)}
 				</div>

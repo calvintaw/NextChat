@@ -2,6 +2,8 @@
 import React, { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { usePathProvider } from "@/app/lib/contexts/PathContext";
+import { useGeneralProvider } from "@/app/lib/contexts/GeneralContextProvider";
+import clsx from "clsx";
 
 export const PathBanner = () => {
 	const pathname = usePathname();
@@ -45,16 +47,33 @@ export const PathBanner = () => {
 		};
 	}, []);
 
+	const { isVideoPageOpen } = useGeneralProvider();
+
 	return (
 		<div
 			id="path-banner"
-			className="hidden lg:block p-1 w-full  text-center 
+			className={clsx(
+				`  p-1 w-full  text-center 
 			text-sm text-muted font-sans font-semibold
 			border-contrast
+			
+			hidden
+			
+			max-sm:left-13
+			`,
+				!isVideoPageOpen
+					? `
+			lg:block
 			max-lg:border-l
 			max-lg:left-15.5
-			max-sm:left-13
-			"
+				
+			`
+					: `
+				
+					border-l
+					left-15.5
+				`
+			)}
 		>
 			{banner}
 		</div>

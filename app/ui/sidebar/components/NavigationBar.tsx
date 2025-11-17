@@ -33,18 +33,29 @@ const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: R
 	const nav_icon_styles =
 		"group hover:bg-primary not-dark:hover:bg-foreground border-2 border-transparent max-sm:!rounded-lg !rounded-xl max-sm:!size-10 !size-11.5";
 
+	const { isVideoPageOpen } = useGeneralProvider();
+
 	return (
 		<>
 			<aside
 				id="nav-bar"
-				className="
-			bg-background
-			flex items-start flex-col max-sm:gap-1.5 gap-1 h-full w-fit py-2 sticky top-0 navigation-bar
-			min-w-13
-			max-lg:border-r
-			dark:border-surface border-surface
-
-			"
+				className={clsx(
+					`
+						bg-background
+						flex items-start flex-col max-sm:gap-1.5 gap-1
+						h-full w-fit py-2 sticky top-0
+						min-w-13
+						dark:border-surface border-surface
+						`,
+					!isVideoPageOpen
+						? `
+								max-lg:border-r
+							`
+						: `
+            [#sidebar.active_&]:border-r
+            [#sidebar.active_&]:!border-contrast
+							`
+				)}
 			>
 				<DashboardBtn />
 				{NavigationSections.map((icon, index) => {
@@ -161,10 +172,11 @@ const NavigationBar = ({ user, joined_servers }: { user: User; joined_servers: R
 
 const DashboardBtn = () => {
 	const [isHovered, setIsHovered] = useState(false);
+	const { isVideoPageOpen } = useGeneralProvider();
 
 	const handleResize = () => {
 		const isLargeScreen = window.innerWidth > 767;
-		if (isLargeScreen) {
+		if (isLargeScreen && !isVideoPageOpen) {
 			document?.getElementById("sidebar")?.classList.remove("active");
 		}
 	};
@@ -182,10 +194,16 @@ const DashboardBtn = () => {
 		"group hover:bg-primary not-dark:hover:bg-foreground border-2 border-transparent max-sm:!rounded-lg !rounded-xl max-sm:!size-10 !size-11.5 cursor-ew-resize";
 
 	return (
-		<div className={"lg:hidden px-2 max-sm:px-1.5 sm:min-h-13 relative flex items-center justify-center z-50"}>
+		<div
+			className={clsx(
+				"px-2 max-sm:px-1.5 sm:min-h-13 relative flex items-center justify-center z-50",
+				!isVideoPageOpen ? "lg:hidden " : ""
+			)}
+		>
 			<IconWithSVG
 				onClick={() => {
 					document?.getElementById("sidebar")?.classList.toggle("active");
+					// if (isVideoPageOpen) document?.getElementById("sidebar")?.classList.toggle("active-video-page");
 				}}
 				data-tooltip-id={"navigation-bar-tooltips"}
 				data-tooltip-content={"Toggle Sidebar"}

@@ -88,9 +88,11 @@ export const CallVideoChatDialog = ({ user }: { user: User }) => {
 					<p className="text-base font-normal text-muted mt-1">Click on the camera icon if you want to start a call.</p>
 					<div className="flex justify-center gap-2 mt-auto">
 						<div className=" flex flex-col gap-2 items-center text-center min-w-19">
-							<IconWithSVG onClick={startVideoCall} className="!rounded-full bg-success hover:bg-success/75">
-								<PiVideoCameraFill />
-							</IconWithSVG>
+							<Dialog.Close asChild>
+								<IconWithSVG onClick={startVideoCall} className="!rounded-full bg-success hover:bg-success/75">
+									<PiVideoCameraFill />
+								</IconWithSVG>
+							</Dialog.Close>
 							<span className="text-sm text-muted">Start Video</span>
 						</div>
 
@@ -104,9 +106,11 @@ export const CallVideoChatDialog = ({ user }: { user: User }) => {
 						</div>
 
 						<div className=" flex flex-col gap-2 items-center text-center min-w-19">
-							<IconWithSVG onClick={startCall} className="!rounded-full bg-success hover:bg-success/75">
-								<IoCall />
-							</IconWithSVG>
+							<Dialog.Close asChild>
+								<IconWithSVG onClick={startCall} className="!rounded-full bg-success hover:bg-success/75">
+									<IoCall />
+								</IconWithSVG>
+							</Dialog.Close>
 							<span className="text-sm text-muted">Start Call</span>
 						</div>
 					</div>

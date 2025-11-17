@@ -18,6 +18,8 @@ import ChatInputBox, { ChatInputBoxRef } from "./components/ChatInputBox";
 import ChatMessages from "./components/ChatMessages";
 import { supabase } from "@/app/lib/supabase";
 import VideoCallPage from "../video_chat/VideoCallPage";
+import { useGeneralProvider } from "@/app/lib/contexts/GeneralContextProvider";
+import clsx from "clsx";
 
 dayjs.extend(isToday);
 dayjs.extend(isYesterday);
@@ -45,12 +47,6 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	const scrollHeightBefore = useRef(0);
 	const lastBatchLength = useRef(limit);
 	const offsetRef = useRef(0);
-
-	const filterNewMessages = (newMsgs: MessageType[]) => {
-		const existingIds = new Set(messages.map((m) => m.id));
-		const unique = newMsgs.filter((msg) => !existingIds.has(msg.id));
-		return [...unique, ...messages]; // prepend older messages
-	};
 
 	const sortMessagesAsc = (msgs: MessageType[]) =>
 		[...msgs].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
@@ -172,6 +168,16 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	}
 
 	useEffect(() => {
+		console.log("MESSAGES CHANGE:", messages, {
+			// messageIds: messageIdsRef.current,
+			oldestMsgCreatedAt: oldestMsgCreatedAt.current,
+			scrollHeightBefore: scrollHeightBefore.current,
+			lastBatchLength: lastBatchLength.current,
+			offset: offsetRef.current,
+		});
+	}, [messages]);
+
+	useEffect(() => {
 		const initialize = async () => {
 			resetRefs();
 
@@ -189,18 +195,13 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 			}
 
 			try {
-				// const recent = await getRecentMessages(roomId, { limit });
-
-				// IMPORTANT
-				const recent: MessageType[] = [];
-
-				console.log("RECENT: ", recent);
+				const recent = await getRecentMessages(roomId, { limit });
 
 				if (recent.length > 0) {
 					offsetRef.current = recent.length;
 					lastBatchLength.current = recent.length;
 					oldestMsgCreatedAt.current = recent[recent.length - 1].createdAt;
-					setMessages(sortMessagesAsc(filterNewMessages(recent)));
+					setMessages(sortMessagesAsc(recent));
 				}
 				setHasMore(recent.length === limit);
 			} catch (err) {
@@ -250,11 +251,11 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 			cursor: oldestMsgCreatedAt.current,
 			limit,
 		});
+
 		lastBatchLength.current = olderMessages.length;
-		// ... (rest of function is unchanged)
-		if (olderMessages.length < limit) setHasMore(false);
 		offsetRef.current += olderMessages.length;
 
+		if (olderMessages.length < limit) setHasMore(false);
 		if (olderMessages.length === 0) {
 			setIsLoadingOldMsg(false);
 			return;
@@ -265,13 +266,11 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		scrollHeightBefore.current = scrollContainer.scrollHeight;
 
 		// prepend messages
-		const uniqueOlder = filterNewMessages(olderMessages);
-
 		setMessages((prev) => {
-			console.log("OLDER MESSAGES: ", sortMessagesAsc(uniqueOlder), "previous messages: ", prev);
-			return [...sortMessagesAsc(uniqueOlder), ...prev];
+			const seen = new Set(prev.map((m) => m.id));
+			const fresh = olderMessages.filter((m) => !seen.has(m.id));
+			return sortMessagesAsc([...fresh, ...prev]);
 		});
-
 		setIsLoadingOldMsg(false);
 	};
 
@@ -310,11 +309,17 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		}
 	};
 
+	const { isVideoPageOpen } = useGeneralProvider();
+
 	return (
 		<>
 			<div
-				className="flex flex-1 h-full min-lg:max-h-[calc(100vh-34px)] !overflow-clip flex-col shadow-md bg-contrast 
-			"
+				className={clsx(
+					`
+					flex flex-1 h-full  !overflow-clip flex-col shadow-md bg-contrast 
+					`,
+					!isVideoPageOpen && `min-lg:max-h-[calc(100vh-34px)]`
+				)}
 			>
 				<ChatProvider
 					config={{

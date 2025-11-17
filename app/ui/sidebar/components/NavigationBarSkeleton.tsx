@@ -11,7 +11,7 @@ export const NavigationBarSkeleton = () => {
 			id="nav-bar"
 			className="
 				bg-background
-				flex items-start flex-col max-sm:gap-1.5 gap-1 h-full w-fit py-2 sticky top-0 navigation-bar
+				flex items-start flex-col max-sm:gap-1.5 gap-1 h-full w-fit py-2 sticky top-0 
 				min-w-13
 				max-lg:border-r
 				dark:border-surface border-surface
