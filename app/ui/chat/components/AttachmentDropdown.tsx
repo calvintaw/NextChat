@@ -31,6 +31,8 @@ export const AttachmentDropdown = ({ roomId, handleFileUpload, isDisabled }: Pro
 			return;
 		}
 
+		
+
 		console.count("clicked handleUpload");
 		if (selectedFiles.length < 1) {
 			console.log("sorrry: return");

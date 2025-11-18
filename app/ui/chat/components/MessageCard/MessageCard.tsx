@@ -1,19 +1,5 @@
 "use client";
-import { SHORT_URL_REGEX, isRoom, URL_REGEX_ADVANCED, includeLinks } from "@/app/lib/utilities";
-import clsx from "clsx";
-import React, { useEffect, useRef, useState } from "react";
-import { Avatar } from "../../general/Avatar";
 import TextareaAutosize from "react-textarea-autosize";
-import { MessageType } from "@/app/lib/definitions";
-import { useChatProvider } from "../ChatBoxWrapper";
-import InputField from "../../form/InputField";
-import { MessageDropdownMenu } from "./MessageDropdown";
-import { editMsg, getUsername, insertMessageInDB, removeReactionFromMSG } from "@/app/lib/actions";
-import { useToast } from "@/app/lib/hooks/useToast";
-import { RxCross2 } from "react-icons/rx";
-import { IconWithSVG } from "../../general/Buttons";
-import Link from "next/link";
-import dayjs from "dayjs";
 
 type MessageCardType = {
 	msg: MessageType;
@@ -29,13 +15,6 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 	const editInputRef = useRef<HTMLTextAreaElement | null>(null);
 	const { msgToEdit, messages, setMessages, setMsgToEdit, roomId, replyToMsg, user, recipient } = useChatProvider();
 	const toast = useToast();
-	// const [clipboard, setClipboard] = useState("");
-
-	// useEffect(() => {
-	// 	if (clipboard) {
-	// 		setTimeout(() => setClipboard(""), 5000);
-	// 	}
-	// }, [clipboard]);
 
 	const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -154,7 +133,6 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 		}
 	};
 
-	const [videoChatLink, ___toggleChat] = useState(msg.type === "video-call" ? JSON.parse(msg.content)[0] : "");
 	const [linkExpired, ___toggleLink] = useState(() => {
 		if (msg.type !== "video-call") return false;
 		return msg.link_expired ?? dayjs().diff(dayjs(JSON.parse(msg.content)[1]), "minute") >= 3;
@@ -162,9 +140,6 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 
 	return (
 		<div
-			// data-image-url={msg.sender_image}
-			// data-displayname={msg.sender_display_name}
-			// data-content={msg.content.slice(0, 200)}
 			id={msg.id}
 			className={clsx(
 				"flex flex-col w-full dark:hover:bg-background/75 hover:bg-accent/75 px-2 pl-3 py-1.5  relative ",
@@ -262,10 +237,13 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 										) : msg.type === "link" ? (
 											<p className="whitespace-pre-wrap">{renderLinks(msg.content)}</p>
 										) : (
-											<div className=" border-contrast border px-3 py-2 rounded-lg bg-background/75 flex flex-wrap items-center gap-1.5">
-												<p>{msg.sender_display_name} started a video call.</p>
-												<JoinCallButton link_expired={linkExpired} roomId={roomId} id={msg.id} content={msg.content} />
-											</div>
+											<JoinVideoCallCard
+												name={msg.sender_display_name}
+												link_expired={linkExpired}
+												roomId={roomId}
+												id={msg.id}
+												content={msg.content}
+											/>
 										)}{" "}
 										{msg.edited && (
 											<span className="text-[11px] tracking-wide text-muted relative top-[1px]">{"(edited)"}</span>
@@ -345,6 +323,8 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 									</div>
 								</form>
 							))}
+
+						{msg.type === "audio" && <VoiceMessage url={msg.content}></VoiceMessage>}
 
 						{(msg.type === "image" || msg.type === "video") && (
 							<div
@@ -445,93 +425,6 @@ const MessageCard = ({ msg, isFirstGroup, arr_index }: MessageCardType) => {
 
 export default MessageCard;
 
-const ReactionsRow = ({ msg, isFirstGroup }: { msg: MessageType; isFirstGroup: boolean }) => {
-	const { messages, setMessages, user, roomId } = useChatProvider();
-	const [usernamesMap, setUsernamesMap] = useState<Record<string, string>>({});
-	const toast = useToast();
-
-	const handleRemoveReaction = async (msg_id: string, emoji: string) => {
-		const originalMsg = [...messages];
-		setMessages((prev: MessageType[]) => {
-			const index = prev.findIndex((tx) => tx.id === msg_id);
-			if (index === -1) return prev;
-			const newMsg = [...prev];
-			newMsg[index] = {
-				...newMsg[index],
-				reactions: {
-					...newMsg[index].reactions,
-					[emoji]: (newMsg[index].reactions[emoji] || []).filter((id) => id !== user.id),
-				},
-			};
-			return newMsg;
-		});
-		const result = await removeReactionFromMSG({ id: msg_id, roomId, userId: user.id, emoji });
-		if (!result.success) {
-			setMessages(originalMsg);
-			toast({ title: "Error!", mode: "negative", subtitle: result.error as string });
-		}
-	};
-
-	const fetchUsernameIfNeeded = async (userId: string) => {
-		if (usernamesMap[userId]) return usernamesMap[userId];
-		const result = await getUsername(userId);
-		const username = result.success ? result.username : "";
-		setUsernamesMap((prev) => ({ ...prev, [userId]: username as string }));
-		return username;
-	};
-
-	useEffect(() => {
-		if (!msg.reactions) return;
-
-		const fetchAll = async () => {
-			for (const users of Object.values(msg.reactions)) {
-				for (const userId of users) {
-					await fetchUsernameIfNeeded(userId);
-				}
-			}
-		};
-
-		fetchAll();
-	}, [msg.reactions]);
-
-	if (!msg.reactions) return null;
-
-	return (
-		<div
-			className={clsx(
-				"mt-1 h-fit w-fit flex gap-1 flex-wrap max-sm:pl-3 max-sm:mb-0.5",
-				!isFirstGroup && !msg.replyTo && "sm:ml-15"
-			)}
-		>
-			{Object.entries(msg.reactions).map(([emoji, users], idx) => {
-				if (users.length === 0) return null;
-				return (
-					<button
-						data-tooltip-id="chatbox-reactions-row-tooltip"
-						data-tooltip-content={`Reacted by ${users.map((id) => usernamesMap[id] || "loading...").join(", ")}`}
-						key={idx}
-						onClick={() => handleRemoveReaction(msg.id, emoji)}
-						className="
-							flex items-center gap-1 px-1.5 py-[1px]
-							rounded-md
-							border border-primary
-							bg-primary/25
-							text-sm
-							hover:bg-primary/50
-							transition-colors
-							select-none
-							cursor-pointer
-						"
-					>
-						<span className="text-base">{emoji}</span>
-						<span>{users.length}</span>
-					</button>
-				);
-			})}
-		</div>
-	);
-};
-
 const ImgCard = ({ src }: { src: string }) => {
 	const [loaded, setLoaded] = useState(false);
 
@@ -570,12 +463,14 @@ const CornerSVG = () => {
 	);
 };
 
-const JoinCallButton = ({
+const JoinVideoCallCard = ({
 	link_expired,
 	id,
 	content,
 	roomId,
+	name,
 }: {
+	name: string;
 	link_expired?: boolean;
 	id: string;
 	content: string;
@@ -610,7 +505,9 @@ const JoinCallButton = ({
 	}, [expired]);
 
 	return (
-		<>
+		<div className=" border-contrast border px-3 py-2 rounded-lg dark:bg-background/75 bg-primary/10 flex flex-wrap items-center gap-1.5">
+			<p>{name} started a video call.</p>
+
 			{expired ? (
 				<button
 					disabled={expired}
@@ -625,7 +522,7 @@ const JoinCallButton = ({
 					</button>
 				</Link>
 			)}
-		</>
+		</div>
 	);
 };
 
@@ -635,12 +532,18 @@ import { supabase } from "@/app/lib/supabase";
 //@ts-ignore
 import extractUrls from "extract-urls";
 import { MdDone } from "react-icons/md";
-//@ts-ignore
-// function attachInternalLinks(str: string): string {
-// 	return str.replace(DOMAIN_REGEX, (domain) => {
-// 		return `https://${domain} [modified]`;
-// 	});
-// }
+import { editMsg, insertMessageInDB, removeReactionFromMSG, getUsername } from "@/app/lib/actions";
+import { MessageType } from "@/app/lib/definitions";
+import { useToast } from "@/app/lib/hooks/useToast";
+import { includeLinks, isRoom, URL_REGEX_ADVANCED, SHORT_URL_REGEX } from "@/app/lib/utilities";
+import { Avatar } from "@/app/ui/general/Avatar";
+import clsx from "clsx";
+import dayjs, { name } from "dayjs";
+import Link from "next/link";
+import React, { useRef, useEffect, useState } from "react";
+import { useChatProvider } from "../../ChatBoxWrapper";
+import { MessageDropdownMenu } from "./MessageDropdown";
+import { ReactionsRow } from "./MessageReactionsBar";
 
 // regex codes are written by chatgpt except the one in utilities. src: https://daringfireball.net/2010/07/improved_regex_for_matching_urls
 export function renderLinks(text: string) {
@@ -695,3 +598,70 @@ export function renderLinks(text: string) {
 
 	return result;
 }
+
+const VoiceMessage = ({ url }: { url: string }) => {
+	return (
+		// <audio controls>
+		// 	<source src={url} type="audio/webm" />
+		// 	Your browser does not support the audio element.
+		// </audio>
+		<div className=" border-contrast border px-2 py-1.5 rounded-full dark:bg-background/75 bg-primary/10 flex flex-wrap items-center gap-2">
+			<IconWithSVG className="icon-small !rounded-full !bg-primary hover:!bg-primary/75">
+				<IoIosPlay className="text-white"></IoIosPlay>
+			</IconWithSVG>
+
+			<LuAudioLines className="text-2xl mr-1"></LuAudioLines>
+
+			<span className="text-sm">0:33</span>
+
+			<IconWithSVG className="icon-small !rounded-full">
+				<HiSpeakerWave className="text-lg"></HiSpeakerWave>
+			</IconWithSVG>
+		</div>
+	);
+};
+
+
+const VoiceVisualizer = ({ roomId, fileName }: { roomId: string; fileName: string }) => {
+	const [blob, setBlob] = useState<Blob | null>(null);
+	const visualizerRef = useRef<HTMLCanvasElement>(null);
+
+	useEffect(() => {
+		const fetchAudio = async () => {
+			const { data, error } = await supabase.storage.from("voice-messages").download(`${roomId}/${fileName}`);
+
+			if (error) {
+				console.error("Error fetching audio:", error);
+				return;
+			}
+
+			setBlob(data);
+		};
+
+		fetchAudio();
+	}, [roomId, fileName]);
+
+	return (
+		<div>
+			{blob ? (
+				<AudioVisualizer
+					ref={visualizerRef}
+					blob={blob}
+					width={500}
+					height={75}
+					barWidth={1}
+					gap={0}
+					barColor="#f76565"
+				/>
+			) : (
+				<p>Loading audio...</p>
+			)}
+		</div>
+	);
+};
+
+
+import { IconWithSVG } from "@/app/ui/general/Buttons";
+import { HiSpeakerWave } from "react-icons/hi2";
+import { IoIosPlay } from "react-icons/io";
+import { LuAudioLines } from "react-icons/lu";

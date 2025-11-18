@@ -334,7 +334,8 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 					`
 					flex flex-1 h-full  !overflow-clip flex-col shadow-md bg-contrast 
 					`,
-					!isVideoPageOpen && `min-lg:max-h-[calc(100vh-34px)]`
+					!isVideoPageOpen && `min-lg:max-h-[calc(100vh-34px)]`, 
+					isVideoPageOpen && "max-[820px]:!hidden"
 				)}
 			>
 				<ChatProvider

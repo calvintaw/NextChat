@@ -6,11 +6,11 @@ import dayjs from "dayjs";
 import isToday from "dayjs/plugin/isToday";
 import isYesterday from "dayjs/plugin/isYesterday";
 import weekday from "dayjs/plugin/weekday";
-import MessageCard from "./MessageCard";
+import MessageCard from "./MessageCard/MessageCard";
 import { useChatProvider } from "../ChatBoxWrapper";
 import { HiExclamationCircle } from "react-icons/hi";
 import clsx from "clsx";
-import MessageSkeleton from "./MsgCardSkeleton";
+import MessageSkeleton from "./MessageCard/MsgCardSkeleton";
 import { HiOutlineChatBubbleLeftRight } from "react-icons/hi2";
 
 dayjs.extend(isToday);

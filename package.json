@@ -42,6 +42,7 @@
 		"react-masonry-css": "^1.0.16",
 		"react-textarea-autosize": "^8.5.9",
 		"react-tooltip": "^5.29.1",
+		"react-voice-visualizer": "^2.0.8",
 		"rehype-react": "^8.0.0",
 		"remark-gfm": "^4.0.1",
 		"socket.io-client": "^4.8.1",

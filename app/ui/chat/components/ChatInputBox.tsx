@@ -17,6 +17,7 @@ import { insertMessageInDB } from "@/app/lib/actions";
 import { useToast } from "@/app/lib/hooks/useToast";
 import { supabase } from "@/app/lib/supabase";
 import { includeLinks } from "@/app/lib/utilities";
+import { useGeneralProvider } from "@/app/lib/contexts/GeneralContextProvider";
 
 type ChatInputBoxProps = {
 	activePersons: string[];
@@ -103,7 +104,8 @@ const ChatInputBox = forwardRef<ChatInputBoxRef, ChatInputBoxProps>((props, ref)
 			createdAt: new Date().toISOString(),
 			edited: false,
 			reactions: {},
-			type: hasLinks ? "link" : type,
+			type: "audio" as MessageContentType,
+			// type: hasLinks ? "link" : type,
 		};
 
 		console.log("does my msg has Links: ", hasLinks);
@@ -181,13 +183,14 @@ const ChatInputBox = forwardRef<ChatInputBoxRef, ChatInputBoxProps>((props, ref)
 		}
 	});
 
+	const { isVideoPageOpen } = useGeneralProvider();
 	// when user click reply, auto focuses the input
 	useEffect(() => {
 		if (replyToMsg) textRef.current?.focus();
 	}, [replyToMsg]);
 
 	return (
-		<div className={clsx("relative", (isBlocked || (isSystem && isBlocked)) && "cursor-not-allowed")}>
+		<div className={clsx("relative ", (isBlocked || (isSystem && isBlocked)) && "cursor-not-allowed")}>
 			<div
 				className={clsx("p-4 pt-0", (isBlocked || (isSystem && isBlocked)) && "pointer-events-none")}
 				data-tooltip-id={"typing-indicator"}
@@ -198,7 +201,7 @@ const ChatInputBox = forwardRef<ChatInputBoxRef, ChatInputBoxProps>((props, ref)
 				<div
 					id="ChatInputBox"
 					className={clsx(
-						"flex items-end gap-2 rounded-lg px-3 py-1.5 bg-background dark:bg-accent/50 border border-foreground/15 not-dark:!border-foreground/30 focus-within:border-muted/25 relative shadow-lg",
+						"flex @container items-end gap-2 rounded-lg px-3 py-1.5 bg-background dark:bg-accent/50 border border-foreground/15 not-dark:!border-foreground/30 focus-within:border-muted/25 relative shadow-lg",
 						replyToMsg && "rounded-t-none !border-muted/25"
 					)}
 				>
@@ -210,18 +213,21 @@ const ChatInputBox = forwardRef<ChatInputBoxRef, ChatInputBoxProps>((props, ref)
 
 					{!isFocused && (
 						<div
-							className="max-[500px]:hidden absolute border top-1/2 -translate-y-1/2 right-22
-			             text-sm bg-black/25  not-dark:text-black text-white rounded-md p-1.5 py-1 border-background
+							className={clsx(
+								`max-[560px]:hidden  absolute border top-1/2 -translate-y-1/2 right-32
+			             text-sm bg-black/75 dark:bg-black/25  not-dark:text-black text-white rounded-md p-1.5 py-1 border-background
 			             z-[1]
 			             opacity-50
 			             pointer-events-none
-			             "
+			             `,
+								isVideoPageOpen && "@max-[450px]:!hidden"
+							)}
 						>
 							Press Ctrl + / to type
 						</div>
 					)}
 					<TextareaAutosize
-						autoComplete="off"
+						autoComplete="€off"
 						disabled={isBlocked || (isSystem && isBlocked)}
 						ref={textRef}
 						name="query"

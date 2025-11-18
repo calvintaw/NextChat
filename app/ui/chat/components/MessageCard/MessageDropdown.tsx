@@ -1,21 +1,4 @@
-"use client";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { FaReply, FaArrowRight, FaCopy, FaThumbtack, FaLink, FaVolumeUp } from "react-icons/fa";
-import { IconWithSVG } from "../../general/Buttons";
-import { IoIosArrowBack } from "react-icons/io";
-import { HiDotsHorizontal } from "react-icons/hi";
-import clsx from "clsx";
-import useToggle from "@/app/lib/hooks/useToggle";
-import { ChangeEvent, forwardRef, ReactNode, useEffect, useRef, useState } from "react";
-import { AiOutlineReload } from "react-icons/ai";
-import { useChatProvider } from "../ChatBoxWrapper";
-import { FiCamera, FiEdit } from "react-icons/fi";
-import { addReactionToMSG, deleteMsg, removeReactionFromMSG } from "@/app/lib/actions";
-import { MessageType, MessageType } from "@/app/lib/definitions";
-import { HiReply } from "react-icons/hi";
-import { useToast } from "@/app/lib/hooks/useToast";
-import { ImBin } from "react-icons/im";
-import { socket } from "@/app/lib/socket";
 
 type Props = {
 	msg: MessageType;
@@ -498,13 +481,25 @@ const EditImageDialog = ({ msg }: { msg: MessageType }) => {
 
 import * as Dialog from "@radix-ui/react-dialog";
 import { IoClose } from "react-icons/io5";
-import { Dispatch, SetStateAction } from "react";
-import { HiOutlineX } from "react-icons/hi";
+import { ChangeEvent, Dispatch, forwardRef, ReactNode, SetStateAction, useEffect, useRef, useState } from "react";
+import { HiDotsHorizontal, HiOutlineX, HiReply } from "react-icons/hi";
 import { supabase } from "@/app/lib/supabase";
 import imageCompression from "browser-image-compression";
 import { nanoid } from "nanoid";
 import { GoPlus } from "react-icons/go";
 import { extractFilePath } from "@/app/lib/utilities";
+import { addReactionToMSG, removeReactionFromMSG, deleteMsg } from "@/app/lib/actions";
+import { MessageType } from "@/app/lib/definitions";
+import { useToast } from "@/app/lib/hooks/useToast";
+import useToggle from "@/app/lib/hooks/useToggle";
+import { IconWithSVG } from "@/app/ui/general/Buttons";
+import clsx from "clsx";
+import { AiOutlineReload } from "react-icons/ai";
+import { FaReply, FaArrowRight, FaCopy, FaThumbtack, FaLink, FaVolumeUp } from "react-icons/fa";
+import { FiEdit, FiCamera } from "react-icons/fi";
+import { ImBin } from "react-icons/im";
+import { IoIosArrowBack } from "react-icons/io";
+import { useChatProvider } from "../../ChatBoxWrapper";
 
 export interface ImageUploadDialogProps {
 	isUploading: boolean;

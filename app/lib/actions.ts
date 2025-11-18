@@ -89,6 +89,9 @@ export async function checkIfBlocked(user: User, friend: User): Promise<boolean>
 }
 
 export async function getServersInCommon(currentUserId: string, targetUserId: string): Promise<Room[]> {
+	return [];
+	// temporary
+
 	return await sql`
 		SELECT r.id, r.name, r.type, r.profile, r.owner_id
 		FROM rooms r
@@ -185,6 +188,9 @@ export async function clearMsgHistory(
 }
 
 export async function getChats(currentUserId: string): Promise<ChatType[]> {
+	return [];
+	// temporary
+
 	console.log("GETCHATS: CURRENT USER ID: ", currentUserId);
 
 	return await sql`
@@ -208,6 +214,9 @@ export async function getChats(currentUserId: string): Promise<ChatType[]> {
 }
 
 export async function getContacts(currentUserId: string): Promise<ContactType[]> {
+	return [];
+	// temporary
+
 	return await sql`
 			    SELECT 
 					u.id,
@@ -236,6 +245,9 @@ export async function getSystemUser() {
 }
 
 export async function getRecentMessages(room_id: string, options: GetMessagesOptions = {}) {
+	return [];
+	// temporary
+
 	const { cursor = "", limit = 15 } = options;
 
 	let where = sql`m.room_id = ${room_id}`;
@@ -388,27 +400,30 @@ export async function getServer(id: string): Promise<Room[]> {
 }
 
 export async function getAllServers(userId?: string) {
-	if (userId) {
-		// Only return servers that the user has joined
-		return (await sql<Room[]>`
-      SELECT r.*, COUNT(rm.room_id) AS total_members
-      FROM rooms r
-      JOIN room_members rm2 ON r.id = rm2.room_id
-      LEFT JOIN room_members rm ON r.id = rm.room_id
-      WHERE r.type != 'dm'
-        AND rm2.user_id = ${userId}
-      GROUP BY r.id
-    `) as Room[];
-	} else {
-		// Return all servers
-		return (await sql<Room[]>`
-      SELECT r.*, COUNT(rm.room_id) AS total_members
-      FROM rooms r
-      LEFT JOIN room_members rm ON r.id = rm.room_id
-      WHERE r.type != 'dm'
-      GROUP BY r.id
-    `) as Room[];
-	}
+	return [];
+	// temporary
+
+	// if (userId) {
+	// 	// Only return servers that the user has joined
+	// 	return (await sql<Room[]>`
+	//     SELECT r.*, COUNT(rm.room_id) AS total_members
+	//     FROM rooms r
+	//     JOIN room_members rm2 ON r.id = rm2.room_id
+	//     LEFT JOIN room_members rm ON r.id = rm.room_id
+	//     WHERE r.type != 'dm'
+	//       AND rm2.user_id = ${userId}
+	//     GROUP BY r.id
+	//   `) as Room[];
+	// } else {
+	// 	// Return all servers
+	// 	return (await sql<Room[]>`
+	//     SELECT r.*, COUNT(rm.room_id) AS total_members
+	//     FROM rooms r
+	//     LEFT JOIN room_members rm ON r.id = rm.room_id
+	//     WHERE r.type != 'dm'
+	//     GROUP BY r.id
+	//   `) as Room[];
+	// }
 }
 
 export async function editProfile(user: User, formData: FormData) {
@@ -595,6 +610,8 @@ export async function editServer(formData: FormData, server: Room, currentUserId
 }
 
 export async function getJoinedServers(userId: string) {
+	return [];
+	// temporary
 	return (await sql`	
 		select r.id, r.profile, r.name from rooms r
 		join room_members rm on r.id = rm.room_id
@@ -866,15 +883,17 @@ export async function authenticate(prevState: { error: string } | undefined, for
 	}
 }
 
-export async function updateOnlineStatus(status: boolean, user_id: string) {
-	try {
-		await sql`UPDATE user_status set online = ${status} where user_id = ${user_id}`;
-	} catch (error) {
-		console.log(error);
-	}
-}
+// export async function updateOnlineStatus(status: boolean, user_id: string) {
+// 	try {
+// 		await sql`UPDATE user_status set online = ${status} where user_id = ${user_id}`;
+// 	} catch (error) {
+// 		console.log(error);
+// 	}
+// }
 
 export async function getFriendRequests(userId: string) {
+	return [];
+	// temporary
 	console.log("FETCHING FRIEND REQUESTS ---------");
 
 	try {
@@ -904,6 +923,9 @@ export async function getFriendRequests(userId: string) {
 }
 
 export async function getOnlineFriends(userId: string) {
+	return [];
+	// temporary
+
 	try {
 		const friends: User[] = await sql<User[]>`
 						SELECT
@@ -931,7 +953,9 @@ export async function getOnlineFriends(userId: string) {
 	}
 }
 
-export async function deleteDM(targetUser: MinimalUserType): Promise<{ success: boolean; message: string }> {
+export async function deleteDM(
+	targetUser: Pick<User, "id" | "username">
+): Promise<{ success: boolean; message: string }> {
 	return withCurrentUser(async (currentUser: User) => {
 		try {
 			console.log(`Deleting DM between ${currentUser.username} and ${targetUser.username}...`);
@@ -972,7 +996,7 @@ export async function deleteDM(targetUser: MinimalUserType): Promise<{ success: 
 }
 
 export async function createDM(
-	targetUser: MinimalUserType
+	targetUser: Pick<User, "id" | "username">
 ): Promise<{ success: boolean; message: string; roomId?: string }> {
 	return withCurrentUser(async (currentUser: User) => {
 		try {
@@ -1079,13 +1103,8 @@ export async function requestFriendship(
 	});
 }
 
-type MinimalUserType = {
-	id: string;
-	username: string;
-};
-
 export async function removeFriendshipRequest(
-	targetUser: MinimalUserType,
+	targetUser: Pick<User, "id" | "username">,
 	type: "incoming" | "sent" | "friend"
 ): Promise<{ success: boolean; message: string }> {
 	return withCurrentUser(async (currentUser: User) => {

@@ -122,7 +122,7 @@ export type User = {
 	password?: string;
 };
 
-export type MessageContentType = "text" | "video" | "image" | "video-call" | "file" | "link";
+export type MessageContentType = "text" | "video" | "image" | "audio" | "video-call" | "file" | "link";
 
 export type MessageType = {
 	id: string;
@@ -178,3 +178,10 @@ export type NewsApiParams = {
 	pageSize?: number;
 	page?: number;
 };
+
+export interface ReplyBlockProps {
+	replyTo: string;
+	senderImage: string;
+	senderDisplayName: string;
+	contentSnippet: string;
+}

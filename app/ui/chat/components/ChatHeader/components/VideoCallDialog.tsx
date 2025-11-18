@@ -50,15 +50,25 @@ export const CallVideoChatDialog = ({ user }: { user: User }) => {
 
 		toggleVideoPage(true);
 	};
+	const { isVideoPageOpen } = useGeneralProvider();
 
 	return (
 		<Dialog.Root>
-			<Dialog.Trigger asChild>
-				<IconWithSVG className="!size-7.5">
+			{!isVideoPageOpen ? (
+				<Dialog.Trigger asChild>
+					<IconWithSVG className="!size-7.5">
+						<IoCall className="text-lg" />
+					</IconWithSVG>
+				</Dialog.Trigger>
+			) : (
+				<IconWithSVG
+					data-tooltip-id="header-icons-tooltip"
+					data-tooltip-content={"Video Call is already open."}
+					className="!size-7.5 opacity-50 cursor-not-allowed"
+				>
 					<IoCall className="text-lg" />
 				</IconWithSVG>
-			</Dialog.Trigger>
-
+			)}
 			<Dialog.Portal>
 				<Dialog.Overlay className="fixed inset-0 bg-black/70 z-[11000]" />
 				<Dialog.Content

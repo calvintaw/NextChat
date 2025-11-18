@@ -51,8 +51,6 @@ export default function VideoCallPage({
 	const [camOn, setCamOn] = useState(searchParams.camOn);
 	const [inCall, setInCall] = useState(false);
 	const { toggleVideoPage, isVideoPageOpen } = useGeneralProvider();
-	
-	
 
 	useEffect(() => {
 		socket.emit("join-video", roomId);

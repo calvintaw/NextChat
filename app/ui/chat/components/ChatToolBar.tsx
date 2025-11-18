@@ -1,14 +1,14 @@
 import React, { RefObject, useState } from "react";
 import { AddReactionBtn } from "./AddReactionBtn";
 import clsx from "clsx";
-
+import { FaMicrophone } from "react-icons/fa";
 export interface ChatToolbarProps {
 	setEmoji: (emoji: string) => void;
 	isPending: boolean;
 	isFocused: boolean;
 	isSystem: boolean;
 	isBlocked: boolean;
-	textRef: RefObject<HTMLTextAreaElement|null>;
+	textRef: RefObject<HTMLTextAreaElement | null>;
 	setInput: React.Dispatch<React.SetStateAction<string>>;
 	setReplyToMsg: (msg: MessageType | null) => void;
 	sendMessage: (msg: string, type?: MessageContentType) => void;
@@ -32,6 +32,8 @@ export const ChatToolbar = ({
 	return (
 		<div className={clsx("flex items-center gap-2 min-h-10 bg-transparent chat-toolbar-icon", open && "active z-20")}>
 			<DropdownMenu.Root modal={false} open={open} onOpenChange={(open) => setOpen(open)}>
+				<SendAudioMsgDialog  />
+
 				<DropdownMenu.Trigger asChild>
 					<AddReactionBtn className={clsx(open && "animate-none transition-none")}></AddReactionBtn>
 				</DropdownMenu.Trigger>
@@ -128,3 +130,4 @@ import { IconWithSVG } from "../../general/Buttons";
 import { GoSquareFill } from "react-icons/go";
 import { IoArrowUp } from "react-icons/io5";
 import { MessageType, MessageContentType } from "@/app/lib/definitions";
+import { SendAudioMsgDialog } from "./AudioCallDialog";

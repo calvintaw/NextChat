@@ -96,7 +96,6 @@ export const DarkModeBtn = ({ className }: { className?: string }) => {
 	);
 };
 
-
 interface BadgeProps {
 	count: number;
 	max?: number;
