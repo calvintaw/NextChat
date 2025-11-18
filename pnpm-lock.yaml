@@ -86,6 +86,9 @@ importers:
       react:
         specifier: ^19.1.1
         version: 19.1.1
+      react-audio-play:
+        specifier: ^1.0.4
+        version: 1.0.4(react@19.1.1)
       react-dom:
         specifier: ^19.1.1
         version: 19.1.1(react@19.1.1)
@@ -2979,6 +2982,11 @@ packages:
 
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
+
+  react-audio-play@1.0.4:
+    resolution: {integrity: sha512-2xOOQb0VDEqac6fvjdNrbYH4LjJoCxfzDh6cryCTdJusDJ1Th92Wg4oF6QdO0ZR/YbSlmns3T4PnM94KU2QiFw==}
+    peerDependencies:
+      react: '>=17'
 
   react-dom@19.1.1:
     resolution: {integrity: sha512-Dlq/5LAZgF0Gaz6yiqZCf6VCcZs1ghAJyrsu84Q/GT0gV+mCxbfmKNoGRKBYMJ8IEdGPqu49YWXD02GCknEDkw==}
@@ -6549,6 +6557,10 @@ snapshots:
   punycode@2.3.1: {}
 
   queue-microtask@1.2.3: {}
+
+  react-audio-play@1.0.4(react@19.1.1):
+    dependencies:
+      react: 19.1.1
 
   react-dom@19.1.1(react@19.1.1):
     dependencies:

@@ -866,27 +866,29 @@ const VoiceMessage = ({ url }: { url: string }) => {
 	// 	</div>
 	// );
 
-
 	return (
-		<div className="border-contrast border px-2 py-1.5 rounded-full dark:bg-background/75 bg-primary/10 flex items-center gap-2">
-			{/* Play button */}
-			<IconWithSVG className="icon-small !rounded-full !bg-primary hover:!bg-primary/75" onClick={togglePlay}>
-				{isPlaying ? <IoIosPause className="text-white" /> : <IoIosPlay className="text-white" />}
-			</IconWithSVG>
+		// <div className="border-contrast border px-2 py-1.5 rounded-full dark:bg-background/75 bg-primary/10 flex items-center gap-2">
+		// 	{/* Play button */}
+		// 	<IconWithSVG className="icon-small !rounded-full !bg-primary hover:!bg-primary/75" onClick={togglePlay}>
+		// 		{isPlaying ? <IoIosPause className="text-white" /> : <IoIosPlay className="text-white" />}
+		// 	</IconWithSVG>
 
-			{/* Waveform fills the middle */}
-			<div ref={waveContainerRef} className="flex-1 h-10 cursor-pointer" />
+		// 	{/* Waveform fills the middle */}
+		// 	<div ref={waveContainerRef} className="flex-1 h-10 cursor-pointer" />
 
-			{/* Time display */}
-			<span className="text-sm">
-				{formatTime(currentTime)} / {formatTime(duration)}
-			</span>
+		// 	{/* Time display */}
+		// 	<span className="text-sm">
+		// 		{formatTime(currentTime)} / {formatTime(duration)}
+		// 	</span>
 
-			{/* Volume button */}
-			<IconWithSVG className="icon-small !rounded-full" onClick={toggleMute}>
-				{volume > 0 ? <HiSpeakerWave className="text-lg" /> : <HiSpeakerXMark className="text-lg" />}
-			</IconWithSVG>
-		</div>
+		// 	{/* Volume button */}
+		// 	<IconWithSVG className="icon-small !rounded-full" onClick={toggleMute}>
+		// 		{volume > 0 ? <HiSpeakerWave className="text-lg" /> : <HiSpeakerXMark className="text-lg" />}
+		// 	</IconWithSVG>
+		// </div>
+		<audio src={url} controls className="!rounded-full"></audio>
+		// <AudioPlayer src={url} color="#cfcfcf" sliderColor="#94b9ff" backgroundColor="#2c2828" />
 	);
-
 };
+
+import { AudioPlayer } from "react-audio-play";

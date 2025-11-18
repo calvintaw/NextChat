@@ -89,8 +89,8 @@ export async function checkIfBlocked(user: User, friend: User): Promise<boolean>
 }
 
 export async function getServersInCommon(currentUserId: string, targetUserId: string): Promise<Room[]> {
-	return [];
-	// temporary
+	// return [];
+	// // temporary
 
 	return await sql`
 		SELECT r.id, r.name, r.type, r.profile, r.owner_id
@@ -188,7 +188,7 @@ export async function clearMsgHistory(
 }
 
 export async function getChats(currentUserId: string): Promise<ChatType[]> {
-	return [];
+	// return [];
 	// temporary
 
 	console.log("GETCHATS: CURRENT USER ID: ", currentUserId);
@@ -214,8 +214,8 @@ export async function getChats(currentUserId: string): Promise<ChatType[]> {
 }
 
 export async function getContacts(currentUserId: string): Promise<ContactType[]> {
-	return [];
-	// temporary
+	// return [];
+	// // temporary
 
 	return await sql`
 			    SELECT 
@@ -400,8 +400,8 @@ export async function getServer(id: string): Promise<Room[]> {
 }
 
 export async function getAllServers(userId?: string) {
-	return [];
-	// temporary
+	// return [];
+	// // temporary
 
 	// if (userId) {
 	// 	// Only return servers that the user has joined
@@ -610,8 +610,8 @@ export async function editServer(formData: FormData, server: Room, currentUserId
 }
 
 export async function getJoinedServers(userId: string) {
-	return [];
-	// temporary
+	// return [];
+	// // temporary
 	return (await sql`	
 		select r.id, r.profile, r.name from rooms r
 		join room_members rm on r.id = rm.room_id
@@ -892,8 +892,8 @@ export async function authenticate(prevState: { error: string } | undefined, for
 // }
 
 export async function getFriendRequests(userId: string) {
-	return [];
-	// temporary
+	// return [];
+	// // temporary
 	console.log("FETCHING FRIEND REQUESTS ---------");
 
 	try {
@@ -923,8 +923,8 @@ export async function getFriendRequests(userId: string) {
 }
 
 export async function getOnlineFriends(userId: string) {
-	return [];
-	// temporary
+	// return [];
+	// // temporary
 
 	try {
 		const friends: User[] = await sql<User[]>`

@@ -87,9 +87,12 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 						setMessages((prev) => [...prev, msg]);
 					}
 				} else if (payload.eventType === "DELETE") {
+					if (payload.old.sender_id === user.id) return;
 					// messageIdsRef.current.delete(payload.old.id);
 					setMessages((prev) => prev.filter((tx) => tx.id !== payload.old.id));
 				} else if (payload.eventType === "UPDATE") {
+					if (msg.sender_id === user.id) return;
+
 					setMessages((prev) =>
 						prev.map((m) =>
 							m.id === msg.id ? { ...m, ...msg, reactions: JSON.parse(JSON.stringify(msg.reactions)) } : m
@@ -312,8 +315,6 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 	};
 
 	const handleUpdateImageFromParent = async (msg: Pick<MessageType, "content" | "id">) => {
-		
-
 		const result = await updateImageMSG({ content: msg.content, id: msg.id });
 
 		if (!result.success) {
@@ -334,7 +335,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 					`
 					flex flex-1 h-full  !overflow-clip flex-col shadow-md bg-contrast 
 					`,
-					!isVideoPageOpen && `min-lg:max-h-[calc(100vh-34px)]`, 
+					!isVideoPageOpen && `min-lg:max-h-[calc(100vh-34px)]`,
 					isVideoPageOpen && "max-[820px]:!hidden"
 				)}
 			>

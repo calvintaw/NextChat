@@ -13,7 +13,7 @@ export function MessageDropdownMenu({ msg, retrySendingMessage }: Props) {
 	const toast = useToast();
 
 	const toggleReaction = async (emoji: string) => {
-		const originalMsg = [...messages];
+		// const originalMsg = [...messages];
 		let didChange = false; // track if reaction changed
 
 		// local update
@@ -23,17 +23,39 @@ export function MessageDropdownMenu({ msg, retrySendingMessage }: Props) {
 
 			const newMsg = [...prev];
 
-			const currentReactors = new Set(newMsg[index].reactions?.[emoji] || []);
-			const hasReacted = currentReactors.has(user.id);
+			// const currentReactors = new Set(newMsg[index].reactions?.[emoji] || []);
+			// const hasReacted = currentReactors.has(user.id);
 
-			// if user already has the same emoji, then remove it (set didChange to false)
+			// // if user already has the same emoji, then remove it (set didChange to false)
+			// if (hasReacted) {
+			// 	currentReactors.delete(user.id);
+			// 	didChange = false; // user removed reaction
+
+			// 	// else user already has the same emoji, then add it (set didChange to true)
+			// } else {
+			// 	currentReactors.add(user.id);
+			// 	didChange = true; // user added reaction
+			// }
+
+			// newMsg[index] = {
+			// 	...newMsg[index],
+			// 	reactions: {
+			// 		...newMsg[index].reactions,
+			// 		[emoji]: [...currentReactors],
+			// 	},
+			// };
+			const currentReactors = newMsg[index].reactions?.[emoji] || [];
+			const hasReacted = currentReactors.includes(user.id);
+
+			let updatedReactors;
+
 			if (hasReacted) {
-				currentReactors.delete(user.id);
+				// Remove user
+				updatedReactors = currentReactors.filter((id) => id !== user.id);
 				didChange = false; // user removed reaction
-
-				// else user already has the same emoji, then add it (set didChange to true)
 			} else {
-				currentReactors.add(user.id);
+				// Add user at the end
+				updatedReactors = [...currentReactors, user.id];
 				didChange = true; // user added reaction
 			}
 
@@ -41,9 +63,10 @@ export function MessageDropdownMenu({ msg, retrySendingMessage }: Props) {
 				...newMsg[index],
 				reactions: {
 					...newMsg[index].reactions,
-					[emoji]: [...currentReactors],
+					[emoji]: updatedReactors,
 				},
 			};
+
 			return newMsg;
 		});
 
@@ -51,7 +74,7 @@ export function MessageDropdownMenu({ msg, retrySendingMessage }: Props) {
 			? await addReactionToMSG({ id: msg.id, roomId, userId: user.id, emoji })
 			: await removeReactionFromMSG({ id: msg.id, roomId, userId: user.id, emoji });
 		if (!result.success) {
-			setMessages(originalMsg);
+			// setMessages(originalMsg);
 			toast({ title: "Error!", mode: "negative", subtitle: result.message });
 		}
 	};

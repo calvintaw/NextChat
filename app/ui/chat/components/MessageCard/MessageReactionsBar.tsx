@@ -58,8 +58,9 @@ export const ReactionsRow = ({ msg, isFirstGroup }: { msg: MessageType; isFirstG
 
 	return (
 		<div
+			key={`${msg.id}-reactions`}
 			className={clsx(
-				"mt-1 h-fit w-fit flex gap-1 flex-wrap max-sm:pl-3 max-sm:mb-0.5",
+				"mt-2 h-fit w-fit flex gap-1 flex-wrap max-sm:pl-3 max-sm:mb-0.5",
 				!isFirstGroup && !msg.replyTo && "sm:ml-15"
 			)}
 		>
