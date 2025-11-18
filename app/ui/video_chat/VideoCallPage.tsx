@@ -225,7 +225,7 @@ export default function VideoCallPage({
 	//                     RENDER (UI NOT CHANGED)
 	// ============================================================
 	return (
-		<div className="relative flex-1 h-[100vh] min-lg:h-[calc(100vh-32px)] flex flex-col bg-background text-text select-none">
+		<div className="relative flex-1 h-[100vh] min-lg:h-[calc(100vh-32px)] pt-2 flex flex-col bg-background text-text select-none">
 			<Tooltip
 				id={`videochat-toolbar-icons-tooltip`}
 				place="top"
@@ -234,8 +234,12 @@ export default function VideoCallPage({
 				offset={5}
 			/>
 
+			<h3 className="ml-4 w-fit text-xs text-red-500">
+				Warning: Video Call feature is still in developement. The UI do not work!
+			</h3>
+
 			{/* Remote Video */}
-			<div className="flex-1 p-4 max-[420px]:p-2">
+			<div className="flex-1 p-4 pt-2 max-[420px]:p-2">
 				<div className="w-full h-full rounded-xl bg-foreground/30 dark:bg-foreground/20 border border-contrast flex items-center justify-center overflow-hidden relative">
 					<div className="text-text opacity-50 text-sm absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
 						Remote Video
