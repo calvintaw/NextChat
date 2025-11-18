@@ -1,17 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { socket } from "@/app/lib/socket";
-import { User } from "@/app/lib/definitions";
-import { HiOutlineMicrophone, HiOutlineX } from "react-icons/hi";
+import { HiOutlineMicrophone } from "react-icons/hi";
 import { MdCallEnd, MdScreenShare } from "react-icons/md";
 import { PiCamera, PiCameraSlash } from "react-icons/pi";
 import { TbMicrophoneOff } from "react-icons/tb";
-import { IconWithSVG } from "../general/Buttons";
 import { FaPhone } from "react-icons/fa6";
 import { Tooltip } from "react-tooltip";
-import { useGeneralProvider } from "@/app/lib/contexts/GeneralContextProvider";
-import clsx from "clsx";
 
 type VideoCallSearchParams = {
 	micOn: boolean;
@@ -20,15 +16,12 @@ type VideoCallSearchParams = {
 
 export default function VideoCallPage({
 	currentUser,
-	searchParams = {
-		micOn: true,
-		camOn: true,
-	},
-	roomId,
+	searchParams,
+	roomId = "",
 }: {
-	roomId: string;
 	currentUser: User;
-	searchParams?: VideoCallSearchParams;
+	roomId?: string;
+	searchParams: VideoCallSearchParams;
 }) {
 	// ============================
 
@@ -49,7 +42,6 @@ export default function VideoCallPage({
 	const [micOn, setMicOn] = useState(searchParams.micOn);
 	const [camOn, setCamOn] = useState(searchParams.camOn);
 	const [inCall, setInCall] = useState(false);
-	const { toggleVideoPage, isVideoPageOpen } = useGeneralProvider();
 
 	useEffect(() => {
 		socket.emit("join-video", roomId);
@@ -229,117 +221,247 @@ export default function VideoCallPage({
 		};
 	};
 
-	if (!isVideoPageOpen) return null;
 	// ============================================================
 	//                     RENDER (UI NOT CHANGED)
 	// ============================================================
 	return (
-		<div
-			className={clsx(
-				"@container relative flex-1 h-[100vh] !min-w-[320px] border-l border-contrast bg-background text-text select-none",
-				!isVideoPageOpen ? "min-lg:h-[calc(100vh-32px)]" : ""
-			)}
-		>
-			<div className="flex flex-col h-full pt-2">
-				<Tooltip
-					id={`videochat-toolbar-icons-tooltip`}
-					place="top"
-					className="small-tooltip"
-					border="var(--tooltip-border)"
-					offset={5}
-				/>
+		<div className="relative flex-1 h-[100vh] min-lg:h-[calc(100vh-32px)] flex flex-col bg-background text-text select-none">
+			<Tooltip
+				id={`videochat-toolbar-icons-tooltip`}
+				place="top"
+				className="small-tooltip"
+				border="var(--tooltip-border)"
+				offset={5}
+			/>
 
-				<h3 className="ml-4 w-fit text-xs text-red-500">
-					Warning: Video Call feature is still in beta. There may be bugs
-				</h3>
-
-				{/* Remote Video */}
-				<div className="flex-1 p-4 pt-2">
-					<div className="w-full h-full rounded-xl bg-foreground/30 dark:bg-foreground/20 border border-contrast overflow-hidden relative group">
-						<IconWithSVG
-							data-tooltip-id="videochat-toolbar-icons-tooltip"
-							data-tooltip-content={"Leave Call"}
-							data-tooltip-place="left-start"
-							onClick={() => toggleVideoPage(false)}
-							className="!absolute !top-2 !right-2 rounded-md !size-8 opacity-0 group-hover:opacity-50 hover:bg-background"
-						>
-							<HiOutlineX className="text-lg"></HiOutlineX>
-						</IconWithSVG>
-
-						<div className="text-text opacity-50 text-sm absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-							Remote Video
-						</div>
-						<video ref={remoteVideoRef} autoPlay playsInline className="w-full h-full object-cover" />
-						<div className="absolute bottom-2 left-2 px-2 py-1 text-xs rounded-md bg-black/40 text-white backdrop-blur-sm">
-							John Doe
-						</div>
+			{/* Remote Video */}
+			<div className="flex-1 p-4 max-[420px]:p-2">
+				<div className="w-full h-full rounded-xl bg-foreground/30 dark:bg-foreground/20 border border-contrast flex items-center justify-center overflow-hidden relative">
+					<div className="text-text opacity-50 text-sm absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+						Remote Video
+					</div>
+					<video ref={remoteVideoRef} autoPlay playsInline className="w-full h-full object-cover" />
+					<div className="absolute bottom-3 left-3 px-2 py-1 text-xs rounded-md bg-black/40 text-white backdrop-blur-sm">
+						John Doe
 					</div>
 				</div>
+			</div>
 
-				{/* Local Mini Preview */}
-				<div className="absolute bottom-24 right-6 w-40 h-28 rounded-lg overflow-hidden shadow-xl border border-border/40 bg-black/40 backdrop-blur">
-					<video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-cover" />{" "}
-					<div
-						className="text-[11px] opacity-50 text-white
+			{/* Local Mini Preview */}
+			<div className="absolute bottom-24 right-6 w-40 h-28 rounded-lg overflow-hidden shadow-xl border border-border/40 bg-black/40 backdrop-blur">
+				<video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-cover" />{" "}
+				<div
+					className="text-[11px] opacity-50 text-white
 					 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
 				"
-					>
-						Your Camera
-					</div>
-					<div className="absolute bottom-1 left-1 text-[10px] px-1 py-[1px] bg-black/60 rounded text-white">You</div>
+				>
+					Your Camera
 				</div>
+				<div className="absolute bottom-1 left-1 text-[10px] px-1 py-[1px] bg-black/60 rounded text-white">You</div>
+			</div>
 
-				{/* Controls */}
-				<div className="w-full py-3 flex items-center justify-center gap-4 border-t border-contrast bg-contrast/75 backdrop-blur-md">
-					{/* START / LEAVE CALL */}
-					{!inCall ? (
-						<button
-							onClick={startCall}
-							className="btn h-12 hover:bg-foreground/25 bg-green-600 text-white flex btn-with-icon gap-2 items-center"
-						>
-							<FaPhone className="text-lg" />
-							Start Call
-						</button>
-					) : (
-						<IconWithSVG onClick={leaveCall} className="icon bg-red-500 hover:bg-red-600 text-white transition">
-							<MdCallEnd className="text-2xl" />
-						</IconWithSVG>
-					)}
-
-					{/* MIC */}
-					<IconWithSVG
-						data-tooltip-id="videochat-toolbar-icons-tooltip"
-						data-tooltip-content={micOn ? "Mute microphone" : "Unmute microphone"}
-						onClick={toggleMic}
-						className="hover:bg-foreground/25 bg-accent dark:bg-surface dark:hover:bg-accent"
-						disabled={!inCall}
-					>
-						{micOn ? <HiOutlineMicrophone className="text-2xl" /> : <TbMicrophoneOff className="text-2xl" />}
+			{/* Controls */}
+			<div className="w-full py-3 flex items-center justify-center gap-4 border-t border-contrast bg-contrast/75 backdrop-blur-md">
+				{/* START / LEAVE CALL */}
+				{!inCall ? (
+					<StartVideoWithFriendDialog user={currentUser} startCall={startCall}></StartVideoWithFriendDialog>
+				) : (
+					<IconWithSVG onClick={leaveCall} className="icon bg-red-500 hover:bg-red-600 text-white transition">
+						<MdCallEnd className="text-2xl" />
 					</IconWithSVG>
+				)}
 
-					{/* CAMERA */}
-					<IconWithSVG
-						data-tooltip-id="videochat-toolbar-icons-tooltip"
-						data-tooltip-content={camOn ? "Turn off camera" : "Turn on camera"}
-						onClick={toggleCam}
-						className="hover:bg-foreground/25 bg-accent dark:bg-surface dark:hover:bg-accent"
-						disabled={!inCall}
-					>
-						{camOn ? <PiCamera className="text-2xl" /> : <PiCameraSlash className="text-2xl" />}
-					</IconWithSVG>
+				{/* MIC */}
+				<IconWithSVG
+					data-tooltip-id="videochat-toolbar-icons-tooltip"
+					data-tooltip-content={micOn ? "Mute microphone" : "Unmute microphone"}
+					onClick={toggleMic}
+					className="hover:bg-foreground/25 bg-accent dark:bg-surface dark:hover:bg-accent"
+					disabled={!inCall}
+				>
+					{micOn ? <HiOutlineMicrophone className="text-2xl" /> : <TbMicrophoneOff className="text-2xl" />}
+				</IconWithSVG>
 
-					{/* SCREEN SHARE */}
-					<IconWithSVG
-						data-tooltip-id="videochat-toolbar-icons-tooltip"
-						data-tooltip-content="Start/stop screen share"
-						onClick={shareScreen}
-						className="hover:bg-foreground/25 bg-accent dark:bg-surface dark:hover:bg-accent"
-						disabled={!inCall}
-					>
-						<MdScreenShare className="text-2xl" />
-					</IconWithSVG>
-				</div>
+				{/* CAMERA */}
+				<IconWithSVG
+					data-tooltip-id="videochat-toolbar-icons-tooltip"
+					data-tooltip-content={camOn ? "Turn off camera" : "Turn on camera"}
+					onClick={toggleCam}
+					className="hover:bg-foreground/25 bg-accent dark:bg-surface dark:hover:bg-accent"
+					disabled={!inCall}
+				>
+					{camOn ? <PiCamera className="text-2xl" /> : <PiCameraSlash className="text-2xl" />}
+				</IconWithSVG>
+
+				{/* SCREEN SHARE */}
+				<IconWithSVG
+					data-tooltip-id="videochat-toolbar-icons-tooltip"
+					data-tooltip-content="Start/stop screen share"
+					onClick={shareScreen}
+					className="hover:bg-foreground/25 bg-accent dark:bg-surface dark:hover:bg-accent"
+					disabled={!inCall}
+				>
+					<MdScreenShare className="text-2xl" />
+				</IconWithSVG>
 			</div>
 		</div>
 	);
 }
+
+// Start CALL Dialog
+
+import { getUserByUsername, createDM, getContacts } from "@/app/lib/actions";
+import InputField from "@/app/ui/form/InputField";
+import { Avatar } from "@/app/ui/general/Avatar";
+import { IconWithSVG } from "@/app/ui/general/Buttons";
+import * as Dialog from "@radix-ui/react-dialog";
+import { ContactType, User } from "@/app/lib/definitions";
+import { useState } from "react";
+import { BiLoaderAlt } from "react-icons/bi";
+import { FaPlus } from "react-icons/fa";
+import { HiOutlineX } from "react-icons/hi";
+import { IoSearch } from "react-icons/io5";
+import { useFriendsProvider } from "@/app/lib/contexts/friendsContext";
+import { UserCardSkeleton } from "../chat/components/ChatHeader/components/CreateDMDialog";
+
+export const StartVideoWithFriendDialog = ({ user, startCall }: { user: User; startCall: () => void }) => {
+	const { contacts } = useFriendsProvider();
+	const [localContacts, setLocalContacts] = useState<ContactType[]>([]);
+	const [loadingFallback, setLoadingFallback] = useState(false);
+	const [username, setUsername] = useState("");
+	const [query, setQuery] = useState("");
+
+	function removeChatBot(contacts: ContactType[]) {
+		return contacts.filter((contact) => contact.username !== "system");
+	}
+
+	useEffect(() => {
+		if (contacts && contacts.length > 0) {
+			setLocalContacts(removeChatBot(contacts));
+		}
+	}, [contacts]);
+
+	useEffect(() => {
+		if (!contacts || contacts.length === 0) {
+			const fetchFallback = async () => {
+				setLoadingFallback(true);
+				const ownContacts = await getContacts(user.id);
+				setLocalContacts(removeChatBot(ownContacts));
+				setLoadingFallback(false);
+			};
+
+			fetchFallback();
+		}
+	}, []);
+
+	const filteredContacts = localContacts.filter(
+		(c) =>
+			c.username.includes(query) ||
+			c.displayName.includes(query) ||
+			c.username.includes(username) ||
+			c.displayName.includes(username)
+	);
+
+	return (
+		<Dialog.Root>
+			<Dialog.Trigger asChild>
+				<button className="btn h-12 hover:bg-foreground/25 bg-green-600 text-white flex btn-with-icon gap-2 items-center">
+					<FaPhone className="text-lg" />
+					Start Call
+				</button>
+			</Dialog.Trigger>
+
+			<Dialog.Portal>
+				<Dialog.Overlay className="fixed inset-0 bg-black/70 z-[11000]" />
+				<Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface rounded-xl p-6 pt-4 w-full max-w-md shadow-lg border border-border z-[12000]">
+					<Dialog.Close asChild className="!absolute !top-2 !right-2">
+						<IconWithSVG className="!rounded-md icon-small bg-accent/40 hover:bg-accent/60">
+							<HiOutlineX />
+						</IconWithSVG>
+					</Dialog.Close>
+					<Dialog.Title className="text-xl font-semibold text-text mb-4">Create a new DM</Dialog.Title>
+
+					<div className="w-full md:ml-auto mb-4">
+						<InputField
+							name="q"
+							type="text"
+							placeholder="Enter username"
+							value={username}
+							onChange={(e) => setUsername(e.target.value)}
+							place="right"
+							className="w-full flex-1"
+							parentClassName="w-full min-h-0 h-10 px-1.5"
+							icon={
+								<IconWithSVG className="icon-small" onClick={() => setQuery(username)}>
+									<IoSearch />
+								</IconWithSVG>
+							}
+						/>
+					</div>
+
+					{loadingFallback && (
+						<div className="max-h-[122px] overflow-y-auto flex flex-col justify-center gap-0.5 mt-2 p-2 pb-1 rounded-md bg-background dark:bg-background/45">
+							<UserCardSkeleton />
+							<UserCardSkeleton />
+						</div>
+					)}
+
+					{!loadingFallback && filteredContacts.length > 0 && (
+						<div className="max-h-[122px] overflow-y-auto flex flex-col justify-center gap-0.5 mt-2 p-2 pb-1 rounded-md bg-background dark:bg-background/45">
+							{filteredContacts.map((user) => (
+								<UserCard startCall={startCall} key={user.id} user={user} />
+							))}
+						</div>
+					)}
+				</Dialog.Content>
+			</Dialog.Portal>
+		</Dialog.Root>
+	);
+};
+
+const UserCard = ({ user, startCall }: { user: User; startCall: () => void }) => {
+	const [isPending, setIsPending] = useState(false);
+	const [result, setResult] = useState<{ success: boolean; message: string }>({ success: false, message: "" });
+
+	async function waitForOtherUserAccept() {
+		setIsPending(true);
+		// const result = await createDM({ id: user.id, username: user.username });
+		// setResult({ success: result.success, message: result.message });
+
+		setIsPending(false);
+		startCall();
+	}
+
+	return (
+		<>
+			<div className="rounded-md h-15 px-2.5  bg-accent/30 flex items-center gap-2.5">
+				<div className="h-full flex items-center flex-row py-2.5">
+					<Avatar
+						disableTooltip={true}
+						id={user.id}
+						src={user.image}
+						size="size-9"
+						displayName={user.displayName}
+						statusIndicator={false}
+					/>
+				</div>
+
+				<div className="text-sm h-full flex flex-col justify-center flex-1 font-medium text-text truncate">
+					<p>{user.displayName}</p>
+					<p>@{user.username}</p>
+				</div>
+
+				<button
+					disabled={isPending}
+					onClick={waitForOtherUserAccept}
+					className="hover:bg-background/75 btn-with-icon justify-center items-center gap-2"
+				>
+					Send Invite
+					{isPending && <BiLoaderAlt className="animate-spin text-lg" />}
+				</button>
+			</div>
+			{result.success && <p className="mt-1 text-sm text-success">{result.message}</p>}
+			{!result.success && <p className="mt-1 text-xs text-red-500">{result.message}</p>}
+		</>
+	);
+};

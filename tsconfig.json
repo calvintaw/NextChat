@@ -35,7 +35,7 @@
 		"app/ui/general/imageForm.jsx",
 		"app/ui/NewsGridWrapper.tsx",
 		"app/api/bot/route.ts",
-		"app/ui/video_chat/VideoCallPage.tsx"
+		"app/ui/video_chat/VideoCallChat.tsx"
 	],
 	"exclude": ["node_modules"]
 }

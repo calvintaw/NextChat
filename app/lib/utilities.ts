@@ -4,6 +4,9 @@ import { socket } from "./socket";
 import { BsChatDotsFill } from "react-icons/bs";
 import { RiCompassDiscoverFill } from "react-icons/ri";
 import CreateServerFormDialog from "../ui/form/CreateServerForm";
+import { CgProfile } from "react-icons/cg";
+import { FaUserFriends } from "react-icons/fa";
+import { MdOutlineFeaturedVideo } from "react-icons/md";
 
 export function getDMRoom(a: string, b?: string) {
 	if (typeof b === "undefined") {
@@ -125,6 +128,15 @@ export const NavigationSections = [
 		icon: RiCompassDiscoverFill,
 		description: "Discover Communities",
 	},
+];
+
+export const ChatPanelHeaderButtons = [
+	{ id: 0, icon: FaUserFriends, label: "Friends", href: "/" },
+	{ id: 1, icon: CgProfile, label: "My Profile", href: "/dashboard" },
+	{ id: 2, icon: MdOutlineFeaturedVideo, label: "Video Chat", href: "/video_chat" },
+
+	// { id: 2, icon: FaPlus, label: "New Chat", href: "/" },
+	// { id: 2, icon: FaRegNewspaper, label: "News Feed", href: "/news?q=home" },
 ];
 
 export const SHORT_URL_REGEX =

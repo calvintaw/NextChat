@@ -17,7 +17,7 @@ import { ServerCardHeader } from "./components/ChatHeader/ChatHeaderForServer";
 import ChatInputBox, { ChatInputBoxRef } from "./components/ChatInputBox";
 import ChatMessages from "./components/ChatMessages";
 import { supabase } from "@/app/lib/supabase";
-import VideoCallPage from "../video_chat/VideoCallPage";
+import VideoCallChat from "../video_chat/VideoCallChat";
 import { useGeneralProvider } from "@/app/lib/contexts/GeneralContextProvider";
 import clsx from "clsx";
 
@@ -404,7 +404,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 					/>
 				</ChatProvider>
 			</div>
-			<VideoCallPage roomId={roomId} currentUser={user}></VideoCallPage>
+			<VideoCallChat roomId={roomId} currentUser={user}></VideoCallChat>
 			<Tooltip
 				className="my-tooltip"
 				id="chatbox-reactions-row-tooltip"
