@@ -505,7 +505,7 @@ const JoinVideoCallCard = ({
 	}, [expired]);
 
 	return (
-		<div className=" border-contrast border px-3 py-2 rounded-lg dark:bg-background/75 bg-primary/10 flex flex-wrap items-center gap-1.5">
+		<div className=" border-contrast border px-3 py-2 rounded-2xl dark:bg-background/75 bg-primary/10 flex flex-wrap items-center gap-1.5">
 			<p>{name} started a video call.</p>
 
 			{expired ? (
@@ -535,10 +535,10 @@ import { MdDone } from "react-icons/md";
 import { editMsg, insertMessageInDB, removeReactionFromMSG, getUsername } from "@/app/lib/actions";
 import { MessageType } from "@/app/lib/definitions";
 import { useToast } from "@/app/lib/hooks/useToast";
-import { includeLinks, isRoom, URL_REGEX_ADVANCED, SHORT_URL_REGEX } from "@/app/lib/utilities";
+import { includeLinks, isRoom, URL_REGEX_ADVANCED, SHORT_URL_REGEX, extractFilePath } from "@/app/lib/utilities";
 import { Avatar } from "@/app/ui/general/Avatar";
 import clsx from "clsx";
-import dayjs, { name } from "dayjs";
+import dayjs from "dayjs";
 import Link from "next/link";
 import React, { useRef, useEffect, useState } from "react";
 import { useChatProvider } from "../../ChatBoxWrapper";
@@ -599,69 +599,294 @@ export function renderLinks(text: string) {
 	return result;
 }
 
-const VoiceMessage = ({ url }: { url: string }) => {
-	return (
-		// <audio controls>
-		// 	<source src={url} type="audio/webm" />
-		// 	Your browser does not support the audio element.
-		// </audio>
-		<div className=" border-contrast border px-2 py-1.5 rounded-full dark:bg-background/75 bg-primary/10 flex flex-wrap items-center gap-2">
-			<IconWithSVG className="icon-small !rounded-full !bg-primary hover:!bg-primary/75">
-				<IoIosPlay className="text-white"></IoIosPlay>
-			</IconWithSVG>
-
-			<LuAudioLines className="text-2xl mr-1"></LuAudioLines>
-
-			<span className="text-sm">0:33</span>
-
-			<IconWithSVG className="icon-small !rounded-full">
-				<HiSpeakerWave className="text-lg"></HiSpeakerWave>
-			</IconWithSVG>
-		</div>
-	);
-};
-
-
-const VoiceVisualizer = ({ roomId, fileName }: { roomId: string; fileName: string }) => {
-	const [blob, setBlob] = useState<Blob | null>(null);
-	const visualizerRef = useRef<HTMLCanvasElement>(null);
-
-	useEffect(() => {
-		const fetchAudio = async () => {
-			const { data, error } = await supabase.storage.from("voice-messages").download(`${roomId}/${fileName}`);
-
-			if (error) {
-				console.error("Error fetching audio:", error);
-				return;
-			}
-
-			setBlob(data);
-		};
-
-		fetchAudio();
-	}, [roomId, fileName]);
-
-	return (
-		<div>
-			{blob ? (
-				<AudioVisualizer
-					ref={visualizerRef}
-					blob={blob}
-					width={500}
-					height={75}
-					barWidth={1}
-					gap={0}
-					barColor="#f76565"
-				/>
-			) : (
-				<p>Loading audio...</p>
-			)}
-		</div>
-	);
-};
-
+// const VoiceMessage = ({ url }: { url: string }) => {
+// 	return (
+// 		// <audio controls>
+// 		// 	<source src={url} type="audio/webm" />
+// 		// 	Your browser does not support the audio element.
+// 		// </audio>
+// 		<div className=" border-contrast border px-2 py-1.5 rounded-full dark:bg-background/75 bg-primary/10 flex flex-wrap items-center gap-2">
+// 			<IconWithSVG className="icon-small !rounded-full !bg-primary hover:!bg-primary/75">
+// 				<IoIosPlay className="text-white"></IoIosPlay>
+// 			</IconWithSVG>
+// 			<LuAudioLines className="text-2xl mr-1"></LuAudioLines>
+// 			<span className="text-sm">0:33</span>
+// 			<IconWithSVG className="icon-small !rounded-full">
+// 				<HiSpeakerWave className="text-lg"></HiSpeakerWave>
+// 			</IconWithSVG>
+// 		</div>
+// 	);
+// };
 
 import { IconWithSVG } from "@/app/ui/general/Buttons";
-import { HiSpeakerWave } from "react-icons/hi2";
-import { IoIosPlay } from "react-icons/io";
+import { HiSpeakerWave, HiSpeakerXMark } from "react-icons/hi2";
+import { IoIosPause, IoIosPlay } from "react-icons/io";
 import { LuAudioLines } from "react-icons/lu";
+
+// const formatTime = (time: number) => {
+// 	const minutes = Math.floor(time / 60);
+// 	const seconds = Math.floor(time % 60);
+// 	return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+// };
+
+// const VoiceMessage = ({ url }: { url: string }) => {
+// 	const audioRef = useRef<HTMLAudioElement>(new Audio(url));
+// 	const [isPlaying, setIsPlaying] = useState(false);
+// 	const [currentTime, setCurrentTime] = useState(0);
+// 	const [duration, setDuration] = useState(0);
+// 	const [volume, setVolume] = useState(1);
+
+// 	// Sync audio element
+// 	useEffect(() => {
+// 		const audio = audioRef.current;
+
+// 		const onLoadedMetadata = () => setDuration(audio.duration);
+// 		const onTimeUpdate = () => setCurrentTime(audio.currentTime);
+// 		audio.addEventListener("loadedmetadata", onLoadedMetadata);
+// 		audio.addEventListener("timeupdate", onTimeUpdate);
+
+// 		return () => {
+// 			audio.removeEventListener("loadedmetadata", onLoadedMetadata);
+// 			audio.removeEventListener("timeupdate", onTimeUpdate);
+// 			audio.pause();
+// 		};
+// 	}, [url]);
+
+// 	const togglePlay = () => {
+// 		const audio = audioRef.current;
+// 		if (isPlaying) {
+// 			audio.pause();
+// 		} else {
+// 			audio.play();
+// 		}
+// 		setIsPlaying(!isPlaying);
+// 	};
+
+// 	const toggleMute = () => {
+// 		const audio = audioRef.current;
+// 		if (volume > 0) {
+// 			setVolume(0);
+// 			audio.volume = 0;
+// 		} else {
+// 			setVolume(1);
+// 			audio.volume = 1;
+// 		}
+// 	};
+
+// 	return (
+// 		<div className="border-contrast border px-2 py-1.5 rounded-full dark:bg-background/75 bg-primary/10 flex flex-wrap items-center gap-2">
+// 			<IconWithSVG className="icon-small !rounded-full !bg-primary hover:!bg-primary/75" onClick={togglePlay}>
+// 				{isPlaying ? <IoIosPause className="text-white" /> : <IoIosPlay className="text-white" />}
+// 			</IconWithSVG>
+
+// 			<LuAudioLines className="text-2xl mr-1" />
+
+// 			<span className="text-sm">
+// 				{formatTime(currentTime)} / {formatTime(duration)}
+// 			</span>
+
+// 			<IconWithSVG className="icon-small !rounded-full" onClick={toggleMute}>
+// 				{volume > 0 ? <HiSpeakerWave className="text-lg" /> : <HiSpeakerXMark className="text-lg" />}
+// 			</IconWithSVG>
+// 		</div>
+// 	);
+// };
+
+// const formatTime = (time: number) => {
+// 	const minutes = Math.floor(time / 60);
+// 	const seconds = Math.floor(time % 60);
+// 	return minutes > 0 ? `${minutes}:${seconds.toString().padStart(2, "0")}` : `${seconds}`;
+// };
+
+// const VoiceMessage = ({ url }: { url: string }) => {
+// 	const audioRef = useRef<HTMLAudioElement>(new Audio(url));
+// 	const [isPlaying, setIsPlaying] = useState(false);
+// 	const [currentTime, setCurrentTime] = useState(0);
+// 	const [duration, setDuration] = useState(0);
+// 	const [volume, setVolume] = useState(1);
+
+// 	useEffect(() => {
+// 		const audio = audioRef.current;
+
+// 		const onLoadedMetadata = () => setDuration(audio.duration);
+// 		const onTimeUpdate = () => setCurrentTime(audio.currentTime);
+
+// 		audio.addEventListener("loadedmetadata", onLoadedMetadata);
+// 		audio.addEventListener("timeupdate", onTimeUpdate);
+
+// 		return () => {
+// 			audio.removeEventListener("loadedmetadata", onLoadedMetadata);
+// 			audio.removeEventListener("timeupdate", onTimeUpdate);
+// 			audio.pause();
+// 		};
+// 	}, [url]);
+
+// 	const togglePlay = () => {
+// 		const audio = audioRef.current;
+// 		if (isPlaying) {
+// 			audio.pause();
+// 		} else {
+// 			audio.play();
+// 		}
+// 		setIsPlaying(!isPlaying);
+// 	};
+
+// 	const toggleMute = () => {
+// 		const audio = audioRef.current;
+// 		if (volume > 0) {
+// 			setVolume(0);
+// 			audio.volume = 0;
+// 		} else {
+// 			setVolume(1);
+// 			audio.volume = 1;
+// 		}
+// 	};
+
+// 	const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+// 		const audio = audioRef.current;
+// 		const newTime = Number(e.target.value);
+// 		audio.currentTime = newTime;
+// 		setCurrentTime(newTime);
+// 	};
+
+// 	return (
+// 		<div className="border-contrast border px-2 py-1.5 rounded-full dark:bg-background/75 bg-primary/10 flex flex-wrap items-center gap-2">
+// 			{/* Play/Pause Button */}
+// 			<IconWithSVG className="icon-small !rounded-full !bg-primary hover:!bg-primary/75" onClick={togglePlay}>
+// 				{isPlaying ? <IoIosPause className="text-white" /> : <IoIosPlay className="text-white" />}
+// 			</IconWithSVG>
+
+// 			{/* Audio Icon */}
+// 			<LuAudioLines className="text-2xl mr-1" />
+
+// 			{/* Time Display */}
+// 			<span className="text-sm">
+// 				{formatTime(currentTime)} / {formatTime(duration)}
+// 			</span>
+
+// 			{/* Slider */}
+// 			<input
+// 				type="range"
+// 				min={0}
+// 				max={duration || 0}
+// 				value={currentTime}
+// 				onChange={handleSliderChange}
+// 				className="flex-1 h-1 rounded-lg accent-primary"
+// 			/>
+
+// 			{/* Volume Control */}
+// 			<IconWithSVG className="icon-small !rounded-full" onClick={toggleMute}>
+// 				{volume > 0 ? <HiSpeakerWave className="text-lg" /> : <HiSpeakerXMark className="text-lg" />}
+// 			</IconWithSVG>
+// 		</div>
+// 	);
+// };
+
+import WaveSurfer from "wavesurfer.js";
+
+// Time formatter: minutes:seconds, only shows minutes if audio > 1 min
+const formatTime = (time: number) => {
+	const minutes = Math.floor(time / 60);
+	const seconds = Math.floor(time % 60);
+	return minutes > 0 ? `${minutes}:${seconds.toString().padStart(2, "0")}` : `${seconds}`;
+};
+
+const VoiceMessage = ({ url }: { url: string }) => {
+	const waveContainerRef = useRef<HTMLDivElement | null>(null);
+	const waveRef = useRef<WaveSurfer | null>(null);
+
+	const [isPlaying, setIsPlaying] = useState(false);
+	const [volume, setVolume] = useState(1);
+	const [currentTime, setCurrentTime] = useState(0);
+	const [duration, setDuration] = useState(0);
+
+	// Initialize WaveSurfer
+	useEffect(() => {
+		if (!waveContainerRef.current) return;
+
+		const wave = WaveSurfer.create({
+			container: waveContainerRef.current,
+			waveColor: "#d1d5db", // same as light gray
+			progressColor: "#3b82f6", // blue progress
+			cursorColor: "#2563eb", // cursor color
+			barWidth: 2,
+			height: 40,
+		});
+
+		wave.load(url);
+		waveRef.current = wave;
+
+		// Update duration when loaded
+		wave.on("ready", () => setDuration(wave.getDuration()));
+
+		// Update current time as audio plays
+		wave.on("audioprocess", () => setCurrentTime(wave.getCurrentTime()));
+
+		// Sync isPlaying when finished
+		wave.on("finish", () => setIsPlaying(false));
+
+		return () => wave.destroy();
+	}, [url]);
+
+	const togglePlay = () => {
+		if (!waveRef.current) return;
+		waveRef.current.playPause();
+		setIsPlaying(!isPlaying);
+	};
+
+	const toggleMute = () => {
+		if (!waveRef.current) return;
+		if (volume > 0) {
+			waveRef.current.setVolume(0);
+			setVolume(0);
+		} else {
+			waveRef.current.setVolume(1);
+			setVolume(1);
+		}
+	};
+
+	// return (
+	// 	<div className="border-contrast border px-2 py-1.5 rounded-full dark:bg-background/75 bg-primary/10 flex flex-col gap-2">
+	// 		<div className="flex items-center gap-2">
+	// 			<IconWithSVG className="icon-small !rounded-full !bg-primary hover:!bg-primary/75" onClick={togglePlay}>
+	// 				{isPlaying ? <IoIosPause className="text-white" /> : <IoIosPlay className="text-white" />}
+	// 			</IconWithSVG>
+
+	// 			<div ref={waveContainerRef} className="w-full h-10 cursor-pointer" />
+
+	// 			<span className="text-sm">
+	// 				{formatTime(currentTime)} / {formatTime(duration)}
+	// 			</span>
+
+	// 			<IconWithSVG className="icon-small !rounded-full" onClick={toggleMute}>
+	// 				{volume > 0 ? <HiSpeakerWave className="text-lg" /> : <HiSpeakerXMark className="text-lg" />}
+	// 			</IconWithSVG>
+	// 		</div>
+
+	// 	</div>
+	// );
+
+
+	return (
+		<div className="border-contrast border px-2 py-1.5 rounded-full dark:bg-background/75 bg-primary/10 flex items-center gap-2">
+			{/* Play button */}
+			<IconWithSVG className="icon-small !rounded-full !bg-primary hover:!bg-primary/75" onClick={togglePlay}>
+				{isPlaying ? <IoIosPause className="text-white" /> : <IoIosPlay className="text-white" />}
+			</IconWithSVG>
+
+			{/* Waveform fills the middle */}
+			<div ref={waveContainerRef} className="flex-1 h-10 cursor-pointer" />
+
+			{/* Time display */}
+			<span className="text-sm">
+				{formatTime(currentTime)} / {formatTime(duration)}
+			</span>
+
+			{/* Volume button */}
+			<IconWithSVG className="icon-small !rounded-full" onClick={toggleMute}>
+				{volume > 0 ? <HiSpeakerWave className="text-lg" /> : <HiSpeakerXMark className="text-lg" />}
+			</IconWithSVG>
+		</div>
+	);
+
+};

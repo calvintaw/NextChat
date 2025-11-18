@@ -245,7 +245,7 @@ export async function getSystemUser() {
 }
 
 export async function getRecentMessages(room_id: string, options: GetMessagesOptions = {}) {
-	return [];
+	// return [];
 	// temporary
 
 	const { cursor = "", limit = 15 } = options;

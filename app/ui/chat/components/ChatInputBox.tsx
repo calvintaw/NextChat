@@ -18,6 +18,7 @@ import { useToast } from "@/app/lib/hooks/useToast";
 import { supabase } from "@/app/lib/supabase";
 import { includeLinks } from "@/app/lib/utilities";
 import { useGeneralProvider } from "@/app/lib/contexts/GeneralContextProvider";
+import { type } from "os";
 
 type ChatInputBoxProps = {
 	activePersons: string[];
@@ -104,8 +105,8 @@ const ChatInputBox = forwardRef<ChatInputBoxRef, ChatInputBoxProps>((props, ref)
 			createdAt: new Date().toISOString(),
 			edited: false,
 			reactions: {},
-			type: "audio" as MessageContentType,
-			// type: hasLinks ? "link" : type,
+			// type: "audio" as MessageContentType,
+			type: hasLinks ? "link" : type,
 		};
 
 		console.log("does my msg has Links: ", hasLinks);
