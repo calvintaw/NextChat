@@ -22,6 +22,7 @@ export default function ErrorPage({
 
 	// Extract text inside square brackets (only present in my custom throw new error statements)
 	// Split error.message into main text and bracketed digest
+	
 	const { mainMessage, digest } = (() => {
 		const match = error.message.match(/^(.*?)\s*\[([^\]]+)\]/);
 		if (match) {

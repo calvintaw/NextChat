@@ -10,7 +10,6 @@ import { TbMicrophoneOff } from "react-icons/tb";
 import { IconWithSVG } from "../general/Buttons";
 import { FaPhone } from "react-icons/fa6";
 import { Tooltip } from "react-tooltip";
-import { useChatProvider } from "../chat/ChatBoxWrapper";
 import { useGeneralProvider } from "@/app/lib/contexts/GeneralContextProvider";
 import clsx from "clsx";
 
@@ -51,8 +50,6 @@ export default function VideoCallPage({
 	const [camOn, setCamOn] = useState(searchParams.camOn);
 	const [inCall, setInCall] = useState(false);
 	const { toggleVideoPage, isVideoPageOpen } = useGeneralProvider();
-	
-	
 
 	useEffect(() => {
 		socket.emit("join-video", roomId);
@@ -243,7 +240,7 @@ export default function VideoCallPage({
 				!isVideoPageOpen ? "min-lg:h-[calc(100vh-32px)]" : ""
 			)}
 		>
-			<div className="flex flex-col h-full">
+			<div className="flex flex-col h-full pt-2">
 				<Tooltip
 					id={`videochat-toolbar-icons-tooltip`}
 					place="top"
@@ -252,8 +249,12 @@ export default function VideoCallPage({
 					offset={5}
 				/>
 
+				<h3 className="ml-4 w-fit text-xs text-red-500">
+					Warning: Video Call feature is still in beta. There may be bugs
+				</h3>
+
 				{/* Remote Video */}
-				<div className="flex-1 p-4">
+				<div className="flex-1 p-4 pt-2">
 					<div className="w-full h-full rounded-xl bg-foreground/30 dark:bg-foreground/20 border border-contrast overflow-hidden relative group">
 						<IconWithSVG
 							data-tooltip-id="videochat-toolbar-icons-tooltip"

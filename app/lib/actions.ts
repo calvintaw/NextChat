@@ -402,7 +402,6 @@ export async function getServer(id: string): Promise<Room[]> {
 export async function getAllServers(userId?: string) {
 	// return [];
 	// // temporary
-
 	// if (userId) {
 	// 	// Only return servers that the user has joined
 	// 	return (await sql<Room[]>`
@@ -827,9 +826,10 @@ export async function registerUser(formData: FormData): Promise<FormState> {
 			  ON CONFLICT (user_id, room_id) DO NOTHING;
 			`;
 
+			// currently inserting false bc I have no use for that table now
 			await sql<LoginFormUser[]>`
 				INSERT INTO user_status (user_id, online)
-				VALUES (${id}, true)
+				VALUES (${id}, false)
 				ON CONFLICT DO NOTHING
 			`;
 		});

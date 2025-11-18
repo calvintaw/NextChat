@@ -43,7 +43,6 @@ const images = [
 
 export default function LoginPage() {
 	return (
-				// max-[998px]:bg-[url('/auth_bg.svg')]
 		<>
 			<section
 				className="h-screen w-screen p-2 md:p-6 flex items-center justify-center gap-6 @container *:
@@ -74,8 +73,8 @@ function LoginForm() {
 	const actionStatus = isPending
 		? "pending"
 		: localError
-		? "idle" // login failed, do NOT signal finished
-		: "finished"; // login succeeded
+		? "idle"
+		: "finished";
 
 	return (
 		<AuthFormWrapper className="bg-background max-w-[440px]">

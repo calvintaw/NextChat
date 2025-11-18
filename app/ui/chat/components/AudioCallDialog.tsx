@@ -1,50 +1,19 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { HiOutlineX } from "react-icons/hi";
-import { PiVideoCameraFill } from "react-icons/pi";
-import { Avatar } from "@/app/ui/general/Avatar";
 import { IconWithSVG } from "@/app/ui/general/Buttons";
-import { useRouter } from "next/navigation";
-import { IoCall, IoPause, IoPlay, IoSend, IoStop } from "react-icons/io5";
+import { IoPause, IoPlay, IoSend, IoStop } from "react-icons/io5";
 import { useChatProvider } from "../ChatBoxWrapper";
 import { FaMicrophone } from "react-icons/fa";
 import { useVoiceVisualizer, VoiceVisualizer } from "react-voice-visualizer";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { LuRotateCcw } from "react-icons/lu";
 import { supabase } from "@/app/lib/supabase";
 import { nanoid } from "nanoid";
-import { insertMessageInDB } from "@/app/lib/actions";
 
 export const SendAudioMsgDialog = () => {
 	const { handleSendMessageFromParent, roomId, user } = useChatProvider();
-	// const recorderControls = useVoiceVisualizer();
-	// const { recordedBlob, error } = recorderControls;
-
-	// useEffect(() => {
-	// 	if (recordedBlob) {
-	// 		console.log("final blob:", recordedBlob);
-	// 	}
-	// }, [recordedBlob]);
-
-	// useEffect(() => {
-	// 	if (error) console.error(error);
-	// }, [error]);
-
-	// function sendVoiceMessage() {}
-	// function cancelVoiceMessage() {}
-
-	// const handleStart = () => {
-	// 	recorderControls.startRecording();
-	// };
-
-	// const handleSend = () => {
-	// 	recorderControls.stopRecording();
-	// 	sendVoiceMessage();
-	// };
-
-	// const handleCancel = () => {
-	// 	recorderControls.stopRecording();
-	// 	cancelVoiceMessage();
-	// };
+	const [dialogOpen, setDialogOpen] = useState(false);
+	const [isPending, setIsPending] = useState(false);
 
 	const controls = useVoiceVisualizer();
 	const {
@@ -63,8 +32,8 @@ export const SendAudioMsgDialog = () => {
 
 	const sendVoiceMsg = async () => {
 		if (!recordedBlob) return;
+		setIsPending(true);
 		stopRecording();
-		controls.clearCanvas();
 
 		// upload + save
 		const fileName = `voice_${nanoid()}.webm`;
@@ -74,15 +43,17 @@ export const SendAudioMsgDialog = () => {
 		if (error) return console.error(error);
 		const publicUrl = supabase.storage.from("voice_msgs").getPublicUrl(data.path).data.publicUrl;
 
-		handleSendMessageFromParent(publicUrl, "audio");
-		console.log("finished !!");
+		await handleSendMessageFromParent(publicUrl, "audio");
+		setDialogOpen(false);
+		setIsPending(false);
+		controls.clearCanvas();
 	};
 
 	useEffect(() => {
 		if (error) console.error(error);
 	}, [error]);
 	return (
-		<Dialog.Root>
+		<Dialog.Root open={dialogOpen} onOpenChange={setDialogOpen}>
 			<Dialog.Trigger asChild>
 				<IconWithSVG className="bg-accent/60 hover:bg-secondary not-dark:bg-surface icon-small">
 					<FaMicrophone className="text-xl"></FaMicrophone>
@@ -113,20 +84,6 @@ export const SendAudioMsgDialog = () => {
 					<Dialog.Title className="text-lg text-text text-left self-start w-full">Send a voice message</Dialog.Title>
 
 					<div className="mt-6 w-full">
-						{/* <Avatar
-							disableTooltip
-							size={"size-30"}
-							fontSize="text-3xl"
-							displayName={"default"}
-							src={""}
-							statusIndicator={false}
-						/> */}
-						{/* <VoiceVisualizer
-							controls={controls}
-							mainContainerClassName="!bg-black"
-							controlButtonsClassName="!bg-background !text-text hover:!bg-accent active:!bg-accent/50"
-						/> */}
-
 						<div>
 							<VoiceVisualizer
 								mainContainerClassName="!bg-black/25 not-dark:!bg-black/75 !rounded-lg"
@@ -225,7 +182,7 @@ export const SendAudioMsgDialog = () => {
 											>
 												<IoSend />
 											</IconWithSVG>
-											<span className="text-base text-text">Send</span>
+											<span className="text-base text-text">{isPending ? "Sending..." : "Send"}</span>
 										</div>
 									</>
 								)}
@@ -237,31 +194,3 @@ export const SendAudioMsgDialog = () => {
 		</Dialog.Root>
 	);
 };
-
-// <p className="text-3xl mt-8">{"default"}</p>
-// <p className="text-base font-normal text-muted mt-1">Send a voice message.</p>
-
-// <div className="flex justify-center gap-2 mt-auto">
-// 	<div className="flex flex-col gap-2 items-center text-center">
-// 		<IconWithSVG className="bg-accent/40 hover:bg-accent/80 not-dark:hover:bg-black/25 not-dark:bg-black/7" onClick={handleStart}>
-// 			<PiVideoCameraFill />
-// 		</IconWithSVG>
-
-// 		<span className="text-base text-text">Start</span>
-// 	</div>
-
-// 	<div className="flex flex-col gap-2 items-center text-center">
-// 		<IconWithSVG className="bg-accent/40 hover:bg-accent/80 not-dark:hover:bg-black/25 not-dark:bg-black/7" onClick={handleSend}>
-// 			<HiOutlineX />
-// 		</IconWithSVG>
-
-// 		<span className="text-base text-text">Send</span>
-// 	</div>
-
-// 	<div className="flex flex-col gap-2 items-center text-center">
-// 		<IconWithSVG className="bg-accent/40 hover:bg-accent/80 not-dark:hover:bg-black/25 not-dark:bg-black/7" onClick={handleCancel}>
-// 			<IoCall />
-// 		</IconWithSVG>
-// 		<span className="text-base text-text">Cancel</span>
-// 	</div>
-// </div>

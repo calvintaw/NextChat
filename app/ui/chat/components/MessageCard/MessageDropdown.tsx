@@ -310,78 +310,7 @@ const EditImageDialog = ({ msg }: { msg: MessageType }) => {
 	}, []);
 
 	const toast = useToast();
-
-	// const handleUpload = async () => {
-	// 	if (isUploading) {
-	// 		alert("Uploading File...");
-	// 		return;
-	// 	}
-
-	// 	setIsUploading(true);
-	// 	try {
-	// 		const options = {
-	// 			maxSizeMB: 0.45,
-	// 			maxWidthOrHeight: 600,
-	// 			useWebWorker: true,
-	// 			fileType: "image/jpg",
-	// 		};
-
-	// 		const originalFiles = JSON.parse(msg.content);
-	// 		const currentfilePaths = extractFilePath(originalFiles);
-
-	// 		const imgArray = [];
-
-	// 		for (let selectedFile of selectedFiles) {
-	// 			const type = selectedFile.type;
-
-	// 			const compressedFile =
-	// 				compress && type.startsWith("image/") ? await imageCompression(selectedFile, options) : selectedFile;
-
-	// 			const filename = `${nanoid()}.${compressedFile.name.split(".").pop()}`;
-	// 			const filePath = `${roomId}/${filename}`;
-
-	// 			if (currentfilePaths.includes(filePath)) {
-	// 				imgArray.push(originalFiles[currentfilePaths.indexOf(filePath)]);
-	// 				continue;
-	// 			}
-
-	// 			const { data, error } = await supabase.storage.from("uploads").upload(filePath, compressedFile);
-
-	// 			if (error) throw error;
-
-	// 			const { data: publicData } = supabase.storage.from("uploads").getPublicUrl(data?.path || "");
-
-	// 			if (publicData?.publicUrl) {
-	// 				if (type.startsWith("image/")) {
-	// 					imgArray.push(publicData.publicUrl);
-	// 				}
-	// 			}
-	// 		}
-
-	// 		if (imgArray.length > 0) {
-	// 			const { error } = await supabase.storage.from("uploads").remove(extractFilePath(removed));
-	// 			if (error) {
-	// 				console.error("Error deleting file:", error.message);
-	// 				toast({
-	// 					title: "Error",
-	// 					subtitle: "Failed to delete the current Image. Please try again later!",
-	// 					mode: "negative",
-	// 				});
-	// 				return;
-	// 			}
-
-	// 			await handleUpdateImageFromParent({ content: JSON.stringify(imgArray), id: msg.id });
-	// 		}
-	// 	} catch (err) {
-	// 		console.error("Upload error:", err);
-	// 	} finally {
-	// 		setUploaded([]);
-	// 		setSelectedFiles([]);
-	// 		setIsUploading(false);
-	// 		setDialogOpen(false);
-	// 	}
-	// };
-
+	
 	const handleUpload = async () => {
 		console.log("EditImageDialog MSG: ", msg);
 
