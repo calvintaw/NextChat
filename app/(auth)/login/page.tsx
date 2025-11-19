@@ -70,11 +70,11 @@ function LoginForm() {
 	const [input, setInput] = useState("");
 	const formRef = useRef<HTMLFormElement | null>(null);
 
-	const actionStatus = isPending
-		? "pending"
-		: localError
-		? "idle"
-		: "finished";
+	// const actionStatus = isPending
+	// 	? "pending"
+	// 	: localError
+	// 	? "idle"
+	// 	: "finished";
 
 	return (
 		<AuthFormWrapper className="bg-background max-w-[440px]">
@@ -103,7 +103,7 @@ function LoginForm() {
 						fnToCallOnChange={() => {
 							setLocalError("");
 						}}
-						actionStatus={actionStatus}
+						// actionStatus={actionStatus}
 						hideRules
 						disabled={isPending}
 						name="password"

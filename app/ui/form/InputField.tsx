@@ -68,7 +68,7 @@ const RULES = [
 type PasswordFieldProps = InputFieldProps & {
 	setIsAllowed?: React.Dispatch<React.SetStateAction<boolean>>;
 	fnToCallOnChange?: () => void;
-	actionStatus?: "idle" | "pending" | "finished";
+	// actionStatus?: "idle" | "pending" | "finished";
 };
 
 export function PasswordField({
@@ -78,7 +78,7 @@ export function PasswordField({
 	errors,
 	className,
 	parentClassName = "",
-	actionStatus,
+	// actionStatus,
 	hideRules = false,
 	setIsAllowed,
 	fnToCallOnChange = () => {},
@@ -89,13 +89,13 @@ export function PasswordField({
 	const [zxcvbnScore, setZxcvbnScore] = useState<number | null>(null);
 	const toast = useToast();
 
-	useEffect(() => {
-		if (!actionStatus) return;
+	// useEffect(() => {
+	// 	if (!actionStatus) return;
 
-		if (actionStatus === "finished") {
-			setValue("");
-		}
-	}, [actionStatus]);
+	// 	if (actionStatus === "finished") {
+	// 		setValue("");
+	// 	}
+	// }, [actionStatus]);
 
 	useEffect(() => {
 		if (hideRules) return;
@@ -141,6 +141,7 @@ export function PasswordField({
 			if (isValid && setIsAllowed && zxcvbnScore && zxcvbnScore >= 3) {
 				console.log("[FORM SUBMIT] Password allowed");
 				setIsAllowed(true);
+				
 			}
 		};
 
