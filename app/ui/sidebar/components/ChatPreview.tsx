@@ -13,12 +13,7 @@ import React, { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa6";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import clsx from "clsx";
-import {
-	blockFriendship,
-	deleteDM,
-	getUser,
-	removeFriendshipRequest,
-} from "@/app/lib/actions";
+import { blockFriendship, deleteDM, getUser, removeFriendshipRequest } from "@/app/lib/actions";
 import { usePathname } from "next/navigation";
 import { Route } from "next";
 import { useFriendsProvider } from "@/app/lib/contexts/friendsContext";
@@ -52,16 +47,22 @@ export const ChatPreviewContainer = ({ user, chats }: { user: User; chats: ChatT
 
 			if (data.status === "accepted") {
 				const { bio, readme, password, createdAt, ...rest } = recipient;
-				setLocalChats((prev) => [
-					...prev,
-					{
-						...rest,
-						room_id: getDMRoom(user.id, recipient.id),
-						room_image: "",
-						room_name: "",
-						room_type: "dm",
-					},
-				]);
+				setLocalChats((prev) => {
+					// avoid adding if chat with same id already exists
+					const exists = prev.some((chat) => chat.id === recipient.id);
+					if (exists) return prev;
+
+					return [
+						...prev,
+						{
+							...rest,
+							room_id: getDMRoom(user.id, recipient.id),
+							room_image: "",
+							room_name: "",
+							room_type: "dm",
+						},
+					];
+				});
 			}
 		};
 

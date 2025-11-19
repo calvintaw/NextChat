@@ -87,7 +87,7 @@ export function PasswordField({
 	const [value, setValue] = useState("");
 	const [score, setScore] = useState(0);
 	const [zxcvbnScore, setZxcvbnScore] = useState<number | null>(null);
-	const toast = useToast()
+	const toast = useToast();
 
 	useEffect(() => {
 		if (!actionStatus) return;

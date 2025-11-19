@@ -134,6 +134,12 @@ const ContactTabs = ({ user, initialFriendRequests }: ContactTabsProps) => {
 
 					// early return bc there's already local UI Update if user accepted an incoming friend request
 					if (data.request_sender_id !== user.id) return;
+
+					setFriendRequests((prev) => ({
+						sent: prev.sent.filter((person) => person.id !== recipient_id),
+						incoming: prev.incoming.filter((person) => person.id !== recipient_id),
+					}));
+
 					const recipient = await getUser(recipient_id);
 					if (!recipient) return;
 					const { createdAt, bio, password, readme, ...rest } = recipient;
