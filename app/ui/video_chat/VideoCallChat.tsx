@@ -12,6 +12,7 @@ import { FaPhone } from "react-icons/fa6";
 import { Tooltip } from "react-tooltip";
 import { useGeneralProvider } from "@/app/lib/contexts/GeneralContextProvider";
 import clsx from "clsx";
+import { supabase } from "@/app/lib/supabase";
 
 type VideoCallSearchParams = {
 	micOn: boolean;
@@ -52,6 +53,9 @@ export default function VideoCallChat({
 	const { toggleVideoPage, isVideoPageOpen } = useGeneralProvider();
 
 	useEffect(() => {
+		
+		const channel = supabase.channel(`video_chat/${roomId}`)
+
 		socket.emit("join-video", roomId);
 		console.log("Joined room:", roomId);
 
