@@ -127,15 +127,18 @@ That just means I didn’t write that part, I had ChatGPT generate it for me eit
 
 ## My thoughts
 
-I worked on this project for about 5-6 months. maybe less or more. I didn't work on it everyday though.
+I worked on this project for about 4-5 months. maybe less or more. I didn't work on it everyday though.
 
-Now that it’s done, I have mixed feelings. It’s not some groundbreaking project; it’s basically another CRUD app with chat features. I don’t think it’s great, but I don’t hate it either, it’s somewhere in between.
+Now that it’s done, I have mixed feelings. It’s not some groundbreaking project; it’s basically another CRUD app with chat features. I don’t think it’s great, but I don’t hate it either, it’s somewhere in between, though, sometimes, I wish I did better.
 
 I used ChatGPT for maybe around 5% of the project, mostly for SQL syntax or creating indexes. Later on, I started using it more when I got stuck, especially with React components and useEffects. At some point, I realized I was relying on it too much, and that’s not where I want to be.
+I feel myself that I am using less and less of my own thinking and it is worrying me a lot. I can probably say like I am a shit coder.
 
-My Next.js skills definitely improved, but my React fundamentals, or rather my logical thinking, still need work. I even failed to build a simple Snake game from scratch, ended up using code from a blog and patched it with ChatGPT’s help to make it work. I’m not exactly proud of that, but it is what it is.
+The good things with this project, though, is my Next.js skills definitely improved, but my React fundamentals, or rather my logical thinking, still need work. I even failed to build a simple Snake game from scratch, ended up using code from a blog and patched it with ChatGPT’s help to make it work. I’m not exactly proud of that, but it is what it is.
 
-This project has turned into a place where I experiment with everything I’ve wanted to try and learn. 
+This project has turned into a place where I experiment with everything I’ve wanted to try and learn such as adding a audio feature or a video chat feature. That is why my commits are so random. BUT now, I am moving on.
+
+I gonna try to learn react native and do some projects because I think it is cool to build mobile apps 
 
 ---
 
