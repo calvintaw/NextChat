@@ -465,7 +465,7 @@ export default function CreateServerFormDialog({ className, user }: { className:
 									></InputField>
 								</div>
 
-								<input disabled={isPendingCreate} type="hidden" name="visibility" value={serverType} readOnly />
+								<input disabled={isPendingCreate} className="!hidden" name="visibility" value={serverType} />
 
 								<span className="my-0.5 text-xs text-muted">
 									By creating a server, you agree to{" "}
