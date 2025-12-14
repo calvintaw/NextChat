@@ -1,6 +1,6 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
-import { MessageContentType, MessageType, Room, sql, User } from "../../lib/definitions";
+import { useEffect, useRef, useState } from "react";
+import { MessageContentType, MessageType, Room, User } from "../../lib/definitions";
 import { checkIfBlocked, deleteMsg, getRecentMessages, getUserProfileForMsg, updateImageMSG } from "../../lib/actions";
 import dayjs from "dayjs";
 import isToday from "dayjs/plugin/isToday";
@@ -121,22 +121,20 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 		// B. Broadcast Events
 		channel
-		// 	.on("broadcast", { event: "msg_inserted" }, ({ payload }) => {
-		// 		const msg = payload.msg;
-		// 		if (!messageIdsRef.current.has(msg.id) && msg.sender_id !== user.id) {
-		// 			messageIdsRef.current.add(msg.id);
-		// 			setMessages((prev) => [...prev, msg]);
-		// 		}
-		// 	})
-		// 	.on("broadcast", { event: "msg_deleted" }, ({ payload }) => {
-		// 		messageIdsRef.current.delete(payload.msg_id);
-		// 		setMessages((prev) => prev.filter((tx) => tx.id !== payload.msg_id));
-		// 	})
-		// 	.on("broadcast", { event: "msg_edited" }, ({ payload }) => {
-		// 		setMessages((prev) =>
-		// 			prev.map((tx) => (tx.id === payload.msg_id ? { ...tx, content: payload.msg_content } : tx))
-		// 		);
-		// 	})
+			.on("broadcast", { event: "msg_inserted" }, ({ payload }) => {
+				const msg = payload.msg;
+				if (msg.sender_id !== user.id) {
+					setMessages((prev) => (prev.some((pm) => pm.id === msg.id) ? prev : [...prev, msg]));
+				}
+			})
+			.on("broadcast", { event: "msg_deleted" }, ({ payload }) => {
+				setMessages((prev) => prev.filter((tx) => tx.id !== payload.msg_id));
+			})
+			.on("broadcast", { event: "msg_edited" }, ({ payload }) => {
+				setMessages((prev) =>
+					prev.map((tx) => (tx.id === payload.msg_id ? { ...tx, content: payload.msg_content } : tx))
+				);
+			})
 			.on("broadcast", { event: "reaction_updated" }, ({ payload }) => {
 				setMessages((prev) =>
 					prev.map((msg) => {

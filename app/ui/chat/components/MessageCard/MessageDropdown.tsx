@@ -70,28 +70,30 @@ export function MessageDropdownMenu({ msg, retrySendingMessage }: Props) {
 			return newMsg;
 		});
 
-		const result = didChange ? await didChangeYes() : await didChangeNo();
+		const result = didChange
+			? await addReactionToMSG({ id: msg.id, roomId, userId: user.id, emoji })
+			: await removeReactionFromMSG({ id: msg.id, roomId, userId: user.id, emoji });
 
-		async function didChangeYes() {
-			const result = await addReactionToMSG({ id: msg.id, roomId, userId: user.id, emoji });
-			await supabase.channel(`room:${roomId}`).send({
-				type: "broadcast",
-				event: "reaction_updated",
-				payload: { messageId: msg.id, emoji, userId: user.id, type: "added" },
-			});
-			return result;
-		}
+		// async function didChangeYes() {
+		// 	const result = await addReactionToMSG({ id: msg.id, roomId, userId: user.id, emoji });
+		// 	await supabase.channel(`room:${roomId}`).send({
+		// 		type: "broadcast",
+		// 		event: "reaction_updated",
+		// 		payload: { messageId: msg.id, emoji, userId: user.id, type: "added" },
+		// 	});
+		// 	return result;
+		// }
 
-		async function didChangeNo() {
-			const result = await removeReactionFromMSG({ id: msg.id, roomId, userId: user.id, emoji });
+		// async function didChangeNo() {
+		// 	const result = await removeReactionFromMSG({ id: msg.id, roomId, userId: user.id, emoji });
 
-			await supabase.channel(`room:${roomId}`).send({
-				type: "broadcast",
-				event: "reaction_updated",
-				payload: { messageId: msg.id, emoji, userId: user.id, type: "removed" },
-			});
-			return result;
-		}
+		// 	await supabase.channel(`room:${roomId}`).send({
+		// 		type: "broadcast",
+		// 		event: "reaction_updated",
+		// 		payload: { messageId: msg.id, emoji, userId: user.id, type: "removed" },
+		// 	});
+		// 	return result;
+		// }
 
 		if (!result.success) {
 			// setMessages(originalMsg);

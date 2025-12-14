@@ -139,11 +139,11 @@ export async function deleteMsg(
 			console.log("Pic DELETE successfully, deleted: ", files);
 		}
 
-		// await supabase.channel(`room:${roomId}`).send({
-		// 	type: "broadcast",
-		// 	event: "msg_deleted",
-		// 	payload: { msg_id: id },
-		// });
+		await supabase.channel(`room:${roomId}`).send({
+			type: "broadcast",
+			event: "msg_deleted",
+			payload: { msg_id: id },
+		});
 
 		return { success: true, message: "Message deleted successfully." };
 	} catch (error) {
@@ -325,11 +325,11 @@ export async function insertMessageInDB(msg: LocalMessageType): Promise<{ succes
 			`;
 		}
 
-		// await supabase.channel(`room:${msg.room_id}`).send({
-		// 	type: "broadcast",
-		// 	event: "msg_inserted",
-		// 	payload: { msg },
-		// });
+		await supabase.channel(`room:${msg.room_id}`).send({
+			type: "broadcast",
+			event: "msg_inserted",
+			payload: { msg },
+		});
 
 		console.log("Sent:", { name: msg.sender_display_name, msg: msg.content });
 		return { success: true };
@@ -1350,11 +1350,11 @@ export async function editMsg({
 			`;
 		});
 
-		// await supabase.channel(`room:${roomId}`).send({
-		// 	type: "broadcast",
-		// 	event: "msg_edited",
-		// 	payload: { msg_id: id, msg_content: content },
-		// });
+		await supabase.channel(`room:${roomId}`).send({
+			type: "broadcast",
+			event: "msg_edited",
+			payload: { msg_id: id, msg_content: content },
+		});
 
 		return { success: true, message: "Message edited successfully." };
 	} catch (error) {
@@ -1397,11 +1397,11 @@ export async function addReactionToMSG({
 		});
 
 		// Broadcast outside the transaction
-		// await supabase.channel(`room:${roomId}`).send({
-		// 	type: "broadcast",
-		// 	event: "reaction_updated",
-		// 	payload: { messageId: id, emoji, userId, type: "added" },
-		// });
+		await supabase.channel(`room:${roomId}`).send({
+			type: "broadcast",
+			event: "reaction_updated",
+			payload: { messageId: id, emoji, userId, type: "added" },
+		});
 
 		return { success: true, message: "Reaction added and broadcasted." };
 	} catch (error) {
@@ -1444,11 +1444,11 @@ export async function removeReactionFromMSG({
 		});
 
 		// Broadcast outside the transaction
-		// await supabase.channel(`room:${roomId}`).send({
-		// 	type: "broadcast",
-		// 	event: "reaction_updated",
-		// 	payload: { messageId: id, emoji, userId, type: "removed" },
-		// });
+		await supabase.channel(`room:${roomId}`).send({
+			type: "broadcast",
+			event: "reaction_updated",
+			payload: { messageId: id, emoji, userId, type: "removed" },
+		});
 
 		return { success: true, message: "Reaction removed and broadcasted." };
 	} catch (error) {
