@@ -121,12 +121,13 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 
 		// B. Broadcast Events
 		channel
-			.on("broadcast", { event: "msg_inserted" }, ({ payload }) => {
-				const msg = payload.msg;
-				if (msg.sender_id !== user.id) {
-					setMessages((prev) => (prev.some((pm) => pm.id === msg.id) ? prev : [...prev, msg]));
-				}
-			})
+			// .on("broadcast", { event: "msg_inserted" }, ({ payload }) => {
+			// 	console.log("Broadcast RECEIVED: msg_inserted");
+			// 	const msg = payload.msg;
+			// 	if (msg.sender_id !== user.id) {
+			// 		setMessages((prev) => (prev.some((pm) => pm.id === msg.id) ? prev : [...prev, msg]));
+			// 	}
+			// })
 			.on("broadcast", { event: "msg_deleted" }, ({ payload }) => {
 				setMessages((prev) => prev.filter((tx) => tx.id !== payload.msg_id));
 			})
@@ -135,15 +136,18 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 					prev.map((tx) => (tx.id === payload.msg_id ? { ...tx, content: payload.msg_content } : tx))
 				);
 			})
+
 			.on("broadcast", { event: "reaction_updated" }, ({ payload }) => {
+				if (payload.userId === user.id) return;
+
 				setMessages((prev) =>
 					prev.map((msg) => {
 						if (msg.id !== payload.messageId) return msg;
+
 						const currentReactions = { ...msg.reactions };
 						const users = new Set(currentReactions[payload.emoji] || []);
 
-						if (payload.type === "added") users.add(payload.userId);
-						else if (payload.type === "removed") users.delete(payload.userId);
+						payload.type === "added" ? users.add(payload.userId) : users.delete(payload.userId);
 
 						currentReactions[payload.emoji] = Array.from(users);
 						return { ...msg, reactions: currentReactions };

@@ -281,10 +281,7 @@ type LocalMessageType = MessageType & {
 };
 
 import { OpenAI } from "openai";
-import { emoji } from "zod/v4";
-import { id } from "zod/v4/locales";
 import { revalidatePath } from "next/cache";
-import path from "path";
 const client = new OpenAI({
 	baseURL: "https://router.huggingface.co/v1",
 	apiKey: process.env.HF_API_KEY,
@@ -325,11 +322,11 @@ export async function insertMessageInDB(msg: LocalMessageType): Promise<{ succes
 			`;
 		}
 
-		await supabase.channel(`room:${msg.room_id}`).send({
-			type: "broadcast",
-			event: "msg_inserted",
-			payload: { msg },
-		});
+		// await supabase.channel(`room:${msg.room_id}`).send({
+		// 	type: "broadcast",
+		// 	event: "msg_inserted",
+		// 	payload: { msg },
+		// });
 
 		console.log("Sent:", { name: msg.sender_display_name, msg: msg.content });
 		return { success: true };
