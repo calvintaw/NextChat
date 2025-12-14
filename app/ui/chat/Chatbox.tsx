@@ -120,7 +120,7 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		});
 
 		// B. Broadcast Events
-		// channel
+		channel
 		// 	.on("broadcast", { event: "msg_inserted" }, ({ payload }) => {
 		// 		const msg = payload.msg;
 		// 		if (!messageIdsRef.current.has(msg.id) && msg.sender_id !== user.id) {
@@ -137,21 +137,21 @@ export function Chatbox({ recipient, user, roomId, type }: ChatboxProps) {
 		// 			prev.map((tx) => (tx.id === payload.msg_id ? { ...tx, content: payload.msg_content } : tx))
 		// 		);
 		// 	})
-		// 	.on("broadcast", { event: "reaction_updated" }, ({ payload }) => {
-		// 		setMessages((prev) =>
-		// 			prev.map((msg) => {
-		// 				if (msg.id !== payload.messageId) return msg;
-		// 				const currentReactions = { ...msg.reactions };
-		// 				const users = new Set(currentReactions[payload.emoji] || []);
+			.on("broadcast", { event: "reaction_updated" }, ({ payload }) => {
+				setMessages((prev) =>
+					prev.map((msg) => {
+						if (msg.id !== payload.messageId) return msg;
+						const currentReactions = { ...msg.reactions };
+						const users = new Set(currentReactions[payload.emoji] || []);
 
-		// 				if (payload.type === "added") users.add(payload.userId);
-		// 				else if (payload.type === "removed") users.delete(payload.userId);
+						if (payload.type === "added") users.add(payload.userId);
+						else if (payload.type === "removed") users.delete(payload.userId);
 
-		// 				currentReactions[payload.emoji] = Array.from(users);
-		// 				return { ...msg, reactions: currentReactions };
-		// 			})
-		// 		);
-		// 	});
+						currentReactions[payload.emoji] = Array.from(users);
+						return { ...msg, reactions: currentReactions };
+					})
+				);
+			});
 
 		// Subscribe to the channel
 		channel.subscribe((status) => {
