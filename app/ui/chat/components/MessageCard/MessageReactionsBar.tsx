@@ -64,15 +64,22 @@ export const ReactionsRow = ({ msg, isFirstGroup }: { msg: MessageType; isFirstG
 				!isFirstGroup && !msg.replyTo && "sm:ml-15"
 			)}
 		>
-			{Object.entries(msg.reactions).map(([emoji, users], idx) => {
-				if (users.length === 0) return null;
-				return (
-					<button
-						data-tooltip-id="chatbox-reactions-row-tooltip"
-						data-tooltip-content={`Reacted by ${users.map((id) => usernamesMap[id] || "loading...").join(", ")}`}
-						key={idx}
-						onClick={() => handleRemoveReaction(msg.id, emoji)}
-						className="
+			{Object.entries(msg.reactions)
+				.filter(([, users]) => users.length > 0)
+				.sort((a, b) => {
+					const countDiff = b[1].length - a[1].length;
+					if (countDiff !== 0) return countDiff;
+					return a[0].localeCompare(b[0]); // stable tie-break
+				})
+				.map(([emoji, users]) => {
+					if (users.length === 0) return null;
+					return (
+						<button
+							data-tooltip-id="chatbox-reactions-row-tooltip"
+							data-tooltip-content={`Reacted by ${users.map((id) => usernamesMap[id] || "loading...").join(", ")}`}
+							key={`${msg.id}-${emoji}`}
+							onClick={() => handleRemoveReaction(msg.id, emoji)}
+							className="
               flex items-center gap-1 px-1.5 py-[1px]
               rounded-md
               border border-primary
@@ -83,12 +90,12 @@ export const ReactionsRow = ({ msg, isFirstGroup }: { msg: MessageType; isFirstG
               select-none
               cursor-pointer
             "
-					>
-						<span className="text-base">{emoji}</span>
-						<span>{users.length}</span>
-					</button>
-				);
-			})}
+						>
+							<span className="text-base">{emoji}</span>
+							<span>{users.length}</span>
+						</button>
+					);
+				})}
 		</div>
 	);
 };

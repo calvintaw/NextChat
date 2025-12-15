@@ -13,64 +13,41 @@ export function MessageDropdownMenu({ msg, retrySendingMessage }: Props) {
 	const toast = useToast();
 
 	const toggleReaction = async (emoji: string) => {
-		// const originalMsg = [...messages];
-		let didChange = false; // track if reaction changed
+		const originalMessages = messages;
 
-		// local update
+		const msgIndex = messages.findIndex((m: MessageType) => m.id === msg.id);
+		if (msgIndex === -1) return;
+
+		const currentReactors = messages[msgIndex].reactions?.[emoji] || [];
+		const hasReacted = currentReactors.includes(user.id);
+		const isAdding = !hasReacted;
+
 		setMessages((prev: MessageType[]) => {
 			const index = prev.findIndex((tx) => tx.id === msg.id);
 			if (index === -1) return prev;
 
 			const newMsg = [...prev];
+			const existing = newMsg[index].reactions?.[emoji] || [];
 
-			// const currentReactors = new Set(newMsg[index].reactions?.[emoji] || []);
-			// const hasReacted = currentReactors.has(user.id);
+			const updated = isAdding ? [...existing, user.id] : existing.filter((id) => id !== user.id);
 
-			// // if user already has the same emoji, then remove it (set didChange to false)
-			// if (hasReacted) {
-			// 	currentReactors.delete(user.id);
-			// 	didChange = false; // user removed reaction
+			const nextReactions = { ...newMsg[index].reactions };
 
-			// 	// else user already has the same emoji, then add it (set didChange to true)
-			// } else {
-			// 	currentReactors.add(user.id);
-			// 	didChange = true; // user added reaction
-			// }
-
-			// newMsg[index] = {
-			// 	...newMsg[index],
-			// 	reactions: {
-			// 		...newMsg[index].reactions,
-			// 		[emoji]: [...currentReactors],
-			// 	},
-			// };
-			const currentReactors = newMsg[index].reactions?.[emoji] || [];
-			const hasReacted = currentReactors.includes(user.id);
-
-			let updatedReactors;
-
-			if (hasReacted) {
-				// Remove user
-				updatedReactors = currentReactors.filter((id) => id !== user.id);
-				didChange = false; // user removed reaction
+			if (updated.length === 0) {
+				delete nextReactions[emoji]; // 🚫 no empty arrays
 			} else {
-				// Add user at the end
-				updatedReactors = [...currentReactors, user.id];
-				didChange = true; // user added reaction
+				nextReactions[emoji] = updated;
 			}
 
 			newMsg[index] = {
 				...newMsg[index],
-				reactions: {
-					...newMsg[index].reactions,
-					[emoji]: updatedReactors,
-				},
+				reactions: nextReactions,
 			};
 
 			return newMsg;
 		});
 
-		const result = didChange
+		const result = isAdding
 			? await addReactionToMSG({ id: msg.id, roomId, userId: user.id, emoji })
 			: await removeReactionFromMSG({ id: msg.id, roomId, userId: user.id, emoji });
 
@@ -96,8 +73,12 @@ export function MessageDropdownMenu({ msg, retrySendingMessage }: Props) {
 		// }
 
 		if (!result.success) {
-			// setMessages(originalMsg);
-			toast({ title: "Error!", mode: "negative", subtitle: result.message });
+			setMessages(originalMessages);
+			toast({
+				title: "Error",
+				mode: "negative",
+				subtitle: result.message,
+			});
 		}
 	};
 
@@ -474,6 +455,7 @@ import { FiEdit, FiCamera } from "react-icons/fi";
 import { ImBin } from "react-icons/im";
 import { IoIosArrowBack } from "react-icons/io";
 import { useChatProvider } from "../../ChatBoxWrapper";
+import { setTimeout } from "timers";
 
 export interface ImageUploadDialogProps {
 	isUploading: boolean;
